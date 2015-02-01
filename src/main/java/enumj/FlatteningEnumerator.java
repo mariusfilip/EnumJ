@@ -7,8 +7,6 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.Optional;
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
 
 /**
  *
@@ -16,9 +14,10 @@ import org.apache.commons.lang3.mutable.MutableObject;
  */
 class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
-    private final Iterator<Iterator<E>> source;
+    private Iterator<Iterator<E>> source;
     private Iterator<E> iterator;
     private Optional<E> value;
+    private boolean done;
 
     public FlatteningEnumerator(Iterator<Iterator<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
@@ -27,11 +26,19 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     public boolean hasNext() {
-        while ((iterator == null || !iterator.hasNext())
-               && source.hasNext()) {
-            iterator = source.next();
+        if (!done) {
+            while ((iterator == null || !iterator.hasNext())
+                   && source.hasNext()) {
+                iterator = source.next();
+            }
+            done = !(iterator != null && iterator.hasNext());
+            if (done) {
+                source = null;
+                iterator = null;
+                value = null;
+            }
         }
-        return iterator != null && iterator.hasNext();
+        return !done;
     }
 
     @Override

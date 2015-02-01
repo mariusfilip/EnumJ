@@ -70,18 +70,6 @@ public interface Enumerator<E> extends Iterator<E> {
         return new SuppliedEnumerator(source);
     }
 
-    public static <E> Enumerator<E> of(IntSupplier indexSupplier,
-                                       Iterator<E> first,
-                                       Iterator<E> second,
-                                       Iterator<E>... rest) {
-        return new ChoiceEnumerator(indexSupplier, first, second, rest);
-    }
-
-    public static <E> Enumerator<E> of(long count, E element) {
-        Utils.ensureNonNegative(count, Messages.NegativeEnumeratorSize);
-        return rangeLong(0, count).map(i -> element);
-    }
-
     // ---------------------------------------------------------------------- //
 
     public default <T> Enumerator<T> as(Class<T> clazz) {
@@ -126,6 +114,13 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public default Enumerator<E> append(E... elements) {
         return concat(on(elements));
+    }
+
+    public static <E> Enumerator<E> choiceOf(IntSupplier indexSupplier,
+                                             Iterator<E> first,
+                                             Iterator<E> second,
+                                             Iterator<E>... rest) {
+        return new ChoiceEnumerator(indexSupplier, first, second, rest);
     }
 
     public default <R, A> R collect(Collector<? super E, A, R> collector) {
@@ -349,6 +344,11 @@ public interface Enumerator<E> extends Iterator<E> {
             result = accumulator.apply(result, next());
         }
         return result;
+    }
+
+    public static <E> Enumerator<E> repeat(E element, long count) {
+        Utils.ensureNonNegative(count, Messages.NegativeEnumeratorSize);
+        return rangeLong(0, count).map(i -> element);
     }
 
     public default Enumerator<E> reverse() {

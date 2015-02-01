@@ -18,20 +18,29 @@ abstract class RetrievingEnumerator<E> extends BasicEnumerator<E> {
 
     private Optional<Mutable<E>> value;
     private ValueRetriever<E> retriever;
+    private boolean done;
 
     public RetrievingEnumerator(Iterator<E> source,
                                 Function<Iterator<E>, ValueRetriever<E>> retriever) {
         super(source);
         this.value = null;
         this.retriever = retriever.apply(source);
+        assert this.retriever != null;
     }
 
     @Override
     public boolean hasNext() {
-        if (value == null) {
-            value = retriever.get();
+        if (!done) {
+            if (value == null) {
+                value = retriever.get();
+            }
+            done = !value.isPresent();
+            if (done) {
+                value = null;
+                this.retriever = null;
+            }
         }
-        return value.isPresent();
+        return !done;
     }
 
     @Override

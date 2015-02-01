@@ -13,7 +13,8 @@ import java.util.Iterator;
  */
 class BasicEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected final Iterator<E> source;
+    protected Iterator<E> source;
+    private boolean done;
 
     public BasicEnumerator(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
@@ -22,7 +23,13 @@ class BasicEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     public boolean hasNext() {
-        return source.hasNext();
+        if (!done) {
+            done = !source.hasNext();
+            if (done) {
+                source = null;
+            }
+        }
+        return !done;
     }
 
     @Override

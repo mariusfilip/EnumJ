@@ -17,8 +17,8 @@ import java.util.function.IntSupplier;
  */
 public class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
-    private final IntSupplier indexSupplier;
-    private final List<Iterator<E>> sources;
+    private IntSupplier indexSupplier;
+    private List<Iterator<E>> sources;
     private boolean hasNoNext;
     private boolean definitelyHasNext;
 
@@ -45,6 +45,8 @@ public class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     public boolean hasNext() {
         if (hasNoNext) {
+            indexSupplier = null;
+            sources = null;
             return !hasNoNext;
         }
         if (definitelyHasNext) {

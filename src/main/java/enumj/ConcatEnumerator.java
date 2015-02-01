@@ -13,8 +13,10 @@ import java.util.Iterator;
  */
 class ConcatEnumerator<E> extends AbstractEnumerator<E> {
 
-    private final Iterator<E> first;
-    private final Iterator<E> second;
+    private Iterator<E> first;
+    private Iterator<E> second;
+    private boolean firstDone;
+    private boolean secondDone;
 
     public ConcatEnumerator(Iterator<E> first, Iterator<E> second) {
         Utils.ensureNotNull(first, Messages.NullEnumeratorSource);
@@ -25,11 +27,23 @@ class ConcatEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     public boolean hasNext() {
-        return first.hasNext() || second.hasNext();
+        if (!firstDone) {
+            firstDone = !first.hasNext();
+            if (firstDone) {
+                first = null;
+            }
+        }
+        if (!secondDone) {
+            secondDone = !second.hasNext();
+            if (secondDone) {
+                second = null;
+            }
+        }
+        return !(firstDone && secondDone);
     }
 
     @Override
     protected E nextValue() {
-        return first.hasNext() ? first.next() : second.next();
+        return firstDone ? second.next() : first.next();
     }
 }

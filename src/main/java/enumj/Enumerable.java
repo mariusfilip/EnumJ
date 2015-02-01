@@ -17,7 +17,6 @@ class Enumerable<E> implements Iterable<E> {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.source = source;
     }
-    
     @Override
     public Iterator<E> iterator() {
         return this.source;

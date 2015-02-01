@@ -14,8 +14,9 @@ import java.util.function.Supplier;
  */
 class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
-    private final Supplier<Optional<E>> source;
+    private Supplier<Optional<E>> source;
     private Optional<E> value;
+    private boolean done;
 
     public SuppliedEnumerator(Supplier<Optional<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
@@ -24,6 +25,17 @@ class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     public boolean hasNext() {
+        if (!done) {
+            done = !rawHasNext();
+            if (done) {
+                source = null;
+                value = null;
+            }
+        }
+        return !done;
+    }
+    
+    private boolean rawHasNext() {
         if (value == null) {
             retrieveValue();
         }

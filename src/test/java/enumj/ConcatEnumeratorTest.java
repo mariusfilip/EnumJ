@@ -69,7 +69,7 @@ public class ConcatEnumeratorTest {
     public void testNextValue() {
         System.out.println("nextValue");
         for(String s : strings) {
-            assertEquals(enumerator.nextValue(), s);
+            assertEquals(enumerator.next(), s);
         }
     }
 }

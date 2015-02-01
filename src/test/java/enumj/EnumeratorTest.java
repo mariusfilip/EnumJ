@@ -101,12 +101,12 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of of method, of class Enumerator.
+     * Test of choiceOf method, of class Enumerator.
      */
     @Test
     public void testOf_choice() {
         System.out.println("of choice");
-        assertTrue(Enumerator.of(() -> 0,
+        assertTrue(Enumerator.choiceOf(() -> 0,
                                    Enumerator.on(1),
                                    Enumerator.on(2, 3),
                                    Enumerator.on(4, 5, 6))
@@ -119,7 +119,7 @@ public class EnumeratorTest {
     @Test
     public void testOf_repeating_elem() {
         System.out.println("of repeating elem");
-        assertEquals(Enumerator.of(3, "a").count(), 3);
+        assertEquals(Enumerator.repeat("a", 3).count(), 3);
     }
 
     /**
@@ -633,7 +633,7 @@ public class EnumeratorTest {
     @Test
     public void testToSet() {
         System.out.println("toSet");
-        assertEquals(Enumerator.of(100, 5).toSet().size(), 1);
+        assertEquals(Enumerator.repeat(100, 5).toSet().size(), 1);
     }
 
     /**

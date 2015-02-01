@@ -14,8 +14,9 @@ import java.util.function.Function;
  */
 public class MapEnumerator<E, R> extends AbstractEnumerator<R> {
 
-    private final Iterator<E> source;
-    private final Function<? super E, ? extends R> mapper;
+    private Iterator<E> source;
+    private Function<? super E, ? extends R> mapper;
+    private boolean done;
 
     public MapEnumerator(Iterator<E> source,
                          Function<? super E, ? extends R> mapper) {
@@ -27,7 +28,14 @@ public class MapEnumerator<E, R> extends AbstractEnumerator<R> {
 
     @Override
     public boolean hasNext() {
-        return source.hasNext();
+        if (!done) {
+            done = !source.hasNext();
+            if (done) {
+                source = null;
+                mapper = null;
+            }
+        }
+        return !done;
     }
 
     @Override

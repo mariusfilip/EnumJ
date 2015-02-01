@@ -16,11 +16,13 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
 
-    private final Iterator<U> left;
-    private final Iterator<V> right;
+    private Iterator<U> left;
+    private Iterator<V> right;
+    private BinaryCombiner<? super Mutable<U>, ? super Mutable<V>, ? extends W> combiner;
+    private boolean done;
+
     private final boolean doesLeft;
     private final boolean doesRight;
-    private final BinaryCombiner<? super Mutable<U>, ? super Mutable<V>, ? extends W> combiner;
 
     public ZipEnumerator(Iterator<U> left,
                          Iterator<V> right,
@@ -41,6 +43,18 @@ public class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
 
     @Override
     public boolean hasNext() {
+        if (!done) {
+            done = !rawHasNext();
+            if (done) {
+                left = null;
+                right = null;
+                combiner = null;
+            }
+        }
+        return !done;
+    }
+    
+    private boolean rawHasNext() {
         if (doesLeft && doesRight) {
             return left.hasNext() && right.hasNext();
         }
