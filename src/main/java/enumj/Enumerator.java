@@ -78,6 +78,7 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public static <E> Enumerator<E> of(long count, E element) {
+        Utils.ensureNonNegative(count, Messages.NegativeEnumeratorSize);
         return rangeLong(0, count).map(i -> element);
     }
 
