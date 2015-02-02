@@ -73,19 +73,23 @@ public interface Enumerator<E> extends Iterator<E> {
     // ---------------------------------------------------------------------- //
 
     public default <T> Enumerator<T> as(Class<T> clazz) {
+        return (Enumerator<T>)this;
+    }
+
+    public default <T> Enumerator<T> asFiltered(Class<T> clazz) {
         return filter(e -> clazz.isInstance(e)).map(e -> (T)e);
     }
-    
+
     public default Iterable<E> asIterable() {
         return new Enumerable<E>(this);
     }
 
-    public default Stream<E> asStream() {
-        return StreamSupport.stream(asSpliterator(), false);
-    }
-
     public default Spliterator<E> asSpliterator() {
         return Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED);
+    }
+
+    public default Stream<E> asStream() {
+        return StreamSupport.stream(asSpliterator(), false);
     }
 
     public default Supplier<Optional<E>> asSupplier() {

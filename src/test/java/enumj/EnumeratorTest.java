@@ -129,7 +129,18 @@ public class EnumeratorTest {
     public void testAs() {
         System.out.println("as");
         Enumerator.on(1, 2, 3)
-                  .as(Long.class)
+                  .as(Integer.class)
+                  .forEach(i -> assertTrue(i >= 1));
+    }
+
+    /**
+     * Test of as method, of class Enumerator.
+     */
+    @Test
+    public void testAsFiltered() {
+        System.out.println("as filtered");
+        Enumerator.on(1, 2, 3)
+                  .asFiltered(Long.class)
                   .forEach(i -> assertTrue(i >= 1));
     }
 
