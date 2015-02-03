@@ -70,6 +70,29 @@ public interface Enumerator<E> extends Iterator<E> {
         return new SuppliedEnumerator(source);
     }
 
+    public static <E> Enumerator<E> ofLazyIterator(
+            Supplier<? extends Iterator<E>> source) {
+        return new LazyEnumerator(source);
+    }
+
+    public static <E> Enumerator<E> ofLazyIterable(
+            Supplier<? extends Iterable<E>> source) {
+        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        return new LazyEnumerator(() -> of(source.get()));
+    }
+
+    public static <E> Enumerator<E> ofLazyStream(
+            Supplier<? extends Stream<E>> source) {
+        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        return new LazyEnumerator(() -> of(source.get()));
+    }
+
+    public static <E> Enumerator<E> ofLazySpliterator(
+            Supplier<? extends Spliterator<E>> source) {
+        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        return new LazyEnumerator(() -> of(source.get()));
+    }
+
     // ---------------------------------------------------------------------- //
 
     public default <T> Enumerator<T> as(Class<T> clazz) {
