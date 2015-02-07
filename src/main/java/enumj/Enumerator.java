@@ -227,6 +227,12 @@ public interface Enumerator<E> extends Iterator<E> {
         return new FilterEnumerator(this, predicate);
     }
 
+    public default Optional<Mutable<E>> first() {
+        return hasNext()
+               ? Optional.of(new MutableObject(next()))
+               : Optional.empty();
+    }
+
     public default <R> Enumerator<R> flatMap(Function<? super E,
                                                       ? extends Iterator<? extends R>> mapper) {
         return new FlatteningEnumerator(map(mapper));
