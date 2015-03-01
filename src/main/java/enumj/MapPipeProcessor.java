@@ -33,7 +33,7 @@ class MapPipeProcessor<In,Out> extends PipeProcessor<In,Out> {
         return value;
     }
     @Override
-    protected boolean mayContinue() {
+    protected boolean continueOnNoValue() {
         return false;
     }
 }

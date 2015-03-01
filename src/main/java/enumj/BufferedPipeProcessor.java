@@ -42,7 +42,7 @@ class BufferedPipeProcessor<E> extends PipeProcessor<E,List<E>> {
         return Collections.unmodifiableList(buffer);
     }
     @Override
-    public boolean mayContinue() {
+    public boolean continueOnNoValue() {
         return true;
     }
 }

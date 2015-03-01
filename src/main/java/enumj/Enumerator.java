@@ -242,6 +242,11 @@ public interface Enumerator<E> extends Iterator<E> {
         return of(asStream().distinct());
     }
 
+    public static <E> Pair<Enumerator<E>,
+                           Enumerator<E>> dup(Iterator<E> source) {
+        return new ForkingPseudoEnumerator(source).dup();
+    }
+
     public default Optional<E> elementAt(long index) {
         Utils.ensureNonNegative(index, Messages.NegativeEnumeratorIndex);
         Enumerator<E> skipped = skip(index);

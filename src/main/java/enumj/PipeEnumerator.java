@@ -53,7 +53,7 @@ public class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
                     elem = processor.getValue();
                     continue;
                 }
-                if (processor.mayContinue()) {
+                if (processor.continueOnNoValue()) {
                     completed = false;
                     break;
                 }

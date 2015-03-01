@@ -13,5 +13,5 @@ public abstract class PipeProcessor<T,R> {
     abstract void process(T value);
     abstract boolean hasValue();
     abstract R getValue();
-    abstract boolean mayContinue();
+    abstract boolean continueOnNoValue();
 }
