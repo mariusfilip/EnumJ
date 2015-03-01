@@ -9,15 +9,9 @@ package enumj;
  *
  * @author Marius Filip
  */
-class EmptyEnumerator<E> extends AbstractEnumerator<E> {
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    protected E nextValue() {
-        return null;
-    }
+public abstract class PipeProcessor<T,R> {
+    abstract void process(T value);
+    abstract boolean hasValue();
+    abstract R getValue();
+    abstract boolean mayContinue();
 }

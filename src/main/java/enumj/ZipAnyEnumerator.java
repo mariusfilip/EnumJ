@@ -15,13 +15,13 @@ import org.apache.commons.lang3.tuple.Pair;
  * @author Marius Filip
  */
 class ZipAnyEnumerator<U, V>
-      extends ZipEnumerator<U, V, Pair<Optional<Mutable<U>>, Optional<Mutable<V>>>> {
+      extends ZipEnumerator<U, V, Pair<Optional<U>, Optional<V>>> {
     public ZipAnyEnumerator(Iterator<U> left, Iterator<V> right) {
         super(left, right, false, false, ZipAnyEnumerator::combine);
     }
 
-    private static <U,V> Pair<Optional<Mutable<U>>, Optional<Mutable<V>>>
-                         combine(Mutable<U> left, Mutable<V> right) {
+    private static <U,V> Pair<Optional<U>, Optional<V>>
+                         combine(U left, V right) {
         return Pair.of(Optional.ofNullable(left), Optional.ofNullable(right));
     }
 }

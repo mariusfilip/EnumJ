@@ -37,6 +37,7 @@ public class ChoiceEnumeratorTest {
         longIterator = IntStream.range(0, longLen).iterator();
         veryLongIterator = IntStream.range(0, veryLongLen).iterator();
         zipped = new ChoiceEnumerator(this::indexSupply,
+                                      this::nextIndex,
                                       shortIterator,
                                       longIterator,
                                       veryLongIterator);
@@ -54,6 +55,10 @@ public class ChoiceEnumeratorTest {
         int crt = index;
         index = (index+1)%3;
         return crt;
+    }
+    
+    int nextIndex(int index) {
+        return (index+1)%3;
     }
 
     @After

@@ -6,7 +6,7 @@
 package enumj;
 
 import java.util.Iterator;
-import java.util.Optional;
+import java.util.LinkedList;
 
 /**
  *
@@ -14,35 +14,39 @@ import java.util.Optional;
  */
 class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
-    private Iterator<Iterator<E>> source;
-    private Iterator<E> iterator;
-    private Optional<E> value;
-    private boolean done;
+    protected LinkedList<Iterator<E>> sources;
 
     public FlatteningEnumerator(Iterator<Iterator<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
-        this.source = source;
+        this.sources = new LinkedList<>();
+        while(source.hasNext()) {
+            this.sources.add(source.next());
+        }
     }
 
     @Override
-    public boolean hasNext() {
-        if (!done) {
-            while ((iterator == null || !iterator.hasNext())
-                   && source.hasNext()) {
-                iterator = source.next();
+    protected boolean mayContinue() {
+        while (sources.size() > 0) {
+            if (sources.element().hasNext()) {
+                return true;
             }
-            done = !(iterator != null && iterator.hasNext());
-            if (done) {
-                source = null;
-                iterator = null;
-                value = null;
-            }
+            sources.remove();
         }
-        return !done;
+        return false;
     }
-
     @Override
     protected E nextValue() {
-        return iterator.next();
+        return sources.element().next();
+    }
+    @Override
+    protected void cleanup() {
+        sources = null;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Enumerator<E> concat(Iterator<? extends E> elements) {
+        sources.add((Iterator<E>)elements);
+        return this;
     }
 }

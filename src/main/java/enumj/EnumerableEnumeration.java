@@ -5,35 +5,29 @@
  */
 package enumj;
 
+import java.util.Enumeration;
 import java.util.Iterator;
 
 /**
  *
  * @author Marius Filip
  */
-class BasicEnumerator<E> extends AbstractEnumerator<E> {
-
-    protected Iterator<E> source;
-    private boolean done;
-
-    public BasicEnumerator(Iterator<E> source) {
+final class EnumerableEnumeration<E> implements Enumeration<E> {
+    
+    private Iterator<E> source;
+    
+    public EnumerableEnumeration(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.source = source;
     }
-
+    
     @Override
-    public boolean hasNext() {
-        if (!done) {
-            done = !source.hasNext();
-            if (done) {
-                source = null;
-            }
-        }
-        return !done;
+    public boolean hasMoreElements() {
+        return source.hasNext();
     }
-
+    
     @Override
-    protected E nextValue() {
+    public E nextElement() {
         return source.next();
     }
 }

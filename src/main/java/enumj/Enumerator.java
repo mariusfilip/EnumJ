@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -48,12 +50,16 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> of(Iterator<E> source) {
         return (source != null && source instanceof Enumerator)
                ? (Enumerator<E>)source
-               : new BasicEnumerator<>(source);
+               : new PipeEnumerator<>(source);
     }
 
     public static <E> Enumerator<E> of(Iterable<E> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         return of(source.iterator());
+    }
+    
+    public static <E> Enumerator<E> of(Enumeration<E> source) {
+        return new PipeEnumerator(new EnumerationEnumerator(source));
     }
 
     public static <E> Enumerator<E> of(Stream<E> source) {
@@ -67,7 +73,7 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public static <E> Enumerator<E> of(Supplier<Optional<E>> source) {
-        return new SuppliedEnumerator(source);
+        return new PipeEnumerator(new SuppliedEnumerator(source));
     }
 
     public static <E> Enumerator<E> ofLazyIterator(
@@ -77,6 +83,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public static <E> Enumerator<E> ofLazyIterable(
             Supplier<? extends Iterable<E>> source) {
+        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        return new LazyEnumerator(() -> of(source.get()));
+    }
+    
+    public static <E> Enumerator<E> ofLazyEnumeration(
+            Supplier<? extends Enumeration<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         return new LazyEnumerator(() -> of(source.get()));
     }
@@ -100,11 +112,15 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public default <T> Enumerator<T> asFiltered(Class<T> clazz) {
-        return filter(e -> clazz.isInstance(e)).map(e -> (T)e);
+        return filter(e -> clazz.isInstance(e)).as(clazz);
     }
 
     public default Iterable<E> asIterable() {
         return new Enumerable<E>(this);
+    }
+    
+    public default Enumeration<E> asEnumeration() {
+        return new EnumerableEnumeration(this);
     }
 
     public default Spliterator<E> asSpliterator() {
@@ -143,30 +159,60 @@ public interface Enumerator<E> extends Iterator<E> {
         return concat(on(elements));
     }
 
-    public static <E> Enumerator<E> choiceOf(IntSupplier indexSupplier,
-                                             Iterator<E> first,
-                                             Iterator<E> second,
-                                             Iterator<E>... rest) {
-        return new ChoiceEnumerator(indexSupplier, first, second, rest);
+    public default Enumerator<List<E>> buffered(int size) {
+        return buffered(size, size);
+    }
+
+    public default Enumerator<List<E>> buffered(int minSize, int maxSize) {
+        return new PipeEnumerator(this).buffered(minSize, maxSize);
+    }
+
+    public static <E> Enumerator<E> choiceOf(
+            IntSupplier indexSupplier,
+            Iterator<E> first,
+            Iterator<? extends E> second,
+            Iterator<? extends E>... rest) {
+        final int size = 1 + 1 + rest.length;
+        final IntUnaryOperator nextIndexSupplier = i -> (i+1)%size;
+        return choiceOf(indexSupplier,
+                        nextIndexSupplier,
+                        first,
+                        second,
+                        rest);
+    }
+
+    public static <E> Enumerator<E> choiceOf(
+            IntSupplier indexSupplier,
+            IntUnaryOperator nextIndexSupplier,
+            Iterator<E> first,
+            Iterator<? extends E> second,
+            Iterator<? extends E>... rest) {
+        return new ChoiceEnumerator(indexSupplier,
+                                    nextIndexSupplier,
+                                    first,
+                                    second,
+                                    rest);
     }
 
     public default <R, A> R collect(Collector<? super E, A, R> collector) {
         return asStream().collect(collector);
     }
 
-    public default Enumerator<E> concat(Iterator<E> elements) {
-        return new ConcatEnumerator(this, elements);
+    public default Enumerator<E> concat(Iterator<? extends E> elements) {
+        return new FlatteningEnumerator(Collections.emptyIterator())
+                   .concat(this)
+                   .concat(elements);
     }
 
-    public default Enumerator<E> concat(Iterable<E> elements) {
+    public default Enumerator<E> concat(Iterable<? extends E> elements) {
         return concat(of(elements));
     }
 
-    public default Enumerator<E> concat(Stream<E> elements) {
+    public default Enumerator<E> concat(Stream<? extends E> elements) {
         return concat(of(elements));
     }
 
-    public default Enumerator<E> concat(Spliterator<E> elements) {
+    public default Enumerator<E> concat(Spliterator<? extends E> elements) {
         return concat(of(elements));
     }
 
@@ -220,21 +266,20 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public static <E> Enumerator<E> empty() {
-        return new EmptyEnumerator<E>();
+        return of(Collections.emptyIterator());
     }
 
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
-        return new FilterEnumerator(this, predicate);
+        return new PipeEnumerator(this).filter(predicate);
+        // return new FilterEnumerator(this, predicate);
     }
 
-    public default Optional<Mutable<E>> first() {
-        return hasNext()
-               ? Optional.of(new MutableObject(next()))
-               : Optional.empty();
+    public default Optional<E> first() {
+        return hasNext() ? Optional.of(next()) : Optional.empty();
     }
 
-    public default <R> Enumerator<R> flatMap(Function<? super E,
-                                                      ? extends Iterator<? extends R>> mapper) {
+    public default <R> Enumerator<R> flatMap(
+            Function<? super E, ? extends Iterator<? extends R>> mapper) {
         return new FlatteningEnumerator(map(mapper));
     }
 
@@ -242,6 +287,17 @@ public interface Enumerator<E> extends Iterator<E> {
         while (hasNext()) {
             consumer.accept(next());
         }
+    }
+
+    public default <R> Enumerator<R> indexedMap(
+            Function<? super Pair<? super Long, ? super E>,
+                     ? extends R> mapper) {
+        final MutableLong index = new MutableLong(0);
+        return map(e -> {
+            final R result = mapper.apply(Pair.of(index.toLong(), e));
+            index.add(1);
+            return result;
+        });
     }
 
     public static <E> Enumerator<E> iterate(E seed, UnaryOperator<E> f) {
@@ -269,7 +325,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<E> limit(long maxSize) {
         Utils.ensureNonNegative(maxSize, Messages.NegativeEnumeratorSize);
         final MutableLong size = new MutableLong(0);
-        return limitWhile(e -> {
+        return takeWhile(e -> {
             if (size.longValue() >= maxSize) {
                 return false;
             }
@@ -279,11 +335,12 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public default Enumerator<E> limitWhile(Predicate<? super E> predicate) {
-        return new WhileEnumerator<>(this, predicate);
+        return takeWhile(predicate);
     }
 
-    public default <R> Enumerator<R> map(Function<? super E, ? extends R> mapper) {
-        return new MapEnumerator(this, mapper);
+    public default <R> Enumerator<R> map(
+            Function<? super E, ? extends R> mapper) {
+        return new PipeEnumerator(this).map(mapper);
     }
 
     public default Optional<E> max(Comparator<? super E> comparator) {
@@ -318,31 +375,33 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public default Enumerator<E> prepend(E... elements) {
-        return on(elements).concat(this);
+        return Enumerator.on(elements).concat(this);
     }
 
     public static <E> Enumerator<E> range(E startInclusive,
                                           E endExclusive,
                                           UnaryOperator<E> succ,
-                                          Comparator<E> cmp) {
-        return cmp.compare(startInclusive, endExclusive) == 0
+                                          Comparator<? super E> cmp) {
+        return cmp.compare(startInclusive, endExclusive) >= 0
                ? Enumerator.empty()
                : iterate(startInclusive, succ)
-                        .limitWhile(e -> cmp.compare(e, endExclusive) < 0);
+                        .takeWhile(e -> cmp.compare(e, endExclusive) < 0);
     }
 
     public static <E> Enumerator<E> rangeClosed(E startInclusive,
                                                 E endInclusive,
                                                 UnaryOperator<E> succ,
-                                                Comparator<E> cmp) {
-        return range(startInclusive, endInclusive, succ, cmp)
-                    .append(endInclusive);
+                                                Comparator<? super E> cmp) {
+        return cmp.compare(startInclusive, endInclusive) > 0
+               ? Enumerator.empty()
+               : iterate(startInclusive, succ)
+                        .takeWhile(e -> cmp.compare(e, endInclusive) <= 0);
     }
 
     public static Enumerator<Integer> rangeInt(int startInclusive,
                                                int endExclusive) {
         return range(startInclusive, endExclusive,
-                     i -> i+1, Comparator.comparingInt(i -> i));
+                     i -> i+1, Comparator.comparingInt(n -> n));
     }
 
     public static Enumerator<Integer> rangeIntClosed(int startInclusive,
@@ -379,9 +438,9 @@ public interface Enumerator<E> extends Iterator<E> {
         return result;
     }
 
-    public static <E> Enumerator<E> repeat(E element, long count) {
+    public static <E> Enumerator<E> repeat(E element, int count) {
         Utils.ensureNonNegative(count, Messages.NegativeEnumeratorSize);
-        return rangeLong(0, count).map(i -> element);
+        return of(Collections.nCopies(count, element));
     }
 
     public default Enumerator<E> reverse() {
@@ -392,11 +451,13 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public default E single() {
         if (!hasNext()) {
-            throw new InputMismatchException(Messages.NoSingleEnumeratorElement);
+            throw new InputMismatchException(
+                    Messages.NoSingleEnumeratorElement);
         }
         E result = next();
         if (hasNext()) {
-            throw new InputMismatchException(Messages.NoSingleEnumeratorElement);
+            throw new InputMismatchException(
+                    Messages.NoSingleEnumeratorElement);
         }
         return result;
     }
@@ -408,13 +469,13 @@ public interface Enumerator<E> extends Iterator<E> {
             if (size.longValue() >= n) {
                 return false;
             }
-            size.setValue(1+size.longValue());
+            size.add(1);
             return true;
         });
     }
 
     public default Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        return new SkipWhileEnumerator(this, predicate);
+        return new PipeEnumerator(this).skipWhile(predicate);
     }
 
     public default Enumerator<E> sorted() {
@@ -423,6 +484,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public default Enumerator<E> sorted(Comparator<? super E> comparator) {
         return of(asStream().sorted(comparator));
+    }
+    
+    public default Enumerator<E> take(long n) {
+        return limit(n);
+    }
+
+    public default Enumerator<E> takeWhile(Predicate<? super E> predicate) {
+        return new PipeEnumerator(this).takeWhile(predicate);
     }
 
     public default E[] toArray(Class<E> clazz) {
@@ -433,8 +502,8 @@ public interface Enumerator<E> extends Iterator<E> {
         return collect(Collectors.toList());
     }
 
-    public default <K, V> Map<K, V> toMap(Function<? super E, ? extends K> keyMapper,
-                                          Function<? super E, ? extends V> valueMapper) {
+    public default <K, V> Map<K, V> toMap(Function<? super E, K> keyMapper,
+                                          Function<? super E, V> valueMapper) {
         return collect(Collectors.toMap(keyMapper, valueMapper));
     }
 
@@ -442,8 +511,14 @@ public interface Enumerator<E> extends Iterator<E> {
         return collect(Collectors.toSet());
     }
 
-    public default Enumerator<E> union(Iterator<E> others) {
+    public default Enumerator<E> union(Iterator<? extends E> others) {
         return concat(others).distinct();
+    }
+
+    public default <V>
+                   Enumerator<Pair<Optional<E>, Optional<V>>>
+                   zipAny(Iterator<V> elements) {
+        return new ZipAnyEnumerator(this, elements);
     }
 
     public default <V> Enumerator<Pair<E, V>> zipBoth(Iterator<V> others) {
@@ -451,20 +526,14 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public default <V>
-                   Enumerator<Pair<E, Optional<Mutable<V>>>>
+                   Enumerator<Pair<E, Optional<V>>>
                    zipLeft(Iterator<V> elements) {
         return new ZipLeftEnumerator(this, elements);
     }
 
     public default <V>
-                   Enumerator<Pair<Optional<Mutable<E>>, V>>
+                   Enumerator<Pair<Optional<E>, V>>
                    zipRight(Iterator<V> elements) {
         return new ZipRightEnumerator(this, elements);
-    }
-
-    public default <V>
-                   Enumerator<Pair<Optional<Mutable<E>>, Optional<Mutable<E>>>>
-                   zipAny(Iterator<V> elements) {
-        return new ZipAnyEnumerator(this, elements);
     }
 }

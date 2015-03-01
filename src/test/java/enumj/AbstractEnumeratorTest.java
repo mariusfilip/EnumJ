@@ -78,12 +78,12 @@ public class AbstractEnumeratorTest {
         public E value;
 
         @Override
-        public boolean hasNext() {
+        protected boolean mayContinue() {
             return hasNext;
         }
         
         @Override
-        public E nextValue() {
+        protected E nextValue() {
             return value;
         }
     }

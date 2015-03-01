@@ -107,9 +107,9 @@ public class EnumeratorTest {
     public void testOf_choice() {
         System.out.println("of choice");
         assertTrue(Enumerator.choiceOf(() -> 0,
-                                   Enumerator.on(1),
-                                   Enumerator.on(2, 3),
-                                   Enumerator.on(4, 5, 6))
+                                       Enumerator.on(1),
+                                       Enumerator.on(2, 3),
+                                       Enumerator.on(4, 5, 6))
                              .elementsEqual(Enumerator.rangeIntClosed(1, 6)));
     }
 
@@ -352,7 +352,7 @@ public class EnumeratorTest {
         assertTrue(Enumerator.rangeInt(0, 10)
                              .filter(i -> 0 != i%2)
                              .elementsEqual(Enumerator.iterate(1, i -> i+2)
-                                                      .limitWhile(i -> i < 10)));
+                                                      .takeWhile(i -> i < 10)));
     }
 
     /**
@@ -385,7 +385,7 @@ public class EnumeratorTest {
     public void testIterate() {
         System.out.println("iterate");
         assertTrue(Enumerator.iterate(0, i -> i+2)
-                             .limitWhile(i -> i<100)
+                             .takeWhile(i -> i<100)
                              .elementsEqual(Enumerator.rangeInt(0, 100)
                                                       .filter(i -> 0 == i%2)));
     }
@@ -414,13 +414,13 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of limitWhile method, of class Enumerator.
+     * Test of takeWhile method, of class Enumerator.
      */
     @Test
     public void testLimitWhile() {
         System.out.println("limitWhile");
         assertTrue(Enumerator.rangeInt(0, 100)
-                             .limitWhile(i -> i < 10)
+                             .takeWhile(i -> i < 10)
                              .elementsEqual(Enumerator.rangeInt(0, 10)));
     }
 
@@ -433,7 +433,7 @@ public class EnumeratorTest {
         assertTrue(Enumerator.rangeInt(0, 100)
                              .map(i -> 2*i)
                              .elementsEqual(Enumerator.iterate(0, i -> i+2)
-                                                      .limitWhile(i -> i<200)));
+                                                      .takeWhile(i -> i<200)));
     }
 
     /**

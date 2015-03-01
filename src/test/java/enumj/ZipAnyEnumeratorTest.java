@@ -56,18 +56,18 @@ public class ZipAnyEnumeratorTest {
     public void testLeft() {
         for(int i=0; i<shortLen; ++i) {
             assertTrue(leftZipped.hasNext());
-            Pair<Optional<Mutable<Integer>>, Optional<Mutable<Integer>>> val = leftZipped.next();
+            Pair<Optional<Integer>, Optional<Integer>> val = leftZipped.next();
             assertTrue(val.getLeft().isPresent());
             assertTrue(val.getRight().isPresent());
-            assertEquals(val.getLeft().get().getValue(), Integer.valueOf(i));
-            assertEquals(val.getRight().get().getValue(), Integer.valueOf(i));
+            assertEquals(val.getLeft().get(), Integer.valueOf(i));
+            assertEquals(val.getRight().get(), Integer.valueOf(i));
         }
         for(int i=shortLen; i<longLen; ++i) {
             assertTrue(leftZipped.hasNext());
-            Pair<Optional<Mutable<Integer>>, Optional<Mutable<Integer>>> val = leftZipped.next();
+            Pair<Optional<Integer>, Optional<Integer>> val = leftZipped.next();
             assertTrue(!val.getLeft().isPresent());
             assertTrue(val.getRight().isPresent());
-            assertEquals(val.getRight().get().getValue(), Integer.valueOf(i));
+            assertEquals(val.getRight().get(), Integer.valueOf(i));
         }
         assertTrue(!leftZipped.hasNext());
     }    
@@ -76,18 +76,18 @@ public class ZipAnyEnumeratorTest {
     public void testRight() {
         for(int i=0; i<shortLen; ++i) {
             assertTrue(rightZipped.hasNext());
-            Pair<Optional<Mutable<Integer>>, Optional<Mutable<Integer>>> val = rightZipped.next();
+            Pair<Optional<Integer>, Optional<Integer>> val = rightZipped.next();
             assertTrue(val.getLeft().isPresent());
             assertTrue(val.getRight().isPresent());
-            assertEquals(val.getLeft().get().getValue(), Integer.valueOf(i));
-            assertEquals(val.getRight().get().getValue(), Integer.valueOf(i));
+            assertEquals(val.getLeft().get(), Integer.valueOf(i));
+            assertEquals(val.getRight().get(), Integer.valueOf(i));
         }
         for(int i=shortLen; i<longLen; ++i) {
             assertTrue(rightZipped.hasNext());
-            Pair<Optional<Mutable<Integer>>, Optional<Mutable<Integer>>> val = rightZipped.next();
+            Pair<Optional<Integer>, Optional<Integer>> val = rightZipped.next();
             assertTrue(!val.getRight().isPresent());
             assertTrue(val.getLeft().isPresent());
-            assertEquals(val.getLeft().get().getValue(), Integer.valueOf(i));
+            assertEquals(val.getLeft().get(), Integer.valueOf(i));
         }
         assertTrue(!rightZipped.hasNext());
     }    

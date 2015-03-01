@@ -7,7 +7,6 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.Optional;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -15,12 +14,12 @@ import org.apache.commons.lang3.tuple.Pair;
  * @author Marius Filip
  */
 class ZipLeftEnumerator<U, V>
-      extends ZipEnumerator<U, V, Pair<U, Optional<Mutable<V>>>> {
+      extends ZipEnumerator<U, V, Pair<U, Optional<V>>> {
     public ZipLeftEnumerator(Iterator<U> left, Iterator<V> right) {
         super(left, right, true, false, ZipLeftEnumerator::combine);
     }
 
-    private static <U,V> Pair<U, Optional<Mutable<V>>> combine(Mutable<U> left, Mutable<V> right) {
-        return Pair.of(left.getValue(), Optional.ofNullable(right));
+    private static <U,V> Pair<U, Optional<V>> combine(U left, V right) {
+        return Pair.of(left, Optional.ofNullable(right));
     }
 }

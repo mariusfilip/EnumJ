@@ -13,13 +13,43 @@ import java.util.NoSuchElementException;
  */
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
+    private boolean hasNextCalled;
+    private boolean done;
+    
     @Override
-    public final E next() {
-        if (!hasNext()) {
-            throw new NoSuchElementException();
+    public final boolean hasNext() {
+        try {
+            if (done) {
+                return false;
+            }
+            done = !mayContinue();
+            if (done) {
+                cleanup();
+            }
+            return !done;
+        } finally {
+            hasNextCalled = true;
         }
-        return nextValue();
     }
 
+    @Override
+    public final E next() {
+        if (!hasNextCalled) {
+            hasNext();
+        }
+        if (done) {
+            throw new NoSuchElementException();
+        }
+        E value;
+        try {
+            value = nextValue();
+        } finally {
+            hasNextCalled = false;
+        }
+        return value;
+    }
+
+    protected abstract boolean mayContinue();
     protected abstract E nextValue();
+    protected void cleanup() {}
 }

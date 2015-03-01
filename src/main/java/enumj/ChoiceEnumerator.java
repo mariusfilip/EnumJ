@@ -10,23 +10,29 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
 
 /**
  *
  * @author Marius Filip
  */
-public class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
+class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
-    private IntSupplier indexSupplier;
-    private List<Iterator<E>> sources;
-    private boolean hasNoNext;
-    private boolean definitelyHasNext;
+    protected IntSupplier indexSupplier;
+    protected IntUnaryOperator nextIndexSupplier;
+    protected List<Iterator<E>> sources;
+    protected E value;
+    protected boolean isValue;
 
     public ChoiceEnumerator(IntSupplier indexSupplier,
+                            IntUnaryOperator nextIndexSupplier,
                             Iterator<E> first,
                             Iterator<E> second,
                             Iterator<E>... rest) {
-        Utils.ensureNotNull(indexSupplier, Messages.NullEnumeratorGenerator);
+        Utils.ensureNotNull(indexSupplier,
+                            Messages.NullEnumeratorGenerator);
+        Utils.ensureNotNull(nextIndexSupplier,
+                            Messages.NullEnumeratorGenerator);
         Utils.ensureNotNull(first, Messages.NullEnumeratorSource);
         Utils.ensureNotNull(second, Messages.NullEnumeratorSource);
         Utils.ensureNotNull(rest, Messages.NullEnumeratorSource);
@@ -34,45 +40,46 @@ public class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
             Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         }
         this.indexSupplier = indexSupplier;
+        this.nextIndexSupplier = nextIndexSupplier;
         this.sources = new ArrayList<>();
         this.sources.add(first);
         this.sources.add(second);
         this.sources.addAll(Arrays.asList(rest));
-        this.hasNoNext = false;
-        this.definitelyHasNext = false;
     }
 
     @Override
-    public boolean hasNext() {
-        if (hasNoNext) {
-            indexSupplier = null;
-            sources = null;
-            return !hasNoNext;
+    protected boolean mayContinue() {
+        if (isValue) {
+            return true;
         }
-        if (definitelyHasNext) {
-            return definitelyHasNext;
-        }
-        for(Iterator<E> source : sources) {
-            if (source.hasNext()) {
-                return true;
+        if (sources.size() > 0) {
+            int index = indexSupplier.getAsInt();
+            int count = sources.size()-1;
+            while (count >= 0) {
+                if (sources.get(index) != null) {
+                    if (sources.get(index).hasNext()) {
+                        value = sources.get(index).next();
+                        isValue = true;
+                        return true;
+                    }
+                    sources.set(index, null);
+                }
+                index = nextIndexSupplier.applyAsInt(index);
+                --count;
             }
         }
-        hasNoNext = true;
-        definitelyHasNext = false;
         return false;
     }
-
     @Override
     protected E nextValue() {
-        int index = indexSupplier.getAsInt();
-        Utils.ensureNonNegative(index, Messages.NegativeEnumeratorIndex);
-        Utils.ensureLessThan(index, sources.size(), Messages.OverflowedEnumeratorIndex);
-
-        while (!sources.get(index).hasNext()) {
-            index = (index + 1) % sources.size();
-        }
-        E result = sources.get(index).next();
-        definitelyHasNext = sources.get(index).hasNext();
-        return result;
+        isValue = false;
+        return value;
+    }
+    @Override
+    protected void cleanup() {
+        indexSupplier = null;
+        nextIndexSupplier = null;
+        sources = null;
+        value = null;
     }
 }

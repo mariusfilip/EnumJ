@@ -6,7 +6,6 @@
 package enumj;
 
 import java.util.Iterator;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -19,7 +18,7 @@ class ZipBothEnumerator<U, V>
         super(left, right, true, true, ZipBothEnumerator::combine);
     }
 
-    private static <U,V> Pair<U, V> combine(Mutable<U> left, Mutable<V> right) {
-        return Pair.of(left.getValue(), right.getValue());
+    private static <U,V> Pair<U, V> combine(U left, V right) {
+        return Pair.of(left, right);
     }
 }
