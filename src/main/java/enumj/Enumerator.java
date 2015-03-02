@@ -57,7 +57,7 @@ public interface Enumerator<E> extends Iterator<E> {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         return of(source.iterator());
     }
-    
+
     public static <E> Enumerator<E> of(Enumeration<E> source) {
         return new PipeEnumerator(new EnumerationEnumerator(source));
     }
@@ -86,7 +86,7 @@ public interface Enumerator<E> extends Iterator<E> {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         return new LazyEnumerator(() -> of(source.get()));
     }
-    
+
     public static <E> Enumerator<E> ofLazyEnumeration(
             Supplier<? extends Enumeration<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
@@ -118,7 +118,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Iterable<E> asIterable() {
         return new Enumerable<E>(this);
     }
-    
+
     public default Enumeration<E> asEnumeration() {
         return new EnumerableEnumeration(this);
     }
@@ -198,6 +198,10 @@ public interface Enumerator<E> extends Iterator<E> {
         return asStream().collect(collector);
     }
 
+    public default Enumerator<E> concatOn(E... elements) {
+        return concat(on(elements));
+    }
+
     public default Enumerator<E> concat(Iterator<? extends E> elements) {
         return new FlatteningEnumerator(Collections.emptyIterator())
                    .concat(this)
@@ -205,6 +209,10 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     public default Enumerator<E> concat(Iterable<? extends E> elements) {
+        return concat(of(elements));
+    }
+
+    public default Enumerator<E> concat(Enumeration<? extends E> elements) {
         return concat(of(elements));
     }
 
@@ -244,7 +252,7 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public static <E> Pair<Enumerator<E>,
                            Enumerator<E>> dup(Iterator<E> source) {
-        return new ForkingPseudoEnumerator(source).dup();
+        return new DuppingPseudoEnumerator(source).dup();
     }
 
     public default Optional<E> elementAt(long index) {
@@ -292,6 +300,11 @@ public interface Enumerator<E> extends Iterator<E> {
         while (hasNext()) {
             consumer.accept(next());
         }
+    }
+
+    public default Pair<Enumerable<E>,
+                        Enumerable<E>> fork(Predicate<? super E> leftChooser) {
+        return new ForkingPseudoEnumerator(this, leftChooser).fork();
     }
 
     public default <R> Enumerator<R> indexedMap(
@@ -379,8 +392,34 @@ public interface Enumerator<E> extends Iterator<E> {
         return map(e -> { action.accept(e); return e; });
     }
 
-    public default Enumerator<E> prepend(E... elements) {
-        return Enumerator.on(elements).concat(this);
+    public default Enumerator<E> prependOn(E... elements) {
+        return prepend(on(elements));
+    }
+
+    public default Enumerator<E> prepend(Iterator<? extends E> elements) {
+        return new FlatteningEnumerator(Collections.emptyIterator())
+                   .concat(elements)
+                   .concat(this);
+    }
+
+    public default Enumerator<E> prepend(Iterable<? extends E> elements) {
+        return prepend(of(elements));
+    }
+
+    public default Enumerator<E> prepend(Enumeration<? extends E> elements) {
+        return prepend(of(elements));
+    }
+
+    public default Enumerator<E> prepend(Stream<? extends E> elements) {
+        return prepend(of(elements));
+    }
+
+    public default Enumerator<E> prepend(Spliterator<? extends E> elements) {
+        return prepend(of(elements));
+    }
+
+    public default Enumerator<E> prepend(Supplier<Optional<E>> elements) {
+        return prepend(of(elements));
     }
 
     public static <E> Enumerator<E> range(E startInclusive,
@@ -490,7 +529,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<E> sorted(Comparator<? super E> comparator) {
         return of(asStream().sorted(comparator));
     }
-    
+
     public default Enumerator<E> take(long n) {
         return limit(n);
     }
@@ -516,8 +555,32 @@ public interface Enumerator<E> extends Iterator<E> {
         return collect(Collectors.toSet());
     }
 
+    public default Enumerator<E> unionOn(E... others) {
+        return union(on(others));
+    }
+
     public default Enumerator<E> union(Iterator<? extends E> others) {
         return concat(others).distinct();
+    }
+
+    public default Enumerator<E> union(Iterable<? extends E> others) {
+        return union(of(others));
+    }
+
+    public default Enumerator<E> union(Enumeration<? extends E> others) {
+        return prepend(of(others));
+    }
+
+    public default Enumerator<E> union(Stream<? extends E> others) {
+        return prepend(of(others));
+    }
+
+    public default Enumerator<E> union(Spliterator<? extends E> others) {
+        return prepend(of(others));
+    }
+
+    public default Enumerator<E> union(Supplier<Optional<E>> others) {
+        return prepend(of(others));
     }
 
     public default <V>

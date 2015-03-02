@@ -9,12 +9,12 @@ package enumj;
  *
  * @author Marius Filip
  */
-final class ForkedEnumerator<E> extends AbstractEnumerator<E> {
+final class DuppedEnumerator<E> extends AbstractEnumerator<E> {
 
-    private ForkingPseudoEnumerator<E> source;
+    private DuppingPseudoEnumerator<E> source;
     private final boolean isLeft;
-    
-    public ForkedEnumerator(ForkingPseudoEnumerator<E> source, boolean isLeft) {
+
+    DuppedEnumerator(DuppingPseudoEnumerator<E> source, boolean isLeft) {
         assert source != null;
         this.source = source;
         this.isLeft = isLeft;

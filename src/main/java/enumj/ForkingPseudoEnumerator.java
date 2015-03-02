@@ -7,6 +7,7 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -16,107 +17,72 @@ import org.apache.commons.lang3.tuple.Pair;
 final class ForkingPseudoEnumerator<E> {
 
     private final Iterator<E> source;
-    private final LinkedList<ForkedElement<E>> buffer;
+    private final Predicate<E> leftChooser;
 
     private ForkedEnumerator<E> left;
     private ForkedEnumerator<E> right;
-    private ForkedElement<E> leftPtr;
-    private ForkedElement<E> rightPtr;
 
-    public ForkingPseudoEnumerator(Iterator<E> source) {
+    private LinkedList<E> leftBuf;
+    private LinkedList<E> rightBuf;
+
+    public ForkingPseudoEnumerator(Iterator<E> source,
+                                   Predicate<E> leftChooser) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(leftChooser, Messages.NullEnumeratorPredicate);
         this.source = source;
+        this.leftChooser = leftChooser;
+
         this.left = new ForkedEnumerator(this, true);
         this.right = new ForkedEnumerator(this, false);
-        this.buffer = new LinkedList<>();
+
+        this.leftBuf = new LinkedList<>();
+        this.rightBuf = new LinkedList<>();
     }
 
     public boolean hasNext(boolean left) {
+        if (left && this.left == null
+            || !left && this.right == null) {
+            return false;
+        }
+        while(true) {
+            if (left && !this.leftBuf.isEmpty()
+                || !left && !this.rightBuf.isEmpty()) {
+                return true;
+            }
+            if (!source.hasNext()) {
+                break;
+            }
+            final E value = source.next();
+            if (this.leftChooser.test(value)) {
+                this.leftBuf.addLast(value);
+            }
+            else {
+                this.rightBuf.addLast(value);
+            }
+        }
         if (left) {
-            if (this.left == null) {
-                return false;
-            }
-            if (this.leftPtr != null
-                && !this.leftPtr.leftHas()) {
-                return true;
-            }
-            if (source.hasNext()) {
-                return true;
-            }
             this.left = null;
-        } else {
-            if (this.right == null) {
-                return false;
-            }
-            if (this.rightPtr != null
-                && !this.rightPtr.rightHas()) {
-                return true;
-            }
-            if (source.hasNext()) {
-                return true;
-            }
+            this.leftBuf = null;
+        }
+        else {
             this.right = null;
+            this.rightBuf = null;
         }
         return false;
     }
 
     public E next(boolean left) {
-        if (buffer.isEmpty()) {
-            newElement();
-        }
-
-        ForkedElement<E> ptr = null;
         if (left) {
-            if (leftPtr == null) {
-                leftPtr = buffer.getFirst();
-            }
-            if (leftPtr.leftHas()) {
-                if (leftPtr.getNext() == null) {
-                    assert leftPtr == buffer.getLast();
-                    newElement();
-                    assert leftPtr.getNext() != null;
-                }
-                leftPtr = leftPtr.getNext();
-            }
-            ptr = leftPtr;
+            assert !this.leftBuf.isEmpty();
+            return this.leftBuf.removeFirst();
         }
         else {
-            if (rightPtr == null) {
-                rightPtr = buffer.getFirst();
-            }
-            if (rightPtr.rightHas()) {
-                if (rightPtr.getNext() == null) {
-                    assert rightPtr == buffer.getLast();
-                    newElement();
-                    assert rightPtr.getNext() != null;
-                }
-                rightPtr = rightPtr.getNext();
-            }
-            ptr = rightPtr;
+            assert !this.rightBuf.isEmpty();
+            return this.rightBuf.removeFirst();
         }
-
-        final E result = ptr.getValue(left);
-        final ForkedElement<E> head = buffer.getFirst();
-        if (leftPtr != head && rightPtr != head) {
-            assert head.leftHas() && head.rightHas();
-            buffer.remove();
-        }
-
-        assert leftPtr == buffer.getFirst() && rightPtr == buffer.getLast()
-               || leftPtr == buffer.getLast() && rightPtr == buffer.getFirst();
-        return result;
     }
-
-    private void newElement() {
-        final ForkedElement<E> elem = new ForkedElement<>(source.next());
-        if (!buffer.isEmpty()) {
-            buffer.getLast().setNext(elem);
-        }
-        buffer.addLast(elem);
-    }
-
-    public Pair<Enumerator<E>,Enumerator<E>> dup() {
+    
+    public Pair<Enumerator<E>, Enumerator<E>> fork() {
         return Pair.of(left, right);
     }
 }
- 

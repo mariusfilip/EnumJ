@@ -9,14 +9,14 @@ package enumj;
  *
  * @author Marius Filip
  */
-final class ForkedElement<E> {
+final class DuppedElement<E> {
     private final E value;
 
     private boolean leftHas;
     private boolean rightHas;
-    private ForkedElement<E> next;
+    private DuppedElement<E> next;
 
-    public ForkedElement(E value) {
+    public DuppedElement(E value) {
         this.value = value;
     }
     
@@ -34,11 +34,11 @@ final class ForkedElement<E> {
         return this.rightHas;
     }
 
-    public ForkedElement<E> getNext() {
+    public DuppedElement<E> getNext() {
         return this.next;
     }
 
-    public void setNext(ForkedElement<E> next) {
+    public void setNext(DuppedElement<E> next) {
         assert next != null;
         assert this.next == null;
         this.next = next;

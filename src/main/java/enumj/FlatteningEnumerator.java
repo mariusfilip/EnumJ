@@ -20,7 +20,7 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.sources = new LinkedList<>();
         while(source.hasNext()) {
-            this.sources.add(source.next());
+            this.sources.addLast(source.next());
         }
     }
 
@@ -45,8 +45,13 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    public Enumerator<E> prepend(Iterator<? extends E> elements) {
+        sources.addFirst((Iterator<E>)elements);
+        return this;
+    }
+
     public Enumerator<E> concat(Iterator<? extends E> elements) {
-        sources.add((Iterator<E>)elements);
+        sources.addLast((Iterator<E>)elements);
         return this;
     }
 }

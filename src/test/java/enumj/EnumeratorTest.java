@@ -490,7 +490,7 @@ public class EnumeratorTest {
     public void testPrepend() {
         System.out.println("prepend");
         assertTrue(Enumerator.on(3, 4, 5)
-                             .prepend(0, 1, 2)
+                             .prependOn(0, 1, 2)
                              .elementsEqual(Enumerator.rangeInt(0, 6)));
     }
 
