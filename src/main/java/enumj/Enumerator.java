@@ -250,11 +250,6 @@ public interface Enumerator<E> extends Iterator<E> {
         return of(asStream().distinct());
     }
 
-    public static <E> Pair<Enumerator<E>,
-                           Enumerator<E>> dup(Iterator<E> source) {
-        return new DuppingPseudoEnumerator(source).dup();
-    }
-
     public default Optional<E> elementAt(long index) {
         Utils.ensureNonNegative(index, Messages.NegativeEnumeratorIndex);
         Enumerator<E> skipped = skip(index);
@@ -300,11 +295,6 @@ public interface Enumerator<E> extends Iterator<E> {
         while (hasNext()) {
             consumer.accept(next());
         }
-    }
-
-    public default Pair<Enumerable<E>,
-                        Enumerable<E>> fork(Predicate<? super E> leftChooser) {
-        return new ForkingPseudoEnumerator(this, leftChooser).fork();
     }
 
     public default <R> Enumerator<R> indexedMap(
