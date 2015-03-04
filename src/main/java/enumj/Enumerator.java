@@ -134,6 +134,10 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Supplier<Optional<E>> asSupplier() {
         return () -> hasNext() ? Optional.of(next()) : Optional.empty();
     }
+    
+    public default ShareableEnumerator<E> asShareable() {
+        return new ShareableEnumerator<E>(this);
+    }
 
     // ---------------------------------------------------------------------- //
 

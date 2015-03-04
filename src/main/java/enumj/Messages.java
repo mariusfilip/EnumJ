@@ -11,16 +11,29 @@ package enumj;
  */
 class Messages {
 
-    public static final String NullEnumeratorSource = "Null enumerator source";
-    public static final String NullEnumeratorPredicate = "Null enumerator predicate";
-    public static final String NullEnumeratorMapper = "Null enumerator mapper";
-    public static final String NullEnumeratorGenerator = "Null enumerator generator";
-    public static final String NullIterator = "Null iterator";
+    public static final String NullEnumeratorSource =
+            "Null enumerator source";
+    public static final String NullEnumeratorPredicate =
+            "Null enumerator predicate";
+    public static final String NullEnumeratorMapper =
+            "Null enumerator mapper";
+    public static final String NullEnumeratorGenerator =
+            "Null enumerator generator";
+    public static final String NullIterator = 
+            "Null iterator";
 
-    public static final String NegativeEnumeratorSize = "Negative enumerator size";
-    public static final String NegativeEnumeratorIndex = "Negative enumerator index";
-    public static final String NegativeEnumeratorExpectedCount = "Negative enumerator expected count";
+    public static final String NegativeEnumeratorSize =
+            "Negative enumerator size";
+    public static final String NegativeEnumeratorIndex =
+            "Negative enumerator index";
+    public static final String NegativeEnumeratorExpectedCount =
+            "Negative enumerator expected count";
 
-    public static final String NoSingleEnumeratorElement = "No single enumerator element";
-    public static final String OverflowedEnumeratorIndex = "Overflowed enumerator index";
+    public static final String IllegalIteratorState =
+            "Illegal iterator state";
+
+    public static final String NoSingleEnumeratorElement =
+            "No single enumerator element";
+    public static final String OverflowedEnumeratorIndex =
+            "Overflowed enumerator index";
 }
