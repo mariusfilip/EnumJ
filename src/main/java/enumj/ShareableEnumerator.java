@@ -136,13 +136,21 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     private ShareableElement<E> next(ShareableElement<E> consumedPtr) {
-        if (consumedPtr == null || consumedPtr.next == null) {
-            return nextElement();
+        if (consumedPtr == null) {
+            if (buffer.isEmpty()) {
+                getNextElement();
+            }
+            return buffer.getFirst();
+        }
+        if (consumedPtr.next == null) {
+            assert !buffer.isEmpty();
+            assert consumedPtr == buffer.getLast();
+            getNextElement();
         }
         return consumedPtr.next;
     }
 
-    private ShareableElement<E> nextElement() {
+    private void getNextElement() {
         final ShareableElement<E> nextPtr = new ShareableElement(source.next());
         final ShareableElement<E> tail = buffer.isEmpty()
                                          ? null
@@ -151,6 +159,5 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         if (tail != null) {
             tail.next = nextPtr;
         }
-        return nextPtr;
     }
 }

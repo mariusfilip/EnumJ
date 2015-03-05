@@ -37,7 +37,7 @@ public class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
         return (Enumerator<X>)this;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // ---------------------------------------------------------------------- //
 
     @Override
     protected boolean mayContinue() {
@@ -79,12 +79,8 @@ public class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
         value = null;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // ---------------------------------------------------------------------- //
 
-    @Override
-    public Enumerator<List<R>> buffered(int minSize, int maxSize) {
-        return pipe(new BufferedPipeProcessor(minSize, maxSize));
-    }
     @Override
     public Enumerator<R> filter(Predicate<? super R> predicate) {
         return pipe(new FilterPipeProcessor(predicate));

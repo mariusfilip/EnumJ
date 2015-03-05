@@ -5,43 +5,49 @@
  */
 package enumj;
 
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.InputMismatchException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
  * @author Marius Filip
  */
 public class EnumeratorTest {
-    
+
     public EnumeratorTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -52,7 +58,13 @@ public class EnumeratorTest {
     @Test
     public void testOn() {
         System.out.println("on");
-        assertNotNull(Enumerator.on(1, 2, 3));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().onEnumerator(),
+                                  p.getRight().onEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -61,7 +73,20 @@ public class EnumeratorTest {
     @Test
     public void testOf_Iterator() {
         System.out.println("of iterator");
-        assertNotNull(Enumerator.of(Arrays.asList(1, 2, 3).iterator()));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIteratorEnumerator(),
+                                  p.getRight().ofIteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIteratorEnumerator(),
+                                  p.getRight().onEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -70,7 +95,39 @@ public class EnumeratorTest {
     @Test
     public void testOf_Iterable() {
         System.out.println("of iterable");
-        assertNotNull(Enumerator.of(Arrays.asList(1, 2, 3)));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIterableEnumerator(),
+                                  p.getRight().ofIterableEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIterableEnumerator(),
+                                  p.getRight().ofIteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+    }
+
+    @Test
+    public void testOf_Enumeration() {
+        System.out.println("of enumeration");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofEnumerationEnumerator(),
+                                  p.getRight().ofEnumerationEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofEnumerationEnumerator(),
+                                  p.getRight().ofIterableEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -79,7 +136,20 @@ public class EnumeratorTest {
     @Test
     public void testOf_Stream() {
         System.out.println("of stream");
-        assertNotNull(Enumerator.of(Stream.of("a", "b", "c")));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofStreamEnumerator(),
+                                  p.getRight().ofStreamEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofStreamEnumerator(),
+                                  p.getRight().ofEnumerationEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -88,7 +158,20 @@ public class EnumeratorTest {
     @Test
     public void testOf_Spliterator() {
         System.out.println("of spliterator");
-        assertNotNull(Enumerator.of(Stream.of("a", "b", "c").spliterator()));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSpliteratorEnumerator(),
+                                  p.getRight().ofSpliteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSpliteratorEnumerator(),
+                                  p.getRight().ofStreamEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -97,29 +180,95 @@ public class EnumeratorTest {
     @Test
     public void testOf_Supplier() {
         System.out.println("of supplier");
-        assertNotNull(Enumerator.of(() -> Optional.empty()));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSupplierEnumerator(),
+                                  p.getRight().ofSupplierEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSupplierEnumerator(),
+                                  p.getRight().ofSpliteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
-     * Test of choiceOf method, of class Enumerator.
+     * Test of ofLazyIterator method, of class Enumerator.
      */
     @Test
-    public void testOf_choice() {
-        System.out.println("of choice");
-        assertTrue(Enumerator.choiceOf(() -> 0,
-                                       Enumerator.on(1),
-                                       Enumerator.on(2, 3),
-                                       Enumerator.on(4, 5, 6))
-                             .elementsEqual(Enumerator.rangeIntClosed(1, 6)));
+    public void testOfLazyIterator() {
+        System.out.println("ofLazyIterator");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyIteratorEnumerator(),
+                                  p.getRight().ofIteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
-     * Test of of method, of class Enumerator.
+     * Test of ofLazyIterable method, of class Enumerator.
      */
     @Test
-    public void testOf_repeating_elem() {
-        System.out.println("of repeating elem");
-        assertEquals(Enumerator.repeat("a", 3).count(), 3);
+    public void testOfLazyIterable() {
+        System.out.println("ofLazyIterable");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyIterableEnumerator(),
+                                  p.getRight().ofIterableEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+    }
+
+    /**
+     * Test of ofLazyEnumeration method, of class Enumerator.
+     */
+    @Test
+    public void testOfLazyEnumeration() {
+        System.out.println("ofLazyEnumeration");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyEnumerationEnumerator(),
+                                  p.getRight().ofEnumerationEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+    }
+
+    /**
+     * Test of ofLazyStream method, of class Enumerator.
+     */
+    @Test
+    public void testOfLazyStream() {
+        System.out.println("ofLazyStream");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyStreamEnumerator(),
+                                  p.getRight().ofStreamEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+    }
+
+    /**
+     * Test of ofLazySpliterator method, of class Enumerator.
+     */
+    @Test
+    public void testOfLazySpliterator() {
+        System.out.println("ofLazySpliterator");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazySpliteratorEnumerator(),
+                                  p.getRight().ofSpliteratorEnumerator()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -128,9 +277,15 @@ public class EnumeratorTest {
     @Test
     public void testAs() {
         System.out.println("as");
-        Enumerator.on(1, 2, 3)
-                  .as(Integer.class)
-                  .forEach(i -> assertTrue(i >= 1));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .as(Integer.class)
+                                              .as(Double.class)))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -139,9 +294,11 @@ public class EnumeratorTest {
     @Test
     public void testAsFiltered() {
         System.out.println("as filtered");
-        Enumerator.on(1, 2, 3)
-                  .asFiltered(Long.class)
-                  .forEach(i -> assertTrue(i >= 1));
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator().asFiltered(Integer.class))
+                .forEach(e -> e.elementsEqual(Enumerator.empty()));
     }
 
     /**
@@ -150,7 +307,19 @@ public class EnumeratorTest {
     @Test
     public void testAsIterable() {
         System.out.println("asIterable");
-        assertNotNull(Enumerator.on(1, 2, 3).asIterable());
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asIterable()))
+                .forEach(p -> {
+                    long c = p.getLeft().count();
+                    for(double d : p.getRight()) {
+                        --c;
+                    }
+                    assertEquals(0, c);
+                });
     }
 
     /**
@@ -178,6 +347,20 @@ public class EnumeratorTest {
     public void testAsSupplier() {
         System.out.println("asSupplier");
         assertNotNull(Enumerator.on(1, 2, 3).asSupplier());
+    }
+
+    @Test
+    public void testAsShareable() {
+        System.out.println("asShareable");
+        final Enumerator<Integer>[] shared =
+                Enumerator.rangeInt(0, 100)
+                          .asShareable()
+                          .share(3);
+        final Enumerator<Integer> source = shared[0];
+        final Enumerator<Integer> firstHalf = shared[1].filter(i -> i<50);
+        final Enumerator<Integer> secondHalf = shared[2].filter(i -> i>=50);
+
+        assertTrue(source.elementsEqual(firstHalf.concat(secondHalf)));
     }
 
     /**
@@ -706,5 +889,326 @@ public class EnumeratorTest {
         assertEquals(Enumerator.rangeInt(0, 100)
                                .zipAny(Enumerator.rangeInt(100, 200))
                                .count(), 100);
+    }
+
+    /**
+     * Test of asEnumeration method, of class Enumerator.
+     */
+    @Test
+    public void testAsEnumeration() {
+        System.out.println("asEnumeration");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of choiceOf method, of class Enumerator.
+     */
+    @Test
+    public void testChoiceOf_4args() {
+        System.out.println("choiceOf");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of choiceOf method, of class Enumerator.
+     */
+    @Test
+    public void testChoiceOf_5args() {
+        System.out.println("choiceOf");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of concatOn method, of class Enumerator.
+     */
+    @Test
+    public void testConcatOn() {
+        System.out.println("concatOn");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of concat method, of class Enumerator.
+     */
+    @Test
+    public void testConcat_Enumeration() {
+        System.out.println("concat");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of first method, of class Enumerator.
+     */
+    @Test
+    public void testFirst() {
+        System.out.println("first");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of indexedMap method, of class Enumerator.
+     */
+    @Test
+    public void testIndexedMap() {
+        System.out.println("indexedMap");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prependOn method, of class Enumerator.
+     */
+    @Test
+    public void testPrependOn() {
+        System.out.println("prependOn");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Iterator() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Iterable() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Enumeration() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Stream() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Spliterator() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of prepend method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Supplier() {
+        System.out.println("prepend");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of range method, of class Enumerator.
+     */
+    @Test
+    public void testRange() {
+        System.out.println("range");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of rangeClosed method, of class Enumerator.
+     */
+    @Test
+    public void testRangeClosed() {
+        System.out.println("rangeClosed");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of rangeInt method, of class Enumerator.
+     */
+    @Test
+    public void testRangeInt() {
+        System.out.println("rangeInt");
+        int startInclusive = 0;
+        int endExclusive = 0;
+        Enumerator<Integer> expResult = null;
+        Enumerator<Integer> result = Enumerator.rangeInt(startInclusive, endExclusive);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of rangeIntClosed method, of class Enumerator.
+     */
+    @Test
+    public void testRangeIntClosed() {
+        System.out.println("rangeIntClosed");
+        int startInclusive = 0;
+        int endInclusive = 0;
+        Enumerator<Integer> expResult = null;
+        Enumerator<Integer> result = Enumerator.rangeIntClosed(startInclusive, endInclusive);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of rangeLong method, of class Enumerator.
+     */
+    @Test
+    public void testRangeLong() {
+        System.out.println("rangeLong");
+        long startInclusive = 0L;
+        long endExclusive = 0L;
+        Enumerator<Long> expResult = null;
+        Enumerator<Long> result = Enumerator.rangeLong(startInclusive, endExclusive);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of rangeLongClosed method, of class Enumerator.
+     */
+    @Test
+    public void testRangeLongClosed() {
+        System.out.println("rangeLongClosed");
+        long startInclusive = 0L;
+        long endInclusive = 0L;
+        Enumerator<Long> expResult = null;
+        Enumerator<Long> result = Enumerator.rangeLongClosed(startInclusive, endInclusive);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of reduce method, of class Enumerator.
+     */
+    @Test
+    public void testReduce_BinaryOperator() {
+        System.out.println("reduce");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of reduce method, of class Enumerator.
+     */
+    @Test
+    public void testReduce_GenericType_BinaryOperator() {
+        System.out.println("reduce");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of repeat method, of class Enumerator.
+     */
+    @Test
+    public void testRepeat() {
+        System.out.println("repeat");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of sorted method, of class Enumerator.
+     */
+    @Test
+    public void testSorted_0args() {
+        System.out.println("sorted");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of take method, of class Enumerator.
+     */
+    @Test
+    public void testTake() {
+        System.out.println("take");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of takeWhile method, of class Enumerator.
+     */
+    @Test
+    public void testTakeWhile() {
+        System.out.println("takeWhile");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of unionOn method, of class Enumerator.
+     */
+    @Test
+    public void testUnionOn() {
+        System.out.println("unionOn");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Iterator() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Iterable() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Enumeration() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Stream() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Spliterator() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of union method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Supplier() {
+        System.out.println("union");
+        fail("The test case is a prototype.");
     }
 }

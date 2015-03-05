@@ -134,7 +134,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Supplier<Optional<E>> asSupplier() {
         return () -> hasNext() ? Optional.of(next()) : Optional.empty();
     }
-    
+
     public default ShareableEnumerator<E> asShareable() {
         return new ShareableEnumerator<E>(this);
     }
@@ -163,23 +163,15 @@ public interface Enumerator<E> extends Iterator<E> {
         return concat(on(elements));
     }
 
-    public default Enumerator<List<E>> buffered(int size) {
-        return buffered(size, size);
-    }
-
-    public default Enumerator<List<E>> buffered(int minSize, int maxSize) {
-        return new PipeEnumerator(this).buffered(minSize, maxSize);
-    }
-
     public static <E> Enumerator<E> choiceOf(
             IntSupplier indexSupplier,
             Iterator<E> first,
             Iterator<? extends E> second,
             Iterator<? extends E>... rest) {
         final int size = 1 + 1 + rest.length;
-        final IntUnaryOperator nextIndexSupplier = i -> (i+1)%size;
+        final IntUnaryOperator altIndexSupplier = i -> (i+1)%size;
         return choiceOf(indexSupplier,
-                        nextIndexSupplier,
+                        altIndexSupplier,
                         first,
                         second,
                         rest);
@@ -187,12 +179,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public static <E> Enumerator<E> choiceOf(
             IntSupplier indexSupplier,
-            IntUnaryOperator nextIndexSupplier,
+            IntUnaryOperator altIndexSupplier,
             Iterator<E> first,
             Iterator<? extends E> second,
             Iterator<? extends E>... rest) {
         return new ChoiceEnumerator(indexSupplier,
-                                    nextIndexSupplier,
+                                    altIndexSupplier,
                                     first,
                                     second,
                                     rest);
@@ -283,7 +275,6 @@ public interface Enumerator<E> extends Iterator<E> {
 
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
         return new PipeEnumerator(this).filter(predicate);
-        // return new FilterEnumerator(this, predicate);
     }
 
     public default Optional<E> first() {
