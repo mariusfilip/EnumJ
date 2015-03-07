@@ -7,6 +7,7 @@ package enumj;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  *
@@ -16,12 +17,17 @@ final class ShareableElement<E> {
 
     private final E value;
     private Set<SharingEnumerator<E>> sharingOwners;
+    private WeakHashMap<SharingEnumerator<E>, ShareableElement<E>> waiting;
 
     ShareableElement<E> next;
 
-    public ShareableElement(E value) {
+    public ShareableElement(E value,
+                            WeakHashMap<SharingEnumerator<E>,
+                                        ShareableElement<E>> waiting) {
+        assert waiting != null;
         this.value = value;
         this.sharingOwners = new HashSet<>();
+        this.waiting = waiting;
     }
 
     E getValue() {
@@ -40,6 +46,6 @@ final class ShareableElement<E> {
     }
 
     public boolean isFree() {
-        return sharingOwners.isEmpty();
+        return waiting.isEmpty() && sharingOwners.isEmpty();
     }
 }

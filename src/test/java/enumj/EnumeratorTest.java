@@ -8,16 +8,13 @@ package enumj;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.InputMismatchException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -25,7 +22,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 /**
  *
@@ -322,13 +318,24 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of asStream method, of class Enumerator.
-     */
     @Test
-    public void testAsStream() {
-        System.out.println("asStream");
-        assertNotNull(Enumerator.on(1, 2, 3).asStream());
+    public void testAsEnumeration() {
+        System.out.println("asEnumeration");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asEnumeration()))
+                .forEach(p -> {
+                    long c = p.getLeft().count();
+                    final Enumeration<Double> e = p.getRight();
+                    while (e.hasMoreElements()) {
+                        e.nextElement();
+                        --c;
+                    }
+                    assertEquals(0, c);
+                });
     }
 
     /**
@@ -337,7 +344,35 @@ public class EnumeratorTest {
     @Test
     public void testAsSpliterator() {
         System.out.println("asSpliterator");
-        assertNotNull(Enumerator.on(1, 2, 3).asSpliterator());
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asSpliterator()))
+                .forEach(p -> {
+                    MutableLong c = new MutableLong(p.getLeft().count());
+                    final Spliterator<Double> s = p.getRight();
+                    s.forEachRemaining(d -> c.decrement());
+                    assertEquals(0, c.longValue());
+                });
+    }
+
+    /**
+     * Test of asStream method, of class Enumerator.
+     */
+    @Test
+    public void testAsStream() {
+        System.out.println("asStream");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asStream()))
+                .forEach(p -> {
+                    assertEquals(p.getLeft().count(), p.getRight().count());
+                });
     }
 
     /**
@@ -346,21 +381,90 @@ public class EnumeratorTest {
     @Test
     public void testAsSupplier() {
         System.out.println("asSupplier");
-        assertNotNull(Enumerator.on(1, 2, 3).asSupplier());
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asSupplier()))
+                .forEach(p -> {
+                    long c = p.getLeft().count();
+                    Supplier<Optional<Double>> supplier = p.getRight();
+                    Optional<Double> d = supplier.get();
+                    while (d.isPresent()) {
+                        --c;
+                        d = supplier.get();
+                    }
+                    assertEquals(0, c);
+                });
     }
 
     @Test
     public void testAsShareable() {
         System.out.println("asShareable");
-        final Enumerator<Integer>[] shared =
-                Enumerator.rangeInt(0, 100)
-                          .asShareable()
-                          .share(3);
-        final Enumerator<Integer> source = shared[0];
-        final Enumerator<Integer> firstHalf = shared[1].filter(i -> i<50);
-        final Enumerator<Integer> secondHalf = shared[2].filter(i -> i>=50);
-
-        assertTrue(source.elementsEqual(firstHalf.concat(secondHalf)));
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()
+                                              .asShareable()))
+                .forEach(p -> {
+                    assertTrue(p.getLeft().elementsEqual(p.getRight()));
+                });
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.asShareable())
+                .map(e -> e.share(3))
+                .forEach(es -> {
+                    final long c1 = es[0].count();
+                    final long c2 = es[1].filter(x -> x<0).count();
+                    final long c3 = es[2].filter(x -> x>=0).count();
+                    assertEquals(c1, c2+c3);
+                });
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.asShareable())
+                .map(e -> e.share(2))
+                .forEach(es -> {
+                    final Enumerator<Double> plus = es[0];
+                    final Enumerator<Double> minus = es[1].map(x -> -x);
+                    final double sum = plus.zipAny(minus)
+                            .map(p -> p.getLeft().get() + p.getRight().get())
+                            .reduce(0.0, (x,y) -> x+y);
+                    assertTrue(sum < 0.000001);
+                    assertTrue(sum > -0.000001);
+                });
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.asShareable())
+                .map(e -> e.share(2))
+                .forEach(es -> {
+                    final Enumerator<Double> plus = es[0];
+                    final Enumerator<Double> minus = es[1].map(x -> -x);
+                    final double sum = plus.zipAny(minus)
+                            .map(p -> p.getLeft().get() + p.getRight().get())
+                            .reduce(0.0, (x,y) -> x+y);
+                    assertTrue(sum < 0.000001);
+                    assertTrue(sum > -0.000001);
+                });
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.asShareable())
+                .map(e -> e.share(4))
+                .forEach(es -> {
+                    final long count = es[1].count();
+                    final Enumerator<Double> first = es[0].take(count/2);
+                    final Enumerator<Double> second = es[2].skip(count/2);
+                    assertTrue(es[3].elementsEqual(first.concat(second)));
+                });
     }
 
     /**
@@ -369,8 +473,12 @@ public class EnumeratorTest {
     @Test
     public void testAllMatch() {
         System.out.println("allMatch");
-        assertTrue(Enumerator.on(1, 1, 1).allMatch(i -> 1 == i));
-        assertTrue(!Enumerator.on(1, 2, 3, 4).allMatch(i -> i > 1));
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.map(x -> x*x))
+                .forEach(e -> { assertTrue(e.allMatch(x -> x>=0)); });
     }
 
     /**
@@ -379,8 +487,15 @@ public class EnumeratorTest {
     @Test
     public void testAnyMatch() {
         System.out.println("anyMatch");
-        assertTrue(Enumerator.on(1, 2, 3).anyMatch(i -> 2 == i));
-        assertTrue(!Enumerator.on(1, 2, 3).anyMatch(i -> 4 == i));
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator().asShareable().share(3))
+                .filter(es -> es[0].first().isPresent())
+                .map(es -> es[1].skip(1)
+                                .concat(Enumerator.on(Math.abs(es[2].first()
+                                                                    .get()))))
+                .forEach(e -> { assertTrue(e.anyMatch(x -> x >= 0)); });
     }
 
     /**
@@ -389,7 +504,18 @@ public class EnumeratorTest {
     @Test
     public void testAppend() {
         System.out.println("append");
-        assertEquals(Enumerator.on(1, 2, 3).append(4, 5).count(), 5);
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator().asShareable().share(3))
+                .forEach(es -> {
+                    assertTrue(
+                        Enumerator
+                            .on(1.0, 2.0, 3.0)
+                            .elementsEqual(
+                                es[0].append(1.0, 2.0, 3.0)
+                                     .skip(es[1].count())));
+                });
     }
 
     /**
@@ -398,9 +524,15 @@ public class EnumeratorTest {
     @Test
     public void testCollect() {
         System.out.println("collect");
-        assertEquals(Enumerator.on(1, 2, 3)
-                               .collect(Collectors.toList())
-                               .size(), 3);
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator().asShareable().share(2))
+                .forEach(es -> {
+                    assertTrue(
+                        es[0].elementsEqual(
+                            Enumerator.of(es[1].collect(Collectors.toList()))));
+                });
     }
 
     /**
@@ -889,15 +1021,6 @@ public class EnumeratorTest {
         assertEquals(Enumerator.rangeInt(0, 100)
                                .zipAny(Enumerator.rangeInt(100, 200))
                                .count(), 100);
-    }
-
-    /**
-     * Test of asEnumeration method, of class Enumerator.
-     */
-    @Test
-    public void testAsEnumeration() {
-        System.out.println("asEnumeration");
-        fail("The test case is a prototype.");
     }
 
     /**
