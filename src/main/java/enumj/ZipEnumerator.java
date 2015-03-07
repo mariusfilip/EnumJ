@@ -12,7 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
  *
  * @author Marius Filip
  */
-public class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
+class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
 
     private Iterator<U> left;
     private Iterator<V> right;

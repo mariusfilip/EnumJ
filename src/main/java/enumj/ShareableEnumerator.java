@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2015 Marius Filip.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package enumj;
 
@@ -10,8 +28,46 @@ import java.util.LinkedList;
 import java.util.WeakHashMap;
 
 /**
- *
- * @author Marius Filip
+ * Type of {@link Enumerator} with support for element sharing.
+ * <p>
+ * Shareable enumerators encapsulate an {@link Iterator} and spawn
+ * {@link SharingEnumerator} instances that can share the elements without the
+ * original iterator being traversed more than once.
+ * </p>
+ * <p>
+ * Shareable enumerators work in one of the following three modes:
+ * </p>
+ * <ul>
+ *   <li><em>shared mode</em> in which the enumerator spawns
+ * {@link SharingEnumerator} instances</li>
+ *   <li><em>shared enumerating mode</em> in which the
+ * {@link SharingEnumerator} instances enumerate and share the elements
+ * independently of each other</li>
+ *   <li><em>enumerating mode</em> in which the current enumerator yields
+ * the elements directly, like any other enumerator</li>
+ * </ul>
+ * <p>
+ * The second mode must come after the first mode and both are mutually
+ * exclusive with the third.
+ * </p>
+ * <p>
+ * The <em>shared mode</em> it triggered by calls to {@link #share()} or
+ * {@link #share(int)}. The <em>shared enumerating mode</em> begins when
+ * one of the spawned {@link SharingEnumerator} instances starts enumerating.
+ * The <em>enumerating mode</em> commences with calling {@link #hasNext()} or
+ * {@link #next()}.
+ * </p>
+ * <p>
+ * The spawned {@link SharingEnumerator} instances can traverse independently the
+ * sequence of elements because {@link ShareableEnumerator} keeps a transient
+ * internal buffer of elements, from the first in use to the last in use. While
+ * the buffer allows for independent traversal of the same sequence, the
+ * {@link SharingEnumerator} instances may not diverge too much without the danger
+ * of buffer overflow.
+ * </p>
+ * @param <E> type of shared elements
+ * @see Enumerator
+ * @see SharingEnumerator
  */
 public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
 
@@ -22,6 +78,16 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     private LinkedList<ShareableElement<E>> buffer;
     private WeakHashMap<SharingEnumerator<E>, ShareableElement<E>> waiting;
 
+    /**
+     * Constructs an shareable enumerator out of a provided {@link Iterator}.
+     * <p>
+     * The elements of the provided {@link Iterator} will be shared without
+     * the original iterator to be traversed more than once.
+     * </p>
+     * @param source {@link Iterator} sharing the elements
+     * @exception IllegalArgumentException <code>source</code> is
+     * <code>null</code>
+     */
     public ShareableEnumerator(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.source = source;
@@ -34,11 +100,28 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         return this;
     }
 
+    /**
+     * Creates a {@link SharingEnumerator} instance that will share the
+     * elements of the current enumerator.
+     *
+     * @return the new {@link SharingEnumerator} instance
+     */
     public SharingEnumerator<E> share() {
         return share(1)[0];
     }
 
+    /**
+     * Creates an array of {@link SharingEnumerator} instances that will share
+     * the elements of the current enumerator.
+     *
+     * @param count the number of {@link SharingEnumerator} to create
+     * @return array of new {@link SharingEnumerator} instances
+     * @exception IllegalArgumentException <code>count</code> is negative
+     * @exception IllegalStateException enumeration has started
+     */
     public SharingEnumerator<E>[] share(int count) {
+        Utils.ensureNonNegative(count,
+                                Messages.NegativeEnumeratorExpectedCount);
         if (isEnumerating || isSharedEnumerating) {
             throw new IllegalStateException(Messages.IllegalIteratorState);
         }

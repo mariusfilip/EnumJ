@@ -10,6 +10,6 @@ package enumj;
  * @author Marius Filip
  */
 @FunctionalInterface
-public interface BinaryCombiner<U, V, W> {
+interface BinaryCombiner<U, V, W> {
     W combine(U u, V v);
 }

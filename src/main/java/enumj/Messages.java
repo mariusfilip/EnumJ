@@ -15,10 +15,18 @@ class Messages {
             "Null enumerator source";
     public static final String NullEnumeratorPredicate =
             "Null enumerator predicate";
+    public static final String NullEnumeratorHandler =
+            "Null enumerator handler";
     public static final String NullEnumeratorMapper =
             "Null enumerator mapper";
     public static final String NullEnumeratorGenerator =
             "Null enumerator generator";
+    public static final String NullEnumeratorConsumer =
+            "Null enumerator consumer";
+    public static final String NullEnumeratorComparator =
+            "Null enumerator comparator";
+    public static final String NullEnumeratorClass =
+            "Null enumerator class";
     public static final String NullIterator = 
             "Null iterator";
 

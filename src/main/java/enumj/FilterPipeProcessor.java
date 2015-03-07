@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  *
  * @author Marius Filip
  */
-public class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
+class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
     protected E value;
     protected Predicate<E> filter;
     

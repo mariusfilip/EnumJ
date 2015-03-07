@@ -30,6 +30,18 @@
     <build>
         <plugins>
             <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.10.1</version>
+              <configuration>
+                  <author>false</author>
+                  <detectLinks>true</detectLinks>
+                  <show>public</show>
+                  <validateLinks>true</validateLinks>
+                  <windowtitle>EnumJ</windowtitle>
+              </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.2.201409121644</version>

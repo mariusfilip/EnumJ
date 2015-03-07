@@ -7,7 +7,6 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -15,7 +14,7 @@ import java.util.function.Predicate;
  *
  * @author Marius Filip
  */
-public class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
+class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
     protected Iterator<E> source;
     protected LinkedList<PipeProcessor> pipeline;
     protected R value;
@@ -33,7 +32,7 @@ public class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
 
     protected<X> Enumerator<X> pipe(
             PipeProcessor<? super R, ? extends X> processor) {
-        pipeline.add(processor);
+        pipeline.addLast(processor);
         return (Enumerator<X>)this;
     }
 

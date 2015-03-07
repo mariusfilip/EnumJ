@@ -9,7 +9,7 @@ package enumj;
  *
  * @author Marius Filip
  */
-public abstract class PipeProcessor<T,R> {
+abstract class PipeProcessor<T,R> {
     abstract void process(T value);
     abstract boolean hasValue();
     abstract R getValue();

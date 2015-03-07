@@ -959,7 +959,7 @@ public class EnumeratorTest {
     @Test
     public void testToSet() {
         System.out.println("toSet");
-        assertEquals(Enumerator.repeat(100, 5).toSet().size(), 1);
+        assertEquals(Enumerator.repeatElement(100, 5).toSet().size(), 1);
     }
 
     /**
