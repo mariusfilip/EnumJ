@@ -27,6 +27,8 @@ class Messages {
             "Null enumerator comparator";
     public static final String NullEnumeratorClass =
             "Null enumerator class";
+    public static final String NullEnumeratorAccumulator =
+            "Null enumerator accumulator";
     public static final String NullIterator = 
             "Null iterator";
 
