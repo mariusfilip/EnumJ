@@ -7,6 +7,8 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  *
@@ -14,13 +16,13 @@ import java.util.LinkedList;
  */
 class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected LinkedList<Iterator<E>> sources;
+    protected LinkedList<Enumerator<E>> sources;
 
     public FlatteningEnumerator(Iterator<Iterator<E>> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.sources = new LinkedList<>();
         while(source.hasNext()) {
-            this.sources.addLast(source.next());
+            this.sources.addLast(Enumerator.of(source.next()));
         }
     }
 
@@ -43,15 +45,54 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
         sources = null;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // ---------------------------------------------------------------------- //
 
     public Enumerator<E> prepend(Iterator<? extends E> elements) {
-        sources.addFirst((Iterator<E>)elements);
+        sources.addFirst((Enumerator<E>)Enumerator.of(elements));
         return this;
     }
 
     public Enumerator<E> concat(Iterator<? extends E> elements) {
-        sources.addLast((Iterator<E>)elements);
+        sources.addLast((Enumerator<E>)Enumerator.of(elements));
         return this;
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    private <R> Enumerator<R> replace(Function<Enumerator<E>,
+                                               Enumerator<R>> transform) {
+        final Enumerator<E> last = sources.getLast();
+        final Enumerator<R> result = transform.apply(last);
+        if (result != last) {
+            boolean removed = false;
+            try {
+                sources.removeLast(); removed = true;
+                sources.addLast((Enumerator<E>)result);
+            } catch(Exception ex) {
+                if (removed) {
+                    sources.addLast(last);
+                }
+                throw ex;
+            }
+        }
+        return (Enumerator<R>)this;
+    }
+
+    @Override
+    public Enumerator<E> filter(Predicate<? super E> predicate) {
+        return replace(e -> e.filter(predicate));
+    }
+    @Override
+    public <R> Enumerator<R> map(
+            Function<? super E, ? extends R> mapper) {
+        return replace(e -> e.map(mapper));
+    }
+    @Override
+    public Enumerator<E> skipWhile(Predicate<? super E> predicate) {
+        return replace(e -> e.skipWhile(predicate));
+    }
+    @Override
+    public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
+        return replace(e -> e.takeWhile(predicate));
     }
 }

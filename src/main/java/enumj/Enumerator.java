@@ -774,9 +774,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> concat(Iterator<? extends E> elements) {
-        return new FlatteningEnumerator(Collections.emptyIterator())
-                   .concat(this)
-                   .concat(elements);
+        return new FlatteningEnumerator(Enumerator.on(this)).concat(elements);
     }
 
     /**
@@ -1287,7 +1285,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Iterator<? extends E> elements) {
-        return new FlatteningEnumerator(this).prepend(elements);
+        return new FlatteningEnumerator(Enumerator.on(this)).prepend(elements);
     }
 
     /**
