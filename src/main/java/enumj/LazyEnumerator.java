@@ -12,26 +12,30 @@ import java.util.function.Supplier;
  *
  * @author Marius Filip
  */
-final class LazyEnumerator<E> extends PipeEnumerator<E,E> {
+final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<? extends Iterator<E>> source;
+    private Iterator<E> iterator;
 
     public LazyEnumerator(Supplier<? extends Iterator<E>> source) {
-        super();
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.source = source;
     }
-    
+
     @Override
-    protected boolean mayContinue() {
-        if (super.source == null) {
-            super.source = this.source.get();
+    protected boolean internalHasNext() {
+        if (iterator == null) {
+            iterator = source.get();
         }
-        return super.mayContinue();
+        return iterator.hasNext();
+    }
+    @Override
+    protected E internalNext() {
+        return iterator.next();
     }
     @Override
     protected void cleanup() {
-        super.cleanup();
-        this.source = null;
+        source = null;
+        iterator = null;
     }
 }

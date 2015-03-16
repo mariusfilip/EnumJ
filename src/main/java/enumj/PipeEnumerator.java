@@ -39,7 +39,7 @@ class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         if (isValue) {
             return true;
         }
@@ -67,7 +67,7 @@ class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
         return false;
     }
     @Override
-    protected R nextValue() {
+    protected R internalNext() {
         isValue = false;
         return value;
     }

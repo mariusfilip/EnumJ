@@ -12,23 +12,24 @@ import java.util.Enumeration;
  * @author Marius Filip
  */
 final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
-    private Enumeration<E> enumeration;
 
-    public EnumerationEnumerator(Enumeration<E> enumeration) {
-        Utils.ensureNotNull(enumeration, Messages.NullEnumeratorSource);
-        this.enumeration = enumeration;
+    private Enumeration<E> source;
+
+    EnumerationEnumerator(Enumeration<E> source) {
+        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        this.source = source;
     }
 
     @Override
-    protected boolean mayContinue() {
-        return enumeration.hasMoreElements();
+    protected boolean internalHasNext() {
+        return source.hasMoreElements();
     }
     @Override
-    protected E nextValue() {
-        return enumeration.nextElement();
+    protected E internalNext() {
+        return source.nextElement();
     }
     @Override
     protected void cleanup() {
-        enumeration = null;
+        source = null;
     }
 }

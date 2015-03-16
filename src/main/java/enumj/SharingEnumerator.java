@@ -39,12 +39,12 @@ public final class SharingEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         return source.hasNext(consumedPtr);
     }
 
     @Override
-    protected E nextValue() {
+    protected E internalNext() {
         consumedPtr = source.next(this, consumedPtr);
 
         assert consumedPtr != null;

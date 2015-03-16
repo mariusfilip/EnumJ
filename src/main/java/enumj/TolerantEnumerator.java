@@ -19,6 +19,7 @@ final class TolerantEnumerator<E> implements Enumerator<E> {
     private Iterator<E> source;
     private E recent;
     private boolean hasRecent;
+    private boolean hasNextCalled;
     private boolean done;
 
     public TolerantEnumerator(Iterator<E> source,
@@ -30,34 +31,44 @@ final class TolerantEnumerator<E> implements Enumerator<E> {
     }
 
     @Override
+    public boolean enumerating() {
+        return hasNextCalled;
+    }
+
+    @Override
     public boolean hasNext() {
-        if (done) {
+        try {
+            if (done) {
+                return false;
+            }
+            if (hasRecent) {
+                return true;
+            }
+
+            try {
+                while (sourceHasNext()) {
+                    try {
+                        recent = source.next();
+                        hasRecent = true;
+                        break;
+                    } catch(Exception ex) {
+                        handler.accept(ex);
+                    }
+                }
+            } catch(Exception ex3) { }
+
+            if (hasRecent) {
+                return true;
+            }
+            source = null;
+            done = true;
             return false;
         }
-        if (hasRecent) {
-            return true;
+        finally {
+            hasNextCalled = true;
         }
-
-        try {
-            while (sourceHasNext()) {
-                try {
-                    recent = source.next();
-                    hasRecent = true;
-                    break;
-                } catch(Exception ex) {
-                    handler.accept(ex);
-                }
-            }
-        } catch(Exception ex3) { }
-
-        if (hasRecent) {
-            return true;
-        }
-        source = null;
-        done = true;
-        return false;
     }
-    
+
     private boolean sourceHasNext() {
         try {
             return source.hasNext();

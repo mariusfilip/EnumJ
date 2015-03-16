@@ -13,7 +13,7 @@ import java.util.Iterator;
  * @author Marius Filip
  */
 final class EnumerableEnumeration<E> implements Enumeration<E> {
-    
+
     private Iterator<E> source;
 
     public EnumerableEnumeration(Iterator<E> source) {
@@ -25,7 +25,6 @@ final class EnumerableEnumeration<E> implements Enumeration<E> {
     public boolean hasMoreElements() {
         return source.hasNext();
     }
-
     @Override
     public E nextElement() {
         return source.next();

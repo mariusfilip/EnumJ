@@ -7,49 +7,44 @@ package enumj;
 
 import java.util.NoSuchElementException;
 
-/**
- *
- * @author Marius Filip
- */
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
-    private boolean hasNextCalled;
+    private boolean enumerating;
     private boolean done;
-    
+
+    @Override
+    public boolean enumerating() {
+        return enumerating;
+    }
+
     @Override
     public final boolean hasNext() {
         try {
             if (done) {
                 return false;
             }
-            done = !mayContinue();
+            done = !internalHasNext();
             if (done) {
                 cleanup();
             }
             return !done;
         } finally {
-            hasNextCalled = true;
+            enumerating = true;
         }
     }
 
     @Override
     public final E next() {
-        if (!hasNextCalled) {
+        if (!enumerating) {
             hasNext();
         }
         if (done) {
             throw new NoSuchElementException();
         }
-        E value;
-        try {
-            value = nextValue();
-        } finally {
-            hasNextCalled = false;
-        }
-        return value;
+        return internalNext();
     }
 
-    protected abstract boolean mayContinue();
-    protected abstract E nextValue();
+    protected abstract boolean internalHasNext();
+    protected abstract E internalNext();
     protected void cleanup() {}
 }

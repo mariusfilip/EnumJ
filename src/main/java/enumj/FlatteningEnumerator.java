@@ -27,7 +27,7 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         while (sources.size() > 0) {
             if (sources.element().hasNext()) {
                 return true;
@@ -37,7 +37,7 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
         return false;
     }
     @Override
-    protected E nextValue() {
+    protected E internalNext() {
         return sources.element().next();
     }
     @Override

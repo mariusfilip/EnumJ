@@ -69,7 +69,7 @@ public class FlatteningEnumeratorTest {
     }
 
     /**
-     * Test of nextValue method, of class FlatteningEnumerator.
+     * Test of internalNext method, of class FlatteningEnumerator.
      */
     @Test
     public void testNextValue() {

@@ -137,7 +137,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         if (isSharing || isSharedEnumerating) {
             throw new IllegalStateException(Messages.IllegalIteratorState);
         }
@@ -149,7 +149,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected E nextValue() {
+    protected E internalNext() {
         if (isSharing || isSharedEnumerating) {
             throw new IllegalStateException(Messages.IllegalIteratorState);
         }

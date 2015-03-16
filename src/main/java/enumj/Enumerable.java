@@ -7,16 +7,15 @@ package enumj;
 
 import java.util.Iterator;
 
-/**
- *
- * @author Marius Filip
- */
-class Enumerable<E> implements Iterable<E> {
+final class Enumerable<E> implements Iterable<E> {
+
     private Iterator<E> source;
+
     public Enumerable(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         this.source = source;
     }
+
     @Override
     public Iterator<E> iterator() {
         return this.source;

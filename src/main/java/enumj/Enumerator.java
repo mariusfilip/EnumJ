@@ -178,6 +178,19 @@ import org.apache.commons.lang3.tuple.Pair;
 public interface Enumerator<E> extends Iterator<E> {
 
     /**
+     * Returns whether the enumerator has started enumerating.
+     * <p>
+     * This method returns <code>false</code> before the first call
+     * to {@link hasNext} and <code>true</code> afterwards.
+     * </p>
+     *
+     * @return <code>true</code> if the enumerator has started enumerating.
+     * @see hasNext
+     * @see next
+     */
+    public boolean enumerating();
+
+    /**
      * Returns an enumerator returning the given elements.
      *
      * @param <E> the type of elements being enumerated
@@ -204,9 +217,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Iterator<E> source) {
-        return (source != null && source instanceof Enumerator)
-               ? (Enumerator<E>)source
-               : new PipeEnumerator<>(source);
+        return IteratorEnumerator.of(source);
     }
 
     /**
@@ -235,7 +246,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Enumeration<E> source) {
-        return new PipeEnumerator(new EnumerationEnumerator(source));
+        return new EnumerationEnumerator(source);
     }
 
     /**
@@ -288,7 +299,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Supplier<Optional<E>> source) {
-        return new PipeEnumerator(new SuppliedEnumerator(source));
+        return new SuppliedEnumerator(source);
     }
 
     /**

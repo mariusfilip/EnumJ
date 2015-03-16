@@ -39,7 +39,7 @@ class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
     }
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         if (doesLeft && doesRight) {
             return left.hasNext() && right.hasNext();
         }
@@ -52,7 +52,7 @@ class ZipEnumerator<U, V, W extends Pair> extends AbstractEnumerator<W> {
         return left.hasNext() || right.hasNext();
     }
     @Override
-    protected W nextValue() {
+    protected W internalNext() {
         U u = left.hasNext() ? left.next() : null;
         V v = right.hasNext() ? right.next() : null;
         return combiner.combine(u, v);

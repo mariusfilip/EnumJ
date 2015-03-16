@@ -48,7 +48,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected boolean mayContinue() {
+    protected boolean internalHasNext() {
         if (isValue) {
             return true;
         }
@@ -71,7 +71,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         return false;
     }
     @Override
-    protected E nextValue() {
+    protected E internalNext() {
         isValue = false;
         return value;
     }

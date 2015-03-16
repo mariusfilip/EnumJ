@@ -61,7 +61,7 @@ public class AbstractEnumeratorTest {
     }
 
     /**
-     * Test of nextValue method, of class AbstractEnumerator.
+     * Test of internalNext method, of class AbstractEnumerator.
      */
     @Test
     public void testNextValue() {
@@ -69,7 +69,7 @@ public class AbstractEnumeratorTest {
         
         enumerator.hasNext = true;
         enumerator.value = "value";
-        assertSame(enumerator.next(), enumerator.nextValue());
+        assertSame(enumerator.next(), enumerator.internalNext());
     }
 
     public class AbstractEnumeratorImpl<E> extends AbstractEnumerator {
@@ -78,12 +78,12 @@ public class AbstractEnumeratorTest {
         public E value;
 
         @Override
-        protected boolean mayContinue() {
+        protected boolean internalHasNext() {
             return hasNext;
         }
         
         @Override
-        protected E nextValue() {
+        protected E internalNext() {
             return value;
         }
     }
