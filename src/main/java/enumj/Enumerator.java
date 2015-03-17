@@ -534,8 +534,8 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a fault-tolerant enumerator. The resulted enumerator has the
-     * following characteristics:
+     * Returns a fault-tolerant enumerator with no retries. The resulted
+     * enumerator has the following characteristics:
      * <ul>
      *   <li>any exception thrown by {@link #next()} gets handled by
      * calling <code>handler.accept(? super Exception)</code> and it doesn't
@@ -553,10 +553,41 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the new fault-tolerant enumerator
      * @exception IllegalArgumentException <code>handler</code> is
      * <code>null</code>
+     * @see #asTolerant(java.util.function.Consumer, int)
      */
     public default Enumerator<E> asTolerant(
             Consumer<? super Exception> handler) {
-        return new TolerantEnumerator(this, handler);
+        return new TolerantEnumerator(this, handler, 0);
+    }
+
+    /**
+     * Returns a fault-tolerant enumerator with retries. The resulted
+     * enumerator has the following characteristics:
+     * <ul>
+     *   <li>any exception thrown by {@link #next()} gets handled by
+     * calling <code>handler.accept(? super Exception)</code> and it doesn't
+     * stop enumeration</li>
+     *   <li>any exception thrown by {@link #hasNext()} gets handled by
+     * calling <code>handler.accept(? super Exception)</code> and it stops
+     * enumeration after a number of retries.</li>
+     *   <li>any exception thrown by
+     * <code>handler.accept(? super Exception)</code> stops enumeration and
+     * does not re-throw</li>
+     * </ul>
+     *
+     * @param handler {@link Consumer} handling {@link Exception} instances
+     * thrown by {@link #hasNext()} or {@link #next()}
+     * @param retries number of retries to {@link #hasNext()} before returning
+     * <code>false</code> if {@link #hasNext()} throws
+     * @return the new fault-tolerant enumerator
+     * @exception IllegalArgumentException <code>handler</code> is
+     * <code>null</code> or <code>retries</code> is negative
+     * @see #asTolerant(java.util.function.Consumer)
+     */
+    public default Enumerator<E> asTolerant(
+            Consumer<? super Exception> handler,
+            int retries) {
+        return new TolerantEnumerator(this, handler, retries);
     }
 
     // ---------------------------------------------------------------------- //
@@ -1899,7 +1930,8 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <T>
                    Enumerator<Pair<Optional<E>, Optional<T>>>
                    zipAny(Iterator<T> elements) {
-        return new ZipAnyEnumerator(this, elements);
+        return zipAll((Iterator<E>)elements)
+                .map(arr -> Pair.of(arr[0], (Optional<T>)arr[1]));
     }
 
     /**
@@ -1919,8 +1951,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * @exception IllegalArgumentException <code>elements</code> is
      * <code>null</code>
      */
-    public default <T> Enumerator<Pair<E, T>> zipBoth(Iterator<T> elements) {
-        return new ZipBothEnumerator(this, elements);
+    public default <T>
+                   Enumerator<Pair<E, T>>
+                   zipBoth(Iterator<T> elements) {
+        return zipAll((Iterator<E>)elements)
+                .takeWhile(arr -> arr[0].isPresent() && arr[1].isPresent())
+                .map(arr -> Pair.of(arr[0].get(), ((Optional<T>)arr[1]).get()));
     }
 
     /**
@@ -1944,7 +1980,9 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <T>
                    Enumerator<Pair<E, Optional<T>>>
                    zipLeft(Iterator<T> elements) {
-        return new ZipLeftEnumerator(this, elements);
+        return zipAll((Iterator<E>)elements)
+                .takeWhile(arr -> arr[0].isPresent())
+                .map(arr -> Pair.of(arr[0].get(), (Optional<T>)arr[1]));
     }
 
     /**
@@ -1968,6 +2006,23 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <T>
                    Enumerator<Pair<Optional<E>, T>>
                    zipRight(Iterator<T> elements) {
-        return new ZipRightEnumerator(this, elements);
+        return zipAll((Iterator<E>)elements)
+                .takeWhile(arr -> arr[1].isPresent())
+                .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));
+    }
+
+    /**
+     * Returns an enumerator consisting of an array of {@list Optional}
+     * objects containing elements from the current enumerator and
+     * the given {@link Iterator} instances, while any has elements.
+     *
+     * @param first first iterator to zip with
+     * @param rest the rest of iterators to zip with
+     * @return the zipped enumerator
+     */
+    public default Enumerator<Optional<E>[]>
+                   zipAll(Iterator<? extends E> first,
+                          Iterator<? extends E>... rest) {
+        return new ZipAllEnumerator(this, first, rest);
     }
 }

@@ -6,90 +6,91 @@
 package enumj;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 /**
  *
  * @author Marius Filip
  */
-final class TolerantEnumerator<E> implements Enumerator<E> {
+final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
-    private final Consumer<? super Exception> handler;
     private Iterator<E> source;
-    private E recent;
-    private boolean hasRecent;
-    private boolean hasNextCalled;
-    private boolean done;
+    private Consumer<? super Exception> handler;
+    private int retries;
+    private Facultative<E> element;
 
     public TolerantEnumerator(Iterator<E> source,
-                              Consumer<? super Exception> handler) {
+                              Consumer<? super Exception> handler,
+                              int retries) {
         Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
         Utils.ensureNotNull(handler, Messages.NullEnumeratorHandler);
+        Utils.ensureNonNegative(retries, Messages.NegativeRetries);
+
         this.source = source;
         this.handler = handler;
+        this.retries = retries;
+        this.element = Facultative.empty();
     }
 
     @Override
-    public boolean enumerating() {
-        return hasNextCalled;
-    }
+    protected boolean internalHasNext() {
+        if (element.isPresent()) {
+            return true;
+        }
 
-    @Override
-    public boolean hasNext() {
-        try {
-            if (done) {
-                return false;
-            }
-            if (hasRecent) {
-                return true;
-            }
-
+        while(safeHasNext()) {
             try {
-                while (sourceHasNext()) {
-                    try {
-                        recent = source.next();
-                        hasRecent = true;
-                        break;
-                    } catch(Exception ex) {
-                        handler.accept(ex);
-                    }
-                }
-            } catch(Exception ex3) { }
-
-            if (hasRecent) {
+                element.set(source.next());
                 return true;
+            } catch(Exception ex) {
+                try {
+                    handler.accept(ex);
+                } catch(Exception ex1) {
+                    // do nothing
+                }
             }
-            source = null;
-            done = true;
-            return false;
         }
-        finally {
-            hasNextCalled = true;
-        }
+
+        return false;
     }
 
-    private boolean sourceHasNext() {
+    private boolean safeHasNext() {
         try {
             return source.hasNext();
         } catch(Exception ex) {
-            handler.accept(ex);
-            return false;
+            try {
+                handler.accept(ex);
+            } catch(Exception ex1) {
+                return false;
+            }
         }
+        for(int i=0; i<retries; ++i) {
+            try {
+                return source.hasNext();
+            } catch(Exception ex) {
+                try {
+                    handler.accept(ex);
+                } catch(Exception ex1) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
-    public E next() {
-        if (!hasRecent) {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-        }
-        assert hasRecent;
-
-        final E result = recent;
-        hasRecent = false;
-        recent = null;
+    protected E internalNext() {
+        E result = element.get();
+        element.clear();
         return result;
+    }
+    
+    @Override
+    protected void cleanup() {
+        source = null;
+        handler = null;
+        
+        element.clear();
+        element = null;
     }
 }

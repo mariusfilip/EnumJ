@@ -38,6 +38,8 @@ class Messages {
             "Negative enumerator index";
     public static final String NegativeEnumeratorExpectedCount =
             "Negative enumerator expected count";
+    public static final String NegativeRetries =
+            "Negative enumerator retries";
 
     public static final String IllegalIteratorState =
             "Illegal iterator state";
