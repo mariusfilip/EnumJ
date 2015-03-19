@@ -34,10 +34,10 @@ public class ZipAllEnumerator<E> extends AbstractEnumerator<Optional<E>[]> {
     public ZipAllEnumerator(Iterator<E> first,
                             Iterator<? extends E> second,
                             Iterator<? extends E>... rest) {
-        Utils.ensureNotNull(first, Messages.NullEnumeratorSource);
-        Utils.ensureNotNull(second, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(first, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNotNull(second, Messages.NULL_ENUMERATOR_SOURCE);
         for(Iterator<? extends E> it: rest) {
-            Utils.ensureNotNull(it, Messages.NullEnumeratorSource);
+            Utils.ensureNotNull(it, Messages.NULL_ENUMERATOR_SOURCE);
         }
         sources = new Iterator[2+rest.length];
         sources[0] = first;

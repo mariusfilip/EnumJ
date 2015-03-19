@@ -16,7 +16,7 @@ final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
     private Enumeration<E> source;
 
     EnumerationEnumerator(Enumeration<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

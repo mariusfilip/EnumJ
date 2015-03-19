@@ -18,7 +18,7 @@ final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
     private Optional<E> value;
 
     public SuppliedEnumerator(Supplier<Optional<E>> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

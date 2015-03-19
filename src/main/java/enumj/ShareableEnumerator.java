@@ -89,7 +89,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * <code>null</code>
      */
     public ShareableEnumerator(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
         this.buffer = new LinkedList<>();
         this.waiting = new WeakHashMap<>();
@@ -121,12 +121,12 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      */
     public SharingEnumerator<E>[] share(int count) {
         Utils.ensureNonNegative(count,
-                                Messages.NegativeEnumeratorExpectedCount);
+                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         if (isEnumerating || isSharedEnumerating) {
-            throw new IllegalStateException(Messages.IllegalIteratorState);
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         Utils.ensureNonNegative(count,
-                                Messages.NegativeEnumeratorExpectedCount);
+                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         isSharing = true;
         final SharingEnumerator<E>[] enumerators = new SharingEnumerator[count];
         for(int i=0; i<count; ++i) {
@@ -139,7 +139,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     protected boolean internalHasNext() {
         if (isSharing || isSharedEnumerating) {
-            throw new IllegalStateException(Messages.IllegalIteratorState);
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         isEnumerating = true;
         if (source == null || buffer == null) {
@@ -151,7 +151,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     protected E internalNext() {
         if (isSharing || isSharedEnumerating) {
-            throw new IllegalStateException(Messages.IllegalIteratorState);
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         isEnumerating = true;
         return source.next();
@@ -166,7 +166,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
 
     boolean hasNext(ShareableElement<E> consumedPtr) {
         if (isEnumerating) {
-            throw new IllegalStateException(Messages.IllegalIteratorState);
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         isSharedEnumerating = true;
         return consumedPtr != null && consumedPtr.next != null
@@ -177,7 +177,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     ShareableElement<E> next(SharingEnumerator<E> enumerator,
                              ShareableElement<E> consumedPtr) {
         if (isEnumerating) {
-            throw new IllegalStateException(Messages.IllegalIteratorState);
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         isSharedEnumerating = true;
         boolean ok = false;

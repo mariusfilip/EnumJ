@@ -34,7 +34,7 @@ public final class SharingEnumerator<E> extends AbstractEnumerator<E> {
     private ShareableElement<E> consumedPtr;
 
     SharingEnumerator(ShareableEnumerator<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

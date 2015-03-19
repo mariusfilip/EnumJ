@@ -15,17 +15,17 @@ import java.util.function.Supplier;
 final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<? extends Iterator<E>> source;
-    private Iterator<E> iterator;
+    private Enumerator<E> iterator;
 
     public LazyEnumerator(Supplier<? extends Iterator<E>> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 
     @Override
     protected boolean internalHasNext() {
         if (iterator == null) {
-            iterator = source.get();
+            iterator = Enumerator.of(source.get());
         }
         return iterator.hasNext();
     }

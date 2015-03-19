@@ -17,7 +17,7 @@ final class EnumerableEnumeration<E> implements Enumeration<E> {
     private Iterator<E> source;
 
     public EnumerableEnumeration(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

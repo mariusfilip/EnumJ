@@ -17,7 +17,7 @@ class SkipPipeProcessor<E> extends PipeProcessor<E,E> {
     protected boolean skip;
 
     public SkipPipeProcessor(Predicate<E> filter) {
-        Utils.ensureNotNull(filter, Messages.NullEnumeratorPredicate);
+        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
         this.skip = true;
     }

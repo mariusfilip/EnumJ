@@ -22,9 +22,9 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     public TolerantEnumerator(Iterator<E> source,
                               Consumer<? super Exception> handler,
                               int retries) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
-        Utils.ensureNotNull(handler, Messages.NullEnumeratorHandler);
-        Utils.ensureNonNegative(retries, Messages.NegativeRetries);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNotNull(handler, Messages.NULL_ENUMERATOR_HANDLER);
+        Utils.ensureNonNegative(retries, Messages.NEGATIVE_RETRIES);
 
         this.source = source;
         this.handler = handler;

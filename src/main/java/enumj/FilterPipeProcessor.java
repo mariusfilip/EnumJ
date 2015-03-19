@@ -16,7 +16,7 @@ class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
     protected Predicate<E> filter;
     
     public FilterPipeProcessor(Predicate<E> filter) {
-        Utils.ensureNotNull(filter, Messages.NullEnumeratorPredicate);
+        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
 

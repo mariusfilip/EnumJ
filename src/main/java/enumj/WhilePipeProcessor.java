@@ -17,7 +17,7 @@ class WhilePipeProcessor<E> extends PipeProcessor<E,E> {
     protected boolean get;
 
     public WhilePipeProcessor(Predicate<E> filter) {
-        Utils.ensureNotNull(filter, Messages.NullEnumeratorPredicate);
+        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
         this.get = true;
     }

@@ -11,41 +11,43 @@ package enumj;
  */
 class Messages {
 
-    public static final String NullEnumeratorSource =
+    public static final String NULL_ENUMERATOR_SOURCE =
             "Null enumerator source";
-    public static final String NullEnumeratorPredicate =
+    public static final String NULL_ENUMERATOR_PREDICATE =
             "Null enumerator predicate";
-    public static final String NullEnumeratorHandler =
+    public static final String NULL_ENUMERATOR_HANDLER =
             "Null enumerator handler";
-    public static final String NullEnumeratorMapper =
+    public static final String NULL_ENUMERATOR_MAPPER =
             "Null enumerator mapper";
-    public static final String NullEnumeratorGenerator =
+    public static final String NULL_ENUMERATOR_GENERATOR =
             "Null enumerator generator";
-    public static final String NullEnumeratorConsumer =
+    public static final String NULL_ENUMERATOR_CONSUMER =
             "Null enumerator consumer";
-    public static final String NullEnumeratorComparator =
+    public static final String NULL_ENUMERATOR_COMPARATOR =
             "Null enumerator comparator";
-    public static final String NullEnumeratorClass =
+    public static final String NULL_ENUMERATOR_CLASS =
             "Null enumerator class";
-    public static final String NullEnumeratorAccumulator =
+    public static final String NULL_ENUMERATOR_ACCUMULATOR =
             "Null enumerator accumulator";
-    public static final String NullIterator = 
+    public static final String NULL_ITERATOR =
             "Null iterator";
+    public static final String NULL_PIPE_PROCESSOR_REFERENCE =
+            "Null pipe processor reference";
 
-    public static final String NegativeEnumeratorSize =
+    public static final String NEGATIVE_ENUMERATOR_SIZE =
             "Negative enumerator size";
-    public static final String NegativeEnumeratorIndex =
+    public static final String NEGATIVE_ENUMERATOR_INDEX =
             "Negative enumerator index";
-    public static final String NegativeEnumeratorExpectedCount =
+    public static final String NEGATIVE_ENUMERATOR_EXPECTED_COUNT =
             "Negative enumerator expected count";
-    public static final String NegativeRetries =
+    public static final String NEGATIVE_RETRIES =
             "Negative enumerator retries";
 
-    public static final String IllegalIteratorState =
-            "Illegal iterator state";
+    public static final String ILLEGAL_ENUMERATOR_STATE =
+            "Illegal enumerator state";
 
-    public static final String NoSingleEnumeratorElement =
+    public static final String NO_SINGLE_ENUMERATOR_ELEMENT =
             "No single enumerator element";
-    public static final String OverflowedEnumeratorIndex =
+    public static final String OVERFLOWED_ENUMERATOR_INDEX =
             "Overflowed enumerator index";
 }

@@ -12,7 +12,7 @@ final class Enumerable<E> implements Iterable<E> {
     private Iterator<E> source;
 
     public Enumerable(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

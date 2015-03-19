@@ -14,87 +14,117 @@ import java.util.function.Predicate;
  *
  * @author Marius Filip
  */
-class PipeEnumerator<E,R> extends AbstractEnumerator<R> {
-    protected Iterator<E> source;
+class PipeEnumerator<E> extends AbstractEnumerator<E> {
+
     protected LinkedList<PipeProcessor> pipeline;
-    protected R value;
-    protected boolean isValue;
+    protected LinkedList<PipeReference> sources;
+    protected Facultative<E> value;
 
-    public PipeEnumerator(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NullEnumeratorSource);
-        this.source = source;
-        this.pipeline = new LinkedList<>();
+    PipeEnumerator(Iterator<E> source) {
+        this();
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        PipeReference<?> ref = PipeReference.of(source);
+        this.sources.add(ref);
     }
-    protected PipeEnumerator() {
-        this.source = null;
+    PipeEnumerator() {
         this.pipeline = new LinkedList<>();
+        this.sources = new LinkedList<>();
+        this.value = Facultative.empty();
     }
 
-    protected<X> Enumerator<X> pipe(
-            PipeProcessor<? super R, ? extends X> processor) {
+    protected<X> Enumerator<X> enqueue(
+            PipeProcessor<? super E, ? extends X> processor) {
         pipeline.addLast(processor);
+        if (!sources.isEmpty()) {
+            sources.peekLast().setRefIfNull(processor);
+        }
         return (Enumerator<X>)this;
+    }
+    protected void dequeue() {
+        if (!sources.isEmpty()) {
+            sources.remove();
+            if (sources.isEmpty()) {
+                pipeline.clear();
+            } else {
+                while(!pipeline.isEmpty()
+                      && pipeline.peekFirst() != sources.peekFirst().getRef()) {
+                    pipeline.remove();
+                }
+            }
+        }
+    }
+    protected boolean pipe(Object in, Facultative<E> out) {
+        out.clear();
+        for(PipeProcessor processor: pipeline) {
+            processor.process(in);
+            if (processor.hasValue()) {
+                in = processor.getValue();
+            }
+            else if (!processor.continueOnNoValue()) {
+                return false;
+            }
+        }
+
+        out.set((E)in);
+        return true;
     }
 
     // ---------------------------------------------------------------------- //
 
     @Override
     protected boolean internalHasNext() {
-        if (isValue) {
+        if (value.isPresent()) {
             return true;
         }
-        while (source.hasNext()) {
-            Object elem = source.next();
-            boolean completed = true;
-            for(PipeProcessor processor : pipeline) {
-                processor.process(elem);
-                if (processor.hasValue()) {
-                    elem = processor.getValue();
-                    continue;
-                }
-                if (processor.continueOnNoValue()) {
-                    completed = false;
-                    break;
-                }
+        while(true) {
+            while(!sources.isEmpty() && !sources.peekFirst().hasNext()) {
+                dequeue();
+            }
+            if (sources.isEmpty()) {
                 return false;
             }
-            if (completed) {
-                value = (R)elem;
-                isValue = true;
-                return true;
+            do {
+                Object in = sources.peekFirst().next();
+                if (pipe(in, value)) {
+                    return true;
+                }
             }
+            while(sources.peekFirst().hasNext());
         }
-        return false;
     }
     @Override
-    protected R internalNext() {
-        isValue = false;
-        return value;
+    protected E internalNext() {
+        E result = value.get();
+        value.clear();
+        return result;
     }
     @Override
     protected void cleanup() {
-        source = null;
+        pipeline.clear();
         pipeline = null;
+        sources.clear();
+        sources = null;
+        value.clear();
         value = null;
     }
 
     // ---------------------------------------------------------------------- //
 
     @Override
-    public Enumerator<R> filter(Predicate<? super R> predicate) {
-        return pipe(new FilterPipeProcessor(predicate));
+    public Enumerator<E> filter(Predicate<? super E> predicate) {
+        return enqueue(new FilterPipeProcessor(predicate));
     }
     @Override
     public <X> Enumerator<X> map(
-            Function<? super R, ? extends X> mapper) {
-        return pipe(new MapPipeProcessor(mapper));
+            Function<? super E, ? extends X> mapper) {
+        return enqueue(new MapPipeProcessor(mapper));
     }
     @Override
-    public Enumerator<R> skipWhile(Predicate<? super R> predicate) {
-        return pipe(new SkipPipeProcessor(predicate));
+    public Enumerator<E> skipWhile(Predicate<? super E> predicate) {
+        return enqueue(new SkipPipeProcessor(predicate));
     }
     @Override
-    public Enumerator<R> takeWhile(Predicate<? super R> predicate) {
-        return pipe(new WhilePipeProcessor(predicate));
+    public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
+        return enqueue(new WhilePipeProcessor(predicate));
     }
 }

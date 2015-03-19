@@ -25,38 +25,29 @@ package enumj;
 
 import java.util.Iterator;
 
-class IteratorEnumerator<E> extends AbstractEnumerator<E> {
+/**
+ *
+ * @author Marius Filip
+ */
+class PipeReference<E> extends IteratorEnumerator<E> {
 
-    protected Iterator<E> source;
+    private PipeProcessor<?,?> reference;
 
-    protected IteratorEnumerator(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        if (source instanceof Enumerator) {
-            Utils.ensureNonEnumerating((Enumerator<E>)source);
+    protected PipeReference(Iterator<E> source) {
+        super(source);
+    }
+
+    PipeProcessor<?,?> getRef() {
+        return this.reference;
+    }
+    void setRefIfNull(PipeProcessor<?,?> reference) {
+        Utils.ensureNotNull(reference, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
+        if (this.reference == null) {
+            this.reference = reference;
         }
-        this.source = source;
     }
 
-    @Override
-    protected boolean internalHasNext() {
-        return source.hasNext();
-    }
-    @Override
-    protected E internalNext() {
-        return source.next();
-    }
-    @Override
-    protected void cleanup() {
-        source = null;
-    }
-
-    static <T> Enumerator<T> of(Iterator<T> source) {
-        Enumerator<T> result = (source != null && source instanceof Enumerator)
-                               ? (Enumerator<T>)source
-                               : new IteratorEnumerator<>(source);
-        if (result == source) {
-            Utils.ensureNonEnumerating(result);
-        }
-        return result;
+    static <T> PipeReference<T> of(Iterator<T> source) {
+        return new PipeReference(source);
     }
 }

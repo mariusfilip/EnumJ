@@ -20,9 +20,15 @@ class Utils {
             throw new IllegalArgumentException(message);
         }
     }
-    public static void ensureLessThan(long something, long limit, String message) {
+    public static void ensureLessThan(long something, long limit,
+                                      String message) {
         if (something >= limit) {
             throw new IllegalArgumentException(message);
+        }
+    }
+    public static void ensureNonEnumerating(Enumerator<?> enumerator) {
+        if (enumerator.enumerating()) {
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
     }
 }

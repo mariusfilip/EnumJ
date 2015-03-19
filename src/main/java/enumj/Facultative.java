@@ -78,9 +78,9 @@ public final class Facultative<T> {
         }
         throw exceptionSupplier.get();
     }
-    
+
     // ---------------------------------------------------------------------- //
-    
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

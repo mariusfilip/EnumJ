@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
     private boolean enumerating;
+    private boolean yielding;
     private boolean done;
 
     @Override
@@ -30,18 +31,23 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
             return !done;
         } finally {
             enumerating = true;
+            yielding = true;
         }
     }
 
     @Override
     public final E next() {
-        if (!enumerating) {
+        if (!yielding) {
             hasNext();
         }
         if (done) {
             throw new NoSuchElementException();
         }
-        return internalNext();
+        try {
+            return internalNext();
+        } finally {
+            yielding = false;
+        }
     }
 
     protected abstract boolean internalHasNext();

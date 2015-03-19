@@ -16,7 +16,7 @@ class MapPipeProcessor<In,Out> extends PipeProcessor<In,Out> {
     protected Out value;
 
     public MapPipeProcessor(Function<In,Out> functor) {
-        Utils.ensureNotNull(functor, Messages.NullEnumeratorMapper);
+        Utils.ensureNotNull(functor, Messages.NULL_ENUMERATOR_MAPPER);
         this.functor = functor;
     }
 
