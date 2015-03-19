@@ -826,7 +826,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> concat(Iterator<? extends E> elements) {
-        return new FlatteningEnumerator(Enumerator.on(this, elements));
+        return new PipeEnumerator(this).concat(elements);
     }
 
     /**
@@ -1055,9 +1055,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator consisting of the results of replacing each
      * enumerated element with the content of a mapped enumerator obtained
      * by applying the provided mapper on each enumerated element.
-     * <p>
-     * <em>This operation is highly composable.</em>
-     * </p>
      * <pre>
      * Example:
      * <code>
@@ -1066,12 +1063,18 @@ public interface Enumerator<E> extends Iterator<E> {
      * </code>
      * will produce the sequence 1, 2, 4, 6, 9 and 12.
      * </pre>
+     * <p>
+     * <strong>Important: </strong><em>this operation is <u>not</u>
+     * highly composable. For highly composable flat mapping, use
+     * {@link #quickFlatMap(java.util.function.Function)}.</em>
+     * </p>
      * @param <R> the element type of the new enumerator
      * @param mapper {@link Function} instance to apply on each enumerated
      * element of the current enumerator
      * @return the flattened enumerator
      * @exception IllegalArgumentException <code>mapper</code> is
      * <code>null</code>
+     * @see #quickFlatMap(java.util.function.Function)
      */
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
@@ -1344,7 +1347,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default Enumerator<E> prepend(Iterator<? extends E> elements) {
         Utils.ensureNonEnumerating(this);
-        return new FlatteningEnumerator(Enumerator.on(elements, this));
+        return PipeEnumerator.of((Iterator<E>)elements).concat(this);
     }
 
     /**
@@ -1433,6 +1436,47 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<E> prepend(Supplier<Optional<E>> elements) {
         Utils.ensureNonEnumerating(this);
         return prepend(of(elements));
+    }
+
+    /**
+     * Returns an enumerator consisting of the results of replacing each
+     * enumerated element with the content of a mapped enumerator obtained
+     * by applying the provided mapper on each enumerated element.
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * <pre>
+     * Example:
+     * <code>
+     * Enumerator.on(1, 2, 3)
+     *           .quickFlatMap(i -&gt; Enumerator.on(i*i, i*(i+1)))
+     * </code>
+     * will produce the sequence 1, 2, 4, 6, 9 and 12.
+     * </pre>
+     * <p>
+     * <strong>Important: </strong><em>This method works like
+     * {@link #flatMap(java.util.function.Function)} with the exception that
+     * it resolves the iterators to flatten up-front. This makes it
+     * highly composable but in turn it is not applicable when the current
+     * enumerator has many elements. For such situations use
+     * {@link #flatMap(java.util.function.Function)}.</em>
+     * </p>
+     * @param <R> the element type of the new enumerator
+     * @param mapper {@link Function} instance to apply on each enumerated
+     * element of the current enumerator
+     * @return the flattened enumerator
+     * @exception IllegalArgumentException <code>mapper</code> is
+     * <code>null</code>
+     */
+    public default <R> Enumerator<R> quickFlatMap(
+            Function<? super E, ? extends Iterator<? extends R>> mapper) {
+        Utils.ensureNonEnumerating(this);
+        final Mutable<Enumerator<R>> result =
+                new MutableObject(Enumerator.empty());
+        map(mapper).forEach(it -> {
+            result.setValue(result.getValue().concat(it));
+        });
+        return result.getValue();
     }
 
     /**
@@ -1605,7 +1649,7 @@ public interface Enumerator<E> extends Iterator<E> {
         final SharingEnumerator<E>[] sharing = of(elements).asShareable()
                                                            .share(count);
         return Enumerator.rangeInt(0, sharing.length)
-                         .flatMap(i -> sharing[i]);
+                         .quickFlatMap(i -> sharing[i]);
     }
 
     /**

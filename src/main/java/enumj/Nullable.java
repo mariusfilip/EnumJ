@@ -31,13 +31,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public final class Facultative<T> {
+public final class Nullable<T> {
 
     private T value;
     private boolean isPresent;
 
-    private Facultative() {}
-    private Facultative(T value) {
+    private Nullable() {}
+    private Nullable(T value) {
         this.value = value;
         this.isPresent = true;
     }
@@ -86,13 +86,13 @@ public final class Facultative<T> {
         if (this == other) {
             return true;
         }
-        if (!(other instanceof Facultative)) {
+        if (!(other instanceof Nullable)) {
             return false;
         }
-        if (isPresent != ((Facultative)other).isPresent) {
+        if (isPresent != ((Nullable)other).isPresent) {
             return false;
         }
-        return Objects.equals(value, ((Facultative)other).value);
+        return Objects.equals(value, ((Nullable)other).value);
     }
 
     @Override
@@ -111,26 +111,26 @@ public final class Facultative<T> {
 
     // ---------------------------------------------------------------------- //
 
-    public static Facultative empty() {
-        return new Facultative();
+    public static Nullable empty() {
+        return new Nullable();
     }
 
-    public static <E> Facultative<E> of(E elem) {
-        return new Facultative(elem);
+    public static <E> Nullable<E> of(E elem) {
+        return new Nullable(elem);
     }
 
-    public static <E> Facultative<E> of(Optional<E> elem) {
+    public static <E> Nullable<E> of(Optional<E> elem) {
         return elem.isPresent() ? of(elem.get()) : empty();
     }
 
     // ---------------------------------------------------------------------- //
 
-    public Facultative<T> filter(Predicate<? super T> predicate) {
+    public Nullable<T> filter(Predicate<? super T> predicate) {
         return !isPresent || predicate.test(value) ? this : empty();
     }
 
-    public <U> Facultative<U> flatMap(
-            Function<? super T, Facultative<U>> mapper) {
+    public <U> Nullable<U> flatMap(
+            Function<? super T, Nullable<U>> mapper) {
         return isPresent ? mapper.apply(value) : empty();
     }
 
@@ -140,7 +140,7 @@ public final class Facultative<T> {
         }
     }
 
-    public <U> Facultative<U> map(Function<? super T, ? extends U> mapper) {
+    public <U> Nullable<U> map(Function<? super T, ? extends U> mapper) {
         return isPresent ? of(mapper.apply(value)) : empty();
     }
 }

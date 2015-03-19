@@ -17,7 +17,7 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     private Iterator<E> source;
     private Consumer<? super Exception> handler;
     private int retries;
-    private Facultative<E> element;
+    private Nullable<E> element;
 
     public TolerantEnumerator(Iterator<E> source,
                               Consumer<? super Exception> handler,
@@ -29,7 +29,7 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
         this.source = source;
         this.handler = handler;
         this.retries = retries;
-        this.element = Facultative.empty();
+        this.element = Nullable.empty();
     }
 
     @Override

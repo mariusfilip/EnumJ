@@ -6,6 +6,7 @@
 package enumj;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  *
@@ -14,11 +15,12 @@ import java.util.Iterator;
 class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
 
     private Enumerator<Iterator<E>> source;
-    private Facultative<Enumerator<E>> iterator;
+    private Nullable<Enumerator<E>> iterator;
+    private LinkedList<Iterator<E>> rest;
 
     public FlatteningEnumerator(Iterator<Iterator<E>> source) {
         this.source = Enumerator.of(source);
-        this.iterator = Facultative.empty();
+        this.iterator = Nullable.empty();
     }
 
     @Override
@@ -26,11 +28,23 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
         if (iterator.isPresent() && iterator.get().hasNext()) {
             return true;
         }
-        while(source.hasNext()) {
-            iterator.set(Enumerator.of(source.next()));
-            if (iterator.get().hasNext()) {
-                return true;
+        if (source != null) {
+            while(source.hasNext()) {
+                iterator.set(Enumerator.of(source.next()));
+                if (iterator.get().hasNext()) {
+                    return true;
+                }
             }
+            source = null;
+        }
+        if (rest != null) {
+            while (!rest.isEmpty()) {
+                iterator.set(Enumerator.of(rest.remove()));
+                if (iterator.get().hasNext()) {
+                    return true;
+                }
+            }
+            rest = null;
         }
         return false;
     }
@@ -43,5 +57,17 @@ class FlatteningEnumerator<E> extends AbstractEnumerator<E> {
         source = null;
         iterator.clear();
         iterator = null;
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    @Override
+    public Enumerator<E> concat(Iterator<? extends E> elements) {
+        Utils.ensureNonEnumerating(this);
+        if (rest == null) {
+            rest = new LinkedList<>();
+        }
+        rest.addLast((Iterator<E>)elements);
+        return this;
     }
 }

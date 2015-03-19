@@ -18,7 +18,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     protected LinkedList<PipeProcessor> pipeline;
     protected LinkedList<PipeReference> sources;
-    protected Facultative<E> value;
+    protected Nullable<E> value;
 
     PipeEnumerator(Iterator<E> source) {
         this();
@@ -29,10 +29,17 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     PipeEnumerator() {
         this.pipeline = new LinkedList<>();
         this.sources = new LinkedList<>();
-        this.value = Facultative.empty();
+        this.value = Nullable.empty();
     }
 
-    protected<X> Enumerator<X> enqueue(
+    static <T> PipeEnumerator<T> of(Iterator<T> source) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return (source instanceof PipeEnumerator)
+               ? (PipeEnumerator<T>)source
+               : new PipeEnumerator(source);
+    }
+
+    protected <X> Enumerator<X> enqueue(
             PipeProcessor<? super E, ? extends X> processor) {
         pipeline.addLast(processor);
         if (!sources.isEmpty()) {
@@ -53,7 +60,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             }
         }
     }
-    protected boolean pipe(Object in, Facultative<E> out) {
+    protected boolean pipe(Object in, Nullable<E> out) {
         out.clear();
         for(PipeProcessor processor: pipeline) {
             processor.process(in);
@@ -110,6 +117,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // ---------------------------------------------------------------------- //
 
+    @Override
+    public Enumerator<E> concat(Iterator<? extends E> elements) {
+        sources.addLast(PipeReference.of(elements));
+        return this;
+    }
     @Override
     public Enumerator<E> filter(Predicate<? super E> predicate) {
         return enqueue(new FilterPipeProcessor(predicate));
