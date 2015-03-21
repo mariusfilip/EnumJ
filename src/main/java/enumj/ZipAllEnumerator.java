@@ -26,7 +26,7 @@ package enumj;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class ZipAllEnumerator<E> extends AbstractEnumerator<Optional<E>[]> {
+class ZipAllEnumerator<E> extends AbstractEnumerator<Optional<E>[]> {
 
     private Iterator<E>[] sources;
     private int index;

@@ -31,7 +31,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public final class Nullable<T> {
+final class Nullable<T> {
 
     private T value;
     private boolean isPresent;

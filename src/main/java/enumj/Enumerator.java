@@ -192,40 +192,6 @@ public interface Enumerator<E> extends Iterator<E> {
     public boolean enumerating();
 
     /**
-     * Binds the current enumerator to the given iterating source.
-     *
-     * @param source {@link Iterator} to bind to.
-     * @see #bound()
-     * @see #bindable()
-     * @see #ofLateBinding(java.lang.Class)
-     */
-    public default void bind(Iterator<? extends E> source) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Returns whether the current enumerator is late-bound.
-     *
-     * @return <code>true</code> if the enumerator is bound, <code>false</code>
-     * otherwise.
-     */
-    public default boolean bound() {
-        return false;
-    }
-
-    /**
-     * Returns whether the current enumerator support late-binding.
-     *
-     * @return <code>true</code> if the enumerator support late-binding,
-     * <code>false</code> otherwise.
-     */
-    public default boolean bindable() {
-        return false;
-    }
-
-    /**
      * Returns an enumerator returning the given elements.
      *
      * @param <E> the type of elements being enumerated
@@ -266,7 +232,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Iterable<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return of(source.iterator());
     }
 
@@ -452,17 +417,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator that supports late-binding.
-     * <p>
-     * The returned enumerator does not throw
-     * {@link UnsupportedOperationException} on
-     * {@link #bind(java.util.Iterator)}. It also returns <code>true</code>
-     * on {@link #bindable()}.
-     * </p>
-     * @param <E>
-     * @param clazz Type of data to enumerate upon.
-     * @return An enumerator that support late-binding.
+     * @param <E> type of enumerated elements
+     * @param clazz class of enumerated elements
+     * @return the new enumerator
+     * @see LateBindingEnumerator
      */
-    public static <E> Enumerator<E> ofLateBinding(Class<E> clazz) {
+    public static <E> LateBindingEnumerator<E> ofLateBinding(Class<E> clazz) {
         return new LateBindingEnumerator<E>();
     }
 
@@ -2132,7 +2092,7 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator consisting of an array of {@list Optional}
+     * Returns an enumerator consisting of an array of {@link Optional}
      * objects containing elements from the current enumerator and
      * the given {@link Iterator} instances, while any has elements.
      *
