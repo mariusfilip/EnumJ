@@ -33,7 +33,7 @@ class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
         return value;
     }
     @Override
-    public boolean continueOnNoValue() {
+    public boolean nextOnNoValue() {
         return true;
     }
 }

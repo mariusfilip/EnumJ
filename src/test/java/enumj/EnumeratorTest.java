@@ -959,7 +959,7 @@ public class EnumeratorTest {
     @Test
     public void testToSet() {
         System.out.println("toSet");
-        assertEquals(Enumerator.repeatElement(100, 5).toSet().size(), 1);
+        assertEquals(Enumerator.repeat(100, 5).toSet().size(), 1);
     }
 
     /**
@@ -1237,7 +1237,7 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of repeat method, of class Enumerator.
+     * Test of repeatAll method, of class Enumerator.
      */
     @Test
     public void testRepeat() {

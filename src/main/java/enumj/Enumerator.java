@@ -28,8 +28,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +54,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -89,7 +92,9 @@ import org.apache.commons.lang3.tuple.Pair;
  * <ul>
  *   <li>{@link #as(java.lang.Class)}</li>
  *   <li>{@link #asFiltered(java.lang.Class)}</li>
+ *   <li>{@link #asOptional()</li>
  *   <li>{@link #append(java.lang.Object...)}</li>
+ *   <li>{@link #cartesianProduct(java.util.function.Supplier)</li>
  *   <li>{@link #concatOn(java.lang.Object...)}</li>
  *   <li>{@link #concat(java.util.Enumeration)}</li>
  *   <li>{@link #concat(java.lang.Iterable)}</li>
@@ -99,6 +104,7 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #concat(java.util.function.Supplier)}</li>
  *   <li>{@link #filter(java.util.function.Predicate)}</li>
  *   <li>{@link #flatMap(java.util.function.Function)}</li>
+ *   <li>{@link #indexedMap(java.util.function.BiFunction)</li>
  *   <li>{@link #limit(long)}</li>
  *   <li>{@link #limitWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #map(java.util.function.Function)}</li>
@@ -110,10 +116,16 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #prepend(java.util.Spliterator)}</li>
  *   <li>{@link #prepend(java.util.stream.Stream)}</li>
  *   <li>{@link #prepend(java.util.function.Supplier)}</li>
+ *   <li>{@link #repeatEach(int)</li>
  *   <li>{@link #skip(long)}</li>
  *   <li>{@link #skipWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #take(long)}</li>
  *   <li>{@link #takeWhile(java.util.function.Predicate)}</li>
+ *   <li>{@link #zipAll(java.util.Iterator, java.util.Iterator...)</li>
+ *   <li>{@link #zipAny(java.util.Iterator)</li>
+ *   <li>{@link #zipBoth(java.util.Iterator)</li>
+ *   <li>{@link #zipLeft(java.util.Iterator)</li>
+ *   <li>{@link #zipRight(java.util.Iterator)</li>
  * </ul>
  * <p>
  * <strong>Shareability</strong>
@@ -128,10 +140,10 @@ import org.apache.commons.lang3.tuple.Pair;
  * <strong>Fault tolerance</strong>
  * </p>
  * <p>
- * Fault-tolerant enumerators accept an error handler which
- * is being called whenever the process of enumerating throws an exception.
- * The error handler consumes the error and the pipeline doesn't stop.
- * {@link #asTolerant(java.util.function.Consumer)}
+ Fault-tolerant enumerators accept an error handler which
+ is being called whenever the tryPipelineOut of enumerating throws an exception.
+ The error handler consumes the error and the pipeline doesn't stop.
+ {@link #asTolerant(java.util.function.Consumer)}
  * converts any enumerator into a fault-tolerant enumerator.
  * </p>
  * <p>
@@ -493,6 +505,24 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
+     * Returns an infinite enumerator of non-empty {@link Optional} instances
+     * containing the current elements as long as they last or empty
+     * {@link Optional} instances if the current enumerator has no more
+     * elements.
+     * <p>
+     * The current enumerator may not return <code>null</code> elements.
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * @return the infinite enumerator of {@link Optional} instances
+     */
+    public default Enumerator<Optional<E>> asOptional() {
+        Utils.ensureNonEnumerating(this);
+        return map(e -> Optional.of(e))
+                .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
+    }
+
+    /**
      * Returns a sequential {@link Spliterator} iterating over the current
      * enumerator.
      *
@@ -671,6 +701,26 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
+     * Returns an enumerator enumerating over the Cartesian product between the
+     * elements of the current enumerator and the iterator supplied lazily.
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * @param <T> type of elements to make cartesianProduct with
+     * @param source iterator to make cartesianProduct with
+     * @return the cartesianProduct enumerator
+     * @exception IllegalStateException the current enumerator is enumerating
+     * @throws IllegalArgumentException <code>source</code> is
+     * <code>null</code>.
+     */
+    public default <T> Enumerator<Pair<E,T>> cartesianProduct(
+            Supplier<Iterator<T>> source) {
+        Utils.ensureNonEnumerating(this);
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return new PipeEnumerator(this).cartesianProduct(source);
+    }
+
+    /**
      * Returns an enumerator that chooses elements from the provided iterators.
      * <p>
      * This method works like
@@ -719,8 +769,8 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * The pair formed of <code>indexSupplier</code> and
      * <code>altIndexSupplier</code> makes the choice algorithm. The resulted
-     * enumerator chooses its next element in a multi-step process:
-     * </p>
+ enumerator chooses its next element in a multi-step tryPipelineOut:
+ </p>
      * <ul>
      *   <li>it calls <code>indexSupplier.get()</code> to get the index of a
      * provided iterator. That iterator will provide the next element.
@@ -955,15 +1005,21 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator containing the elements of the current enumerator
      * in the same order by without duplicates.
      * <p>
-     * This method works exactly like
-     * <code>of(this.asStream().distinct())</code>.
+     * <em>This operation is highly composable.</em>
      * </p>
      * @return the new enumerator
      * @see #sorted()
      * @see Stream
      */
     public default Enumerator<E> distinct() {
-        return of(asStream().distinct());
+        final Set<E> existing = new HashSet<E>(256);
+        return filter(e -> {
+            if (existing.contains(e)) {
+                return false;
+            }
+            existing.add(e);
+            return true;
+        });
     }
 
     /**
@@ -1065,6 +1121,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator consisting of the results of replacing each
      * enumerated element with the content of a mapped enumerator obtained
      * by applying the provided mapper on each enumerated element.
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
      * <pre>
      * Example:
      * <code>
@@ -1074,10 +1133,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * will produce the sequence 1, 2, 4, 6, 9 and 12.
      * </pre>
      * <p>
-     * <strong>Important: </strong><em>this operation is <u>not</u>
-     * highly composable. For highly composable flat mapping, use
-     * {@link #quickFlatMap(java.util.function.Function)}.</em>
-     * </p>
      * @param <R> the element type of the new enumerator
      * @param mapper {@link Function} instance to apply on each enumerated
      * element of the current enumerator
@@ -1089,7 +1144,8 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
         Utils.ensureNonEnumerating(this);
-        return new FlatteningEnumerator(map(mapper));
+        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
+        return new PipeEnumerator(this).flatMap(mapper);
     }
 
     /**
@@ -1440,53 +1496,14 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param elements {@link Supplier} instance supplying the elements to
      * prepend in front of the current enumerator
      * @return the prepended enumerator
+     * @exception IllegalStateException the current enumerator is enumerating
      * @exception IllegalArgumentException <code>elements</code> is
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Supplier<Optional<E>> elements) {
         Utils.ensureNonEnumerating(this);
+        Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
         return prepend(of(elements));
-    }
-
-    /**
-     * Returns an enumerator consisting of the results of replacing each
-     * enumerated element with the content of a mapped enumerator obtained
-     * by applying the provided mapper on each enumerated element.
-     * <p>
-     * <em>This operation is highly composable.</em>
-     * </p>
-     * <pre>
-     * Example:
-     * <code>
-     * Enumerator.on(1, 2, 3)
-     *           .quickFlatMap(i -&gt; Enumerator.on(i*i, i*(i+1)))
-     * </code>
-     * will produce the sequence 1, 2, 4, 6, 9 and 12.
-     * </pre>
-     * <p>
-     * <strong>Important: </strong><em>This method works like
-     * {@link #flatMap(java.util.function.Function)} with the exception that
-     * it resolves the iterators to flatten up-front. This makes it
-     * highly composable but in turn it is not applicable when the current
-     * enumerator has many elements. For such situations use
-     * {@link #flatMap(java.util.function.Function)}.</em>
-     * </p>
-     * @param <R> the element type of the new enumerator
-     * @param mapper {@link Function} instance to apply on each enumerated
-     * element of the current enumerator
-     * @return the flattened enumerator
-     * @exception IllegalArgumentException <code>mapper</code> is
-     * <code>null</code>
-     */
-    public default <R> Enumerator<R> quickFlatMap(
-            Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        Utils.ensureNonEnumerating(this);
-        final Mutable<Enumerator<R>> result =
-                new MutableObject(Enumerator.empty());
-        map(mapper).forEach(it -> {
-            result.setValue(result.getValue().concat(it));
-        });
-        return result.getValue();
     }
 
     /**
@@ -1637,32 +1654,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator that keeps enumerating over a given sequence
-     * a given number of times.
-     * <p>
-     * The source {@link Iterator} gets iterated only once.
-     * </p>
-     * @param <E> the type of enumerated elements
-     * @param elements sequence to enumerate repeatedly
-     * @param count the number of times to repeat the <code>elements</code>
-     * sequence
-     * @return the repeating enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code> or <code>count</code> is negative
-     * @see #repeatElement(java.lang.Object, long)
-     * @see #repeatElements(java.util.Iterator, int)
-     */
-    public static <E> Enumerator<E> repeat(Iterator<E> elements, int count) {
-        Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonNegative(count,
-                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
-        final SharingEnumerator<E>[] sharing = of(elements).asShareable()
-                                                           .share(count);
-        return Enumerator.rangeInt(0, sharing.length)
-                         .quickFlatMap(i -> sharing[i]);
-    }
-
-    /**
      * Returns an enumerator that enumerates the same element the given number
      * of times.
      *
@@ -1671,33 +1662,79 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param count the number of elements to return
      * @return the enumerator repeating the element
      * @exception IllegalArgumentException <code>count</code> is negative
-     * @see #repeat(java.util.Iterator, int)
-     * @see #repeatElements(java.util.Iterator, int)
+     * @see #repeatAll(java.util.function.Supplier, long)
+     * @see #repeatAll(int)
+     * @see #repeatEach(int)
      */
-    public static <E> Enumerator<E> repeatElement(E element, long count) {
+    public static <E> Enumerator<E> repeat(E element, long count) {
         Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
         return rangeLong(0, count).map(l -> element);
     }
 
     /**
-     * Returns an enumerator that enumerates each element in a sequence, the
-     * given number of times.
+     * Returns an enumerator that enumerates over the iterator supplied lazily
+     * the given number of times.
      *
-     * @param <E> type of enumerated elements
-     * @param elements the sequence whose elements need repetition
-     * @param count the number of times to repeat the elements in the sequence
+     * @param <E> type of enumerated element
+     * @param source supplier of the iterator to repeat
+     * @param count the number of times to repeat
+     * @return the repeated enumerator
+     * @exception IllegalArgumentException <code>source</code> is
+     * <code>null</code> or <code>count</code> is negative
+     * @see #repeat(java.lang.Object, long)
+     * @see #repeatAll(int)
+     * @see #repeatEach(int)
+     */
+    public static <E> Enumerator<E> repeatAll(Supplier<Iterator<E>> source,
+                                              long count) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNonNegative(count,
+                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
+        return rangeLong(0, count).flatMap(l -> source.get());
+    }
+
+    /**
+     * Returns an enumerator that keeps enumerating over the current sequence,
+     * a given number of times.
+     * <p>
+     * The current enumerator gets iterated only once.
+     * </p>
+     * @param count the number of times to repeatAll the <code>elements</code>
+     * sequence
+     * @return the repeating enumerator
+     * @exception IllegalArgumentException <code>elements</code> is
+     * <code>null</code> or <code>count</code> is negative
+     * @see #repeat(java.lang.Object, long)
+     * @see #repeatAll(java.util.function.Supplier, long)
+     * @see #repeatEach(int)
+     */
+    public default Enumerator<E> repeatAll(int count) {
+        Utils.ensureNonNegative(count,
+                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
+        final SharingEnumerator<E>[] sharing = asShareable().share(count);
+        return Enumerator.rangeInt(0, sharing.length)
+                         .flatMap(i -> sharing[i]);
+    }
+
+    /**
+     * Enumerates over the elements of the current enumerator the given number
+     * of times.
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * @param count the number of times to repeatAll the elements in the
+     * sequence
      * @return the enumerator of repeated elements
      * @exception IllegalArgumentException <code>elements</code> is
      * <code>null</code> or <code>count</code> is negative
-     * @see #repeat(java.util.Iterator, int)
-     * @see #repeatElements(java.util.Iterator, int)
+     * @see #repeat(java.lang.Object, long)
+     * @see #repeatAll(java.util.function.Supplier, long)
+     * @see #repeatAll(int)
      */
-    public static <E> Enumerator<E> repeatElements(Iterator<E> elements,
-                                                   int count) {
-        Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
+    public default Enumerator<E> repeatEach(int count) {
         Utils.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
-        return of(elements).flatMap(e -> repeatElement(e, count));
+        return flatMap(e -> repeat(e, count));
     }
 
     /**
@@ -1706,9 +1743,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the reversed enumerator.
      */
     public default Enumerator<E> reverse() {
-        final List<E> elements = collect(Collectors.toList());
-        Collections.reverse(elements);
-        return of(elements);
+        final LinkedList<E> elements = new LinkedList();
+        while(hasNext()) {
+            elements.add(next());
+        }
+        return Enumerator.of(elements.descendingIterator());
     }
 
     /**
@@ -1997,6 +2036,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * elements. Likewise, the second element of a returned pair is empty
      * {@link Optional} if the provided {@link Iterator} has no elements.
      * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
      * @param <T> the of elements to zip with
      * @param elements {@link Iterator} to zip with
      * @return the zipped enumerator
@@ -2020,6 +2062,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * The resulted enumerator stops when aby of the current enumerator or the
      * provided {@link Iterator} stop.
+     * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
      * </p>
      * @param <T> the of elements to zip with
      * @param elements {@link Iterator} to zip with
@@ -2047,6 +2092,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * The second element of a returned pair is empty {@link Optional} if
      * the provided {@link Iterator} has no elements.
      * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
      * @param <T> the of elements to zip with
      * @param elements {@link Iterator} to zip with
      * @return the zipped enumerator
@@ -2073,6 +2121,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * The first element of a returned pair is empty {@link Optional} if the
      * current enumerator has no elements.
      * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
      * @param <T> the of elements to zip with
      * @param elements {@link Iterator} to zip with
      * @return the zipped enumerator
@@ -2095,7 +2146,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator consisting of an array of {@link Optional}
      * objects containing elements from the current enumerator and
      * the given {@link Iterator} instances, while any has elements.
-     *
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
      * @param first first iterator to zip with
      * @param rest the rest of iterators to zip with
      * @return the zipped enumerator
@@ -2104,6 +2157,10 @@ public interface Enumerator<E> extends Iterator<E> {
                    zipAll(Iterator<? extends E> first,
                           Iterator<? extends E>... rest) {
         Utils.ensureNonEnumerating(this);
-        return new ZipAllEnumerator(this, first, rest);
+        Utils.ensureNotNull(first, Messages.NULL_ITERATOR);
+        for(Iterator<?> it: rest) {
+            Utils.ensureNotNull(it, Messages.NULL_ITERATOR);
+        }
+        return new PipeEnumerator(this).zipAll(first, rest);
     }
 }

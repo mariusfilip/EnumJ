@@ -23,16 +23,7 @@
  */
 package enumj;
 
-/**
- *
- * @author Marius Filip
- */
-abstract class PipeProcessor<T,R> {
-    PipeProcessor next;
-
-    protected PipeProcessor() {}
-    abstract void process(T value);
-    abstract boolean hasValue();
-    abstract R getValue();
-    abstract boolean nextOnNoValue();
+abstract class PipeMultiProcessor<T,R> extends PipeProcessor<T,R> {    
+    protected PipeMultiProcessor() {}
+    abstract boolean needsValue();
 }

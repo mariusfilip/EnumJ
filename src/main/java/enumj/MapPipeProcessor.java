@@ -12,17 +12,17 @@ import java.util.function.Function;
  * @author Marius Filip
  */
 class MapPipeProcessor<In,Out> extends PipeProcessor<In,Out> {
-    protected Function<In,Out> functor;
+
+    protected Function<In,Out> mapper;
     protected Out value;
 
     public MapPipeProcessor(Function<In,Out> functor) {
-        Utils.ensureNotNull(functor, Messages.NULL_ENUMERATOR_MAPPER);
-        this.functor = functor;
+        this.mapper = functor;
     }
 
     @Override
     protected void process(In value) {
-        this.value = functor.apply((In)value);
+        this.value = mapper.apply(value);
     }
     @Override
     protected boolean hasValue() {
@@ -33,7 +33,7 @@ class MapPipeProcessor<In,Out> extends PipeProcessor<In,Out> {
         return value;
     }
     @Override
-    protected boolean continueOnNoValue() {
+    protected boolean nextOnNoValue() {
         return false;
     }
 }
