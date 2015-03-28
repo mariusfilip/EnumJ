@@ -34,17 +34,17 @@ public class EnumerableTest {
     @Before
     public void setUp() {
         iterator = Arrays.asList(1, 2, 3).iterator();
-        enumerable = new Enumerable(iterator);
+        enumerable = new OnceEnumerable(iterator);
     }
     Iterator<Integer> iterator;
-    Enumerable<Integer> enumerable;
+    OnceEnumerable<Integer> enumerable;
 
     @After
     public void tearDown() {
     }
 
     /**
-     * Test of iterator method, of class Enumerable.
+     * Test of iterator method, of class OnceEnumerable.
      */
     @Test
     public void testIterator() {

@@ -61,7 +61,7 @@ public class EnumeratorGenerator {
     }
 
     public Enumerator<Double> ofIterableEnumerator() {
-        return Enumerator.of(ofIteratorEnumerator().asIterable());
+        return Enumerator.of(ofIteratorEnumerator().asEnumerable());
     }
 
     public Enumerator<Double> ofEnumerationEnumerator() {
@@ -87,7 +87,7 @@ public class EnumeratorGenerator {
 
     public Enumerator<Double> ofLazyIterableEnumerator() {
         return Enumerator.ofLazyIterable(
-                () -> ofIterableEnumerator().asIterable());
+                () -> ofIterableEnumerator().asEnumerable());
     }
 
     public Enumerator<Double> ofLazyEnumerationEnumerator() {

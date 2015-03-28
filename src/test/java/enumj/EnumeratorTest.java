@@ -298,7 +298,7 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of asIterable method, of class Enumerator.
+     * Test of asEnumerable method, of class Enumerator.
      */
     @Test
     public void testAsIterable() {
@@ -308,7 +308,7 @@ public class EnumeratorTest {
                 .limit(100)
                 .map(p -> Pair.of(p.getLeft().enumerator(),
                                   p.getRight().enumerator()
-                                              .asIterable()))
+                                              .asEnumerable()))
                 .forEach(p -> {
                     long c = p.getLeft().count();
                     for(double d : p.getRight()) {
@@ -553,7 +553,7 @@ public class EnumeratorTest {
     public void testConcat_Iterable() {
         System.out.println("concat");
         assertEquals(Enumerator.on(1, 2, 3)
-                               .concat(Enumerator.on(4, 5).asIterable())
+                               .concat(Enumerator.on(4, 5).asEnumerable())
                                .count(), 5);
     }
 
@@ -597,7 +597,7 @@ public class EnumeratorTest {
     public void testContains() {
         System.out.println("contains");
         Supplier<Enumerator<Integer>> supplier = () -> Enumerator.rangeInt(0, 10);
-        for(Integer i : supplier.get().asIterable()) {
+        for(Integer i : supplier.get().asEnumerable()) {
             assertTrue(supplier.get().contains(i));
             assertTrue(!supplier.get().contains(-i-1));
         }
