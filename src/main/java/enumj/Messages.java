@@ -50,4 +50,7 @@ class Messages {
             "No single enumerator element";
     public static final String OVERFLOWED_ENUMERATOR_INDEX =
             "Overflowed enumerator index";
+
+    public static final String ILLEGAL_MULTIPLE_CALLS =
+            "Illegal multiple calls";
 }

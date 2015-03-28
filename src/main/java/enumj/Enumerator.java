@@ -54,7 +54,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -140,11 +139,11 @@ import org.apache.commons.lang3.tuple.Pair;
  * <strong>Fault tolerance</strong>
  * </p>
  * <p>
- Fault-tolerant enumerators accept an error handler which
- is being called whenever the tryPipelineOut of enumerating throws an exception.
- The error handler consumes the error and the pipeline doesn't stop.
- {@link #asTolerant(java.util.function.Consumer)}
- * converts any enumerator into a fault-tolerant enumerator.
+ * Fault-tolerant enumerators accept an error handler which
+ * is being called whenever the tryPipelineOut of enumerating throws an
+ * exception. The error handler consumes the error and the pipeline doesn't
+ * stop. {@link #asTolerant(java.util.function.Consumer)} converts any
+ * enumerator into a fault-tolerant enumerator.
  * </p>
  * <p>
  * <strong>Lazy evaluations</strong>
@@ -481,23 +480,24 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an {@link Iterable} iterating over the current enumerator.
+     * Returns a {@link OnceEnumerable} instance enumerating over the current
+     * enumerator.
      * <p>
      * This method satisfies the condition
-     * <code>this.asIterable().iterator() == this</code>.
+     * <code>this.asEnumerable().iterator() == this</code>.
      * </p>
      *
-     * @return the new {@link Iterable}
+     * @return the new {@link OnceEnumerable}
      */
-    public default Iterable<E> asIterable() {
+    public default OnceEnumerable<E> asEnumerable() {
         Utils.ensureNonEnumerating(this);
-        return new Enumerable<E>(this);
+        return new OnceEnumerable<E>(this);
     }
 
     /**
      * Returns an {@link Enumeration} enumerating over the current enumerator.
      * @return the new {@link Enumeration}
-     * @see #asIterable()
+     * @see #asEnumerable()
      */
     public default Enumeration<E> asEnumeration() {
         Utils.ensureNonEnumerating(this);

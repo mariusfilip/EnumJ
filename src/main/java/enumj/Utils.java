@@ -5,6 +5,8 @@
  */
 package enumj;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+
 /**
  *
  * @author Marius Filip
@@ -30,5 +32,11 @@ class Utils {
         if (enumerator.enumerating()) {
             throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
+    }
+    public static void ensureOnce(MutableBoolean flag) {
+        if (flag.booleanValue()) {
+            throw new IllegalStateException(Messages.ILLEGAL_MULTIPLE_CALLS);
+        }
+        flag.setValue(true);
     }
 }
