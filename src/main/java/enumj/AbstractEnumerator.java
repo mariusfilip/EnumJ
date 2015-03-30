@@ -14,7 +14,7 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     private boolean done;
 
     @Override
-    public boolean enumerating() {
+    public final boolean enumerating() {
         return enumerating;
     }
 

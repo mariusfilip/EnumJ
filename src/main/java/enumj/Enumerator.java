@@ -332,7 +332,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> ofLazyIterator(
             Supplier<? extends Iterator<E>> source) {
-        return new LazyEnumerator(source);
+        return LazyEnumerator.of(source);
     }
 
     /**
@@ -355,7 +355,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> ofLazyIterable(
             Supplier<? extends Iterable<E>> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerator(() -> of(source.get()));
+        return LazyEnumerator.of(() -> of(source.get()));
     }
 
     /**
@@ -378,7 +378,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> ofLazyEnumeration(
             Supplier<? extends Enumeration<E>> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerator(() -> of(source.get()));
+        return LazyEnumerator.of(() -> of(source.get()));
     }
 
     /**
@@ -400,7 +400,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> ofLazyStream(
             Supplier<? extends Stream<E>> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerator(() -> of(source.get()));
+        return LazyEnumerator.of(() -> of(source.get()));
     }
 
     /**
@@ -423,7 +423,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> ofLazySpliterator(
             Supplier<? extends Spliterator<E>> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerator(() -> of(source.get()));
+        return LazyEnumerator.of(() -> of(source.get()));
     }
 
     /**
@@ -465,9 +465,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * This method works exactly like
      * {@code this.filter(e -> clazz.isInstance(e)).as(clazz)}.
-     * </p>
-     * <p>
-     * <em>This operation is highly composable.</em>
      * </p>
      * @param <T> type of elements of the resulted enumerator
      * @param clazz class of the type to cast and filter to

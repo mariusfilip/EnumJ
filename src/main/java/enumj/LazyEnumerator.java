@@ -14,11 +14,10 @@ import java.util.function.Supplier;
  */
 final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
-    private Supplier<? extends Iterator<E>> source;
+    private Supplier<Iterator<E>> source;
     private Enumerator<E> iterator;
 
-    public LazyEnumerator(Supplier<? extends Iterator<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+    private LazyEnumerator(Supplier<Iterator<E>> source) {
         this.source = source;
     }
 
@@ -37,5 +36,11 @@ final class LazyEnumerator<E> extends AbstractEnumerator<E> {
     protected void cleanup() {
         source = null;
         iterator = null;
+    }
+    
+    public static <E> LazyEnumerator<E> of(
+            Supplier<? extends Iterator<E>> source) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return new LazyEnumerator(source);
     }
 }
