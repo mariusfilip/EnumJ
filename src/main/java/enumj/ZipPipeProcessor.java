@@ -24,6 +24,7 @@
 package enumj;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public class ZipPipeProcessor<E> extends PipeProcessor<Optional<E>,
@@ -34,12 +35,12 @@ public class ZipPipeProcessor<E> extends PipeProcessor<Optional<E>,
     protected boolean hasAny;
     
     public ZipPipeProcessor(Iterator<E> first,
-                            Iterator<E>... rest) {
-        iterators = new Iterator[1+rest.length];
+                            List<Iterator<E>> rest) {
+        iterators = new Iterator[1+rest.size()];
         value = new Optional[1+iterators.length];
         iterators[0] = first;
         for(int i=1; i<iterators.length; ++i) {
-            iterators[i] = rest[i-1];
+            iterators[i] = rest.get(i-1);
         }
     }
 

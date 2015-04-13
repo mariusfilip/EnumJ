@@ -28,7 +28,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
                             IntUnaryOperator nextIndexSupplier,
                             Iterator<E> first,
                             Iterator<E> second,
-                            Iterator<E>... rest) {
+                            List<Iterator<E>> rest) {
         Utils.ensureNotNull(indexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
         Utils.ensureNotNull(nextIndexSupplier,
@@ -44,7 +44,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         this.sources = new ArrayList<>();
         this.sources.add(first);
         this.sources.add(second);
-        this.sources.addAll(Arrays.asList(rest));
+        this.sources.addAll(rest);
     }
 
     @Override

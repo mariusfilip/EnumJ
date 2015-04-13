@@ -45,6 +45,8 @@ class Messages {
 
     public static final String ILLEGAL_ENUMERATOR_STATE =
             "Illegal enumerator state";
+    public static final String NON_CLONEABLE_ENUMERATOR =
+            "Non-cloneable enumerator";
 
     public static final String NO_SINGLE_ENUMERATOR_ELEMENT =
             "No single enumerator element";

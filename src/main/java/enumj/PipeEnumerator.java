@@ -23,8 +23,10 @@
  */
 package enumj;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -243,9 +245,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     public Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
                                             Iterator<? extends E>... rest) {
+        return zipAll(first, Arrays.asList(rest));
+    }
+    
+    // ---------------------------------------------------------------------- //
+
+    Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
+                                     List<Iterator<? extends E>> rest) {
         PipeEnumerator<Optional<E>> optionalPipe =
                 (PipeEnumerator<Optional<E>>)map(e -> Optional.of(e))
                 .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
         return optionalPipe.enqueue(new ZipPipeProcessor(first, rest));
-    }
+    }    
 }

@@ -24,12 +24,22 @@
 package enumj;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Spliterator;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * A type of {@link Iterable} with high composability.
@@ -44,7 +54,10 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public Enumerator<E> enumerator();
-    public boolean consumed();
+    public boolean enumerating();
+
+    public Enumerable<E> clone();
+    public boolean cloneable();
 
     // ---------------------------------------------------------------------- //
 
@@ -77,11 +90,6 @@ public interface Enumerable<E> extends Iterable<E> {
         return Enumerator.of(source).asEnumerable();
     }
 
-    public static <E> Enumerable<E> ofSuppliedIterators(
-            Supplier<Optional<Iterator<E>>> iteratorSupplier) {
-        return RepeatableEnumerable.of(iteratorSupplier);
-    }
-
     public static <E> Enumerable<E> ofLazyIterable(
             Supplier<? extends Iterable<E>> source) {
         return LazyEnumerable.of(source);
@@ -105,5 +113,279 @@ public interface Enumerable<E> extends Iterable<E> {
     public static <E> OnceEnumerable<E> ofLazySpliterator(
             Supplier<? extends Spliterator<E>> source) {
         return of(Enumerator.ofLazySpliterator(source));
+    }
+
+    public static <E> LateBindingEnumerable<E> ofLateBinding(Class<E> clazz) {
+        return new LateBindingEnumerable<E>();
+    }
+
+    public default <T> Enumerable<T> as(Class<T> clazz) {
+        return (Enumerable<T>)this;
+    }
+
+    public default <T> Enumerable<T> asFiltered(Class<T> clazz) {
+        return filter(clazz::isInstance).as(clazz);
+    }
+
+    public default Enumeration<E> asEnumeration() {
+        return enumerator().asEnumeration();
+    }
+
+    public default Spliterator<E> asSpliterator() {
+        return enumerator().asSpliterator();
+    }
+
+    public default Stream<E> asStream() {
+        return enumerator().asStream();
+    }
+
+    public default Enumerable<E> asTolerant(
+            Consumer<? super Exception> handler) {
+        return asTolerant(handler, 0);
+    }
+
+    public default Enumerable<E> asTolerant(
+            Consumer<? super Exception> handler,
+            int retries) {
+        return new PipeEnumerable(this).asTolerant(handler, retries);
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    public default Enumerable<E> append(E... elements) {
+        return concat(on(elements));
+    }
+
+    public default <T> Enumerable<Pair<E,T>> cartesianProduct(
+            Iterable<T> other) {
+        Utils.ensureNonEnumerating(this);
+        Utils.ensureNotNull(other, Messages.NULL_ENUMERATOR_SOURCE);
+        return new PipeEnumerable(this).cartesianProduct(other);
+    }
+
+    public static <E> Enumerable<E> choiceOf(
+            IntSupplier indexSupplier,
+            Iterable<E> first,
+            Iterable<? extends E> second,
+            Iterable<? extends E>... rest) {
+        final int size = 1 + 1 + rest.length;
+        final IntUnaryOperator altIndexSupplier = i -> (i+1)%size;
+        return choiceOf(indexSupplier,
+                        altIndexSupplier,
+                        first,
+                        second,
+                        rest);
+    }
+
+    public static <E> Enumerable<E> choiceOf(
+            IntSupplier indexSupplier,
+            IntUnaryOperator altIndexSupplier,
+            Iterable<E> first,
+            Iterable<? extends E> second,
+            Iterable<? extends E>... rest) {
+        return new ChoiceEnumerable(indexSupplier,
+                                    altIndexSupplier,
+                                    first,
+                                    second,
+                                    Arrays.asList(rest));
+    }
+
+    public default Enumerable<E> concat(Iterable<? extends E> elements) {
+        return new PipeEnumerable(this).concat(elements);
+    }
+
+    public default Enumerable<E> concatOn(E... elements) {
+        return concat(on(elements));
+    }
+
+    public default Enumerable<E> distinct() {
+        Utils.ensureNonEnumerating(this);
+        return new PipeEnumerable(this).distinct();
+    }
+
+    public default <T> boolean elementsEqual(Iterable<T> elements) {
+        return enumerator().elementsEqual(elements.iterator());
+    }
+
+    public static <E> Enumerable<E> empty() {
+        return of(Collections.emptyList());
+    }
+
+    public default Enumerable<E> filter(Predicate<? super E> predicate) {
+        return new PipeEnumerable(this).filter(predicate);
+    }
+
+    public default <R> Enumerable<R> flatMap(
+            Function<? super E, ? extends Iterator<? extends R>> mapper) {
+        return new PipeEnumerable(this).flatMap(mapper);
+    }
+
+    public default <R> Enumerable<R> indexedMap(
+            BiFunction<? super E, ? super Long, ? extends R> mapper) {
+        return new PipeEnumerable(this).indexedMap(mapper);
+    }
+
+    public static <E> Enumerable<E> iterate(E seed, UnaryOperator<E> f) {
+        return new PipeEnumerable(seed, f);
+    }
+
+    public default Enumerable<E> limit(long maxSize) {
+        return new PipeEnumerable(this).limit(maxSize);
+    }
+
+    public default Enumerable<E> limitWhile(Predicate<? super E> predicate) {
+        return new PipeEnumerable(this).limitWhile(predicate);
+    }
+
+    public default <R> Enumerable<R> map(
+            Function<? super E, ? extends R> mapper) {
+        return new PipeEnumerable(this).map(mapper);
+    }
+
+    public default Enumerable<E> prepend(Iterable<? extends E> elements) {
+        Utils.ensureNonEnumerating(this);
+        return of((Iterable<E>)elements).concat(this);
+    }
+
+    public default Enumerable<E> prependOn(E... elements) {
+        return prepend(on(elements));
+    }
+
+    public static <E> Enumerable<E> range(E startInclusive,
+                                          E endExclusive,
+                                          UnaryOperator<E> succ,
+                                          Comparator<? super E> cmp) {
+        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        return cmp.compare(startInclusive, endExclusive) >= 0
+               ? Enumerable.empty()
+               : iterate(startInclusive, succ)
+                        .takeWhile(e -> cmp.compare(e, endExclusive) < 0);
+    }
+
+    public static <E> Enumerable<E> rangeClosed(E startInclusive,
+                                                E endInclusive,
+                                                UnaryOperator<E> succ,
+                                                Comparator<? super E> cmp) {
+        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        return cmp.compare(startInclusive, endInclusive) > 0
+               ? Enumerable.empty()
+               : iterate(startInclusive, succ)
+                        .takeWhile(e -> cmp.compare(e, endInclusive) <= 0);
+    }
+
+    public static Enumerable<Integer> rangeInt(int startInclusive,
+                                               int endExclusive) {
+        return range(startInclusive, endExclusive,
+                     i -> i+1, Comparator.comparingInt(n -> n));
+    }
+
+    public static Enumerable<Integer> rangeIntClosed(int startInclusive,
+                                                     int endInclusive) {
+        return rangeClosed(startInclusive, endInclusive,
+                           i -> i+1, Comparator.comparingInt(i -> i));
+    }
+
+    public static Enumerable<Long> rangeLong(long startInclusive,
+                                             long endExclusive) {
+        return range(startInclusive, endExclusive,
+                     i -> i+1, Comparator.comparingLong(i -> i));
+    }
+
+    public static Enumerable<Long> rangeLongClosed(long startInclusive,
+                                                   long endInclusive) {
+        return rangeClosed(startInclusive, endInclusive,
+                           i -> i+1, Comparator.comparingLong(i -> i));
+    }
+
+    public static <E> Enumerable<E> repeat(E element, long count) {
+        return new PipeEnumerable(element, count);
+    }
+
+    public default Enumerable<E> repeatAll(long count) {
+        Utils.ensureNonEnumerating(this);
+        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        final Enumerable<E> clone = clone();
+        return rangeLong(0L, count).flatMap(l -> clone.enumerator());
+    }
+
+    public default Enumerable<E> repeatEach(long count) {
+        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        return flatMap(e -> Enumerator.repeat(e, count));
+    }
+
+    public default Enumerable<E> reverse() {
+        return new PipeEnumerable(this).reverse();
+    }
+
+    public default Enumerable<E> skip(long n) {
+        return new PipeEnumerable(this).skip(n);
+    }
+
+    public default Enumerable<E> skipWhile(Predicate<? super E> predicate) {
+        return new PipeEnumerable(this).skipWhile(predicate);
+    }
+
+    public default Enumerable<E> sorted() {
+        return new PipeEnumerable(this).sorted();
+    }
+
+    public default Enumerable<E> sorted(Comparator<? super E> comparator) {
+        return new PipeEnumerable(this).sorted(comparator);
+    }
+
+    public default Enumerable<E> take(long n) {
+        return limit(n);
+    }
+
+    public default Enumerable<E> takeWhile(Predicate<? super E> predicate) {
+        return new PipeEnumerable(this).takeWhile(predicate);
+    }
+
+    public default Enumerable<E> union(Iterable<E> others) {
+        return concat(others).distinct();
+    }
+
+    public default Enumerable<E> unionOn(E... others) {
+        return union(on(others));
+    }
+
+    public default <T>
+                   Enumerable<Pair<Optional<E>, Optional<T>>>
+                   zipAny(Iterable<T> elements) {
+        return zipAll((Iterable<E>)elements)
+               .map(arr -> Pair.of(arr[0], (Optional<T>)arr[1]));
+    }
+
+    public default <T>
+                   Enumerable<Pair<E, T>>
+                   zipBoth(Enumerable<E> elements) {
+        return zipAll((Iterable<E>)elements)
+               .takeWhile(arr -> arr[0].isPresent() && arr[1].isPresent())
+               .map(arr -> Pair.of(arr[0].get(), ((Optional<T>)arr[1]).get()));
+    }
+
+    public default <T>
+                   Enumerable<Pair<E, Optional<T>>>
+                   zipLeft(Iterable<T> elements) {
+        return zipAll((Iterable<E>)elements)
+               .takeWhile(arr -> arr[0].isPresent())
+               .map(arr -> Pair.of(arr[0].get(), (Optional<T>)arr[1]));
+    }
+
+    public default <T>
+                   Enumerable<Pair<Optional<E>, T>>
+                   zipRight(Iterable<T> elements) {
+        Utils.ensureNonEnumerating(this);
+        return zipAll((Iterable<E>)elements)
+               .takeWhile(arr -> arr[1].isPresent())
+               .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));
+    }
+
+    public default Enumerable<Optional<E>[]>
+                   zipAll(Iterable<? extends E> first,
+                          Iterable<? extends E>... rest) {
+        return new PipeEnumerable(this).zipAll(first, rest);
     }
 }

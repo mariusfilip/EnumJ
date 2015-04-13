@@ -6,13 +6,10 @@
 package enumj;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-final class OnceEnumerable<E> extends AbstractEnumerable<E> {
+public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
 
     private Enumerator<E> source;
-    private AtomicBoolean consumed = new AtomicBoolean();
 
     public OnceEnumerable(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
@@ -20,18 +17,19 @@ final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     @Override
-    protected Enumerator<E> internalEnumerator() {
-        if (consumed.compareAndSet(false, true)) {
-            return source;
-        }
-        throw new NoSuchElementException();
+    protected AbstractEnumerable<E> internalNewClone() {
+        throw new IllegalStateException();
     }
     @Override
-    protected boolean internalConsumed() {
-        return consumed.get();
-    }
+    protected void internalCopyClone(AbstractEnumerable<E> source) {}
     @Override
-    protected void cleanup() {
+    protected boolean internalCloneable() { return false; }
+
+    @Override
+    public Enumerator<E> internalEnumerator() {
+        Utils.ensureNonEnumerating(this);
+        Enumerator<E> result = source;
         source = null;
+        return result;
     }
 }

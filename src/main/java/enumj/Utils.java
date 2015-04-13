@@ -33,10 +33,14 @@ class Utils {
             throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
     }
-    public static void ensureOnce(MutableBoolean flag) {
-        if (flag.booleanValue()) {
-            throw new IllegalStateException(Messages.ILLEGAL_MULTIPLE_CALLS);
+    public static void ensureNonEnumerating(Enumerable<?> enumerable) {
+        if (enumerable.enumerating()) {
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
-        flag.setValue(true);
+    }
+    public static void ensureCloneable(Enumerable<?> enumerable) {
+        if (!enumerable.cloneable()) {
+            throw new IllegalStateException(Messages.NON_CLONEABLE_ENUMERATOR);
+        }
     }
 }

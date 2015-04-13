@@ -35,14 +35,17 @@ class IterableEnumerable<E> extends AbstractEnumerable<E> {
     protected Enumerator<E> internalEnumerator() {
         return Enumerator.of(source.iterator());
     }
+
     @Override
-    protected boolean internalConsumed() {
-        return false;
+    protected AbstractEnumerable<E> internalNewClone() {
+        return new IterableEnumerable(source);
     }
     @Override
-    protected void cleanup() {
-        source = null;
-    }
+    protected void internalCopyClone(AbstractEnumerable<E> other) {}
+    @Override
+    protected boolean internalCloneable() { return true; }
+
+    // ---------------------------------------------------------------------- //
 
     public static <E> Enumerable<E> of(Iterable<E> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);

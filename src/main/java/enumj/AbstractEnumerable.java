@@ -23,33 +23,47 @@
  */
 package enumj;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ *
+ * @author Marius Filip
+ */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
-    private AtomicBoolean done = new AtomicBoolean();
+    private AtomicBoolean enumerating = new AtomicBoolean(false);
+
+    @Override
+    public final boolean enumerating() {
+        return enumerating.get();
+    }
 
     @Override
     public final Enumerator<E> enumerator() {
-        if (consumed()) {
-            throw new NoSuchElementException();
+        boolean previous = !enumerating.compareAndSet(false, true);
+        try {
+            return internalEnumerator();
+        } catch(Exception ex) {
+            enumerating.set(previous);
+            throw ex;
         }
-        return internalEnumerator();
     }
 
     @Override
-    public final boolean consumed() {
-        if (done.get()) {
-            return true;
-        }
-        if (internalConsumed() && done.compareAndSet(false, true)) {
-            cleanup();
-        }
-        return true;
+    public final Enumerable<E> clone() {
+        Utils.ensureNonEnumerating(this);
+        Utils.ensureCloneable(this);
+        AbstractEnumerable<E> result = internalNewClone();
+        result.internalCopyClone(this);
+        return result;
+    }
+    @Override
+    public final boolean cloneable() {
+        return internalCloneable();
     }
 
     protected abstract Enumerator<E> internalEnumerator();
-    protected abstract boolean internalConsumed();
-    protected abstract void cleanup();
+    protected abstract AbstractEnumerable<E> internalNewClone();
+    protected abstract void internalCopyClone(AbstractEnumerable<E> source);
+    protected abstract boolean internalCloneable();
 }

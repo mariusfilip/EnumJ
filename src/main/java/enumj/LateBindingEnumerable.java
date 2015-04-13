@@ -23,40 +23,45 @@
  */
 package enumj;
 
-import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-class RepeatableEnumerable<E> extends AbstractEnumerable<E> {
+/**
+ *
+ * @author Marius Filip
+ */
+public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
-    protected Supplier<Optional<Iterator<E>>> repeatableSource;
-    protected Optional<Enumerator<E>> enumerator;
-
-    protected RepeatableEnumerable(
-            Supplier<Optional<Iterator<E>>> repeatableSource) {
-        this.repeatableSource = repeatableSource;
-        this.enumerator = repeatableSource.get().map(Enumerator::of);
-    }
+    private Iterable<E> source;
 
     @Override
     protected Enumerator<E> internalEnumerator() {
-        Enumerator<E> result = enumerator.get();
-        enumerator = repeatableSource.get().map(Enumerator::of);
-        return result;
+        if (source == null) {
+            throw new NoSuchElementException();
+        }
+        return Enumerator.of(source.iterator());
+    }
+    
+    @Override
+    protected AbstractEnumerable<E> internalNewClone() {
+        return new LateBindingEnumerable<E>();
     }
     @Override
-    protected boolean internalConsumed() {
-        return !enumerator.isPresent();
+    protected void internalCopyClone(AbstractEnumerable<E> source) {
+        LateBindingEnumerable<E> src = (LateBindingEnumerable<E>)source;
+        this.source = src.source;
     }
     @Override
-    protected void cleanup() {
-        repeatableSource = null;
-        enumerator = null;
+    protected boolean internalCloneable() { return true; }
+
+    // ---------------------------------------------------------------------- //
+
+    public void bind(Iterable<? extends E> source) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        this.source = (Iterable<E>)source;
     }
 
-    public static <E> RepeatableEnumerable<E> of(
-        Supplier<Optional<Iterator<E>>> repeatableSource) {
-        Utils.ensureNotNull(repeatableSource, Messages.NULL_ENUMERATOR_SOURCE);
-        return new RepeatableEnumerable(repeatableSource);
+    public Optional<Iterable<E>> binding() {
+        return Optional.ofNullable(source);
     }
 }

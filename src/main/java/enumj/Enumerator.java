@@ -473,7 +473,8 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #filter(java.util.function.Predicate)
      */
     public default <T> Enumerator<T> asFiltered(Class<T> clazz) {
-        return filter(e -> clazz.isInstance(e)).as(clazz);
+        Utils.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
+        return filter(clazz::isInstance).as(clazz);
     }
 
     /**
@@ -828,7 +829,7 @@ public interface Enumerator<E> extends Iterator<E> {
                                     altIndexSupplier,
                                     first,
                                     second,
-                                    rest);
+                                    Arrays.asList(rest));
     }
 
     /**
@@ -852,23 +853,6 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <R, A> R collect(Collector<? super E, A, R> collector) {
         Utils.ensureNotNull(collector, Messages.NULL_ENUMERATOR_HANDLER);
         return asStream().collect(collector);
-    }
-
-    /**
-     * Concatenates the current enumerator with the sequence formed of the
-     * provided elements
-     * <p>
-     * This method works exactly like {@link #append(java.lang.Object...)}.
-     * </p>
-     * <p>
-     * <em>This operation is highly composable.</em>
-     * </p>
-     * @param elements the values to concatenate at the end of the current
-     * enumerator
-     * @return the concatenated enumerator
-     */
-    public default Enumerator<E> concatOn(E... elements) {
-        return concat(on(elements));
     }
 
     /**
@@ -966,6 +950,23 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
+     * Concatenates the current enumerator with the sequence formed of the
+     * provided elements
+     * <p>
+     * This method works exactly like {@link #append(java.lang.Object...)}.
+     * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * @param elements the values to concatenate at the end of the current
+     * enumerator
+     * @return the concatenated enumerator
+     */
+    public default Enumerator<E> concatOn(E... elements) {
+        return concat(on(elements));
+    }
+
+    /**
      * Returns whether the current enumerator has an element equalling the
      * provided value.
      *
@@ -1010,13 +1011,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default Enumerator<E> distinct() {
         final Set<E> existing = new HashSet<E>(256);
-        return filter(e -> {
-            if (existing.contains(e)) {
-                return false;
-            }
-            existing.add(e);
-            return true;
-        });
+        return filter(existing::add);
     }
 
     /**
@@ -1102,6 +1097,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
         Utils.ensureNonEnumerating(this);
+        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         return new PipeEnumerator(this).filter(predicate);
     }
 
@@ -1378,25 +1374,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Prepends the current enumerator with the sequence formed of the provided
-     * elements.
-     * <p>
-     * This method works like <code>concatOn(elements)</code> but at the
-     * opposite end.
-     * </p>
-     * <p>
-     * <em>This operation is highly composable.</em>
-     * </p>
-     * @param elements the values to prepend at the beginning of the current
-     * enumerator
-     * @return the prepended enumerator
-     */
-    public default Enumerator<E> prependOn(E... elements) {
-        Utils.ensureNonEnumerating(this);
-        return prepend(on(elements));
-    }
-
-    /**
      * Prepends the current enumerator with the provided {@link Iterator}.
      *
      * <p>
@@ -1501,6 +1478,25 @@ public interface Enumerator<E> extends Iterator<E> {
         Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
         return prepend(of(elements));
+    }
+
+    /**
+     * Prepends the current enumerator with the sequence formed of the provided
+     * elements.
+     * <p>
+     * This method works like <code>concatOn(elements)</code> but at the
+     * opposite end.
+     * </p>
+     * <p>
+     * <em>This operation is highly composable.</em>
+     * </p>
+     * @param elements the values to prepend at the beginning of the current
+     * enumerator
+     * @return the prepended enumerator
+     */
+    public default Enumerator<E> prependOn(E... elements) {
+        Utils.ensureNonEnumerating(this);
+        return prepend(on(elements));
     }
 
     /**
@@ -1919,19 +1915,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumeratore enumerating over the current enumerator
-     * and the given elements, all duplicates removed.
-     * <p>
-     * This method works exactly like {@code this.union(on(others))}.
-     * </p>
-     * @param others elements to perform union with
-     * @return the unified enumerator
-     */
-    public default Enumerator<E> unionOn(E... others) {
-        return union(on(others));
-    }
-
-    /**
      * Returns an enumerator enumerating over the current enumerator and
      * the provided enumerator, all duplicates removed.
      * <p>
@@ -2023,6 +2006,19 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
+     * Returns an enumeratore enumerating over the current enumerator
+     * and the given elements, all duplicates removed.
+     * <p>
+     * This method works exactly like {@code this.union(on(others))}.
+     * </p>
+     * @param others elements to perform union with
+     * @return the unified enumerator
+     */
+    public default Enumerator<E> unionOn(E... others) {
+        return union(on(others));
+    }
+
+    /**
      * Returns an enumerator consisting of pairs of elements from the
      * current enumerator and the given {@link Iterator}, while any
      * of them has elements.
@@ -2049,7 +2045,7 @@ public interface Enumerator<E> extends Iterator<E> {
                    Enumerator<Pair<Optional<E>, Optional<T>>>
                    zipAny(Iterator<T> elements) {
         return zipAll((Iterator<E>)elements)
-                .map(arr -> Pair.of(arr[0], (Optional<T>)arr[1]));
+               .map(arr -> Pair.of(arr[0], (Optional<T>)arr[1]));
     }
 
     /**
@@ -2076,8 +2072,8 @@ public interface Enumerator<E> extends Iterator<E> {
                    Enumerator<Pair<E, T>>
                    zipBoth(Iterator<T> elements) {
         return zipAll((Iterator<E>)elements)
-                .takeWhile(arr -> arr[0].isPresent() && arr[1].isPresent())
-                .map(arr -> Pair.of(arr[0].get(), ((Optional<T>)arr[1]).get()));
+               .takeWhile(arr -> arr[0].isPresent() && arr[1].isPresent())
+               .map(arr -> Pair.of(arr[0].get(), ((Optional<T>)arr[1]).get()));
     }
 
     /**
@@ -2105,8 +2101,8 @@ public interface Enumerator<E> extends Iterator<E> {
                    Enumerator<Pair<E, Optional<T>>>
                    zipLeft(Iterator<T> elements) {
         return zipAll((Iterator<E>)elements)
-                .takeWhile(arr -> arr[0].isPresent())
-                .map(arr -> Pair.of(arr[0].get(), (Optional<T>)arr[1]));
+               .takeWhile(arr -> arr[0].isPresent())
+               .map(arr -> Pair.of(arr[0].get(), (Optional<T>)arr[1]));
     }
 
     /**
@@ -2135,8 +2131,8 @@ public interface Enumerator<E> extends Iterator<E> {
                    zipRight(Iterator<T> elements) {
         Utils.ensureNonEnumerating(this);
         return zipAll((Iterator<E>)elements)
-                .takeWhile(arr -> arr[1].isPresent())
-                .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));
+               .takeWhile(arr -> arr[1].isPresent())
+               .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));
     }
 
     /**

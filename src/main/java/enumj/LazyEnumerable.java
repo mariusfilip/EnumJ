@@ -33,6 +33,7 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
     private LazyEnumerable(Supplier<Iterable<E>> source) {
         enumerable = new Lazy(() -> Enumerable.of(source.get()));
     }
+    private LazyEnumerable() {}
 
     @Override
     protected Enumerator<E> internalEnumerator() {
@@ -42,18 +43,18 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
             throw new UnsupportedOperationException(ex);
         }
     }
+
     @Override
-    protected boolean internalConsumed() {
-        try {
-            return enumerable.get().consumed();
-        } catch(ConcurrentException ex) {
-            throw new UnsupportedOperationException(ex);
-        }
+    protected AbstractEnumerable<E> internalNewClone() {
+        return new LazyEnumerable<E>();
     }
     @Override
-    protected void cleanup() {
-        enumerable = null;
+    protected void internalCopyClone(AbstractEnumerable<E> source) {
+        LazyEnumerable<E> src = (LazyEnumerable<E>)source;
+        this.enumerable = src.enumerable;
     }
+    @Override
+    protected boolean internalCloneable() { return true; }
 
     public static <E> LazyEnumerable<E> of(
             Supplier<? extends Iterable<E>> source) {
