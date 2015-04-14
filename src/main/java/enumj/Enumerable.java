@@ -42,21 +42,79 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
- * A type of {@link Iterable} with high composability.
+ * A type of {@link Iterable} with high composability that returns an
+ * {@link Enumerator} instance for an {@link Iterator}.
  *
  * @param <E> the type of elements returned by this enumerable.
+ * @see Enumerator
+ * @see Iterable
+ * @see Iterator
+ * @see #iterator()
+ * @see #enumerator()
  */
 public interface Enumerable<E> extends Iterable<E> {
 
+    /**
+     * Returns a new {@link Iterator} instance that can traverse the current
+     * {@link Enumerable}.
+     * <p>
+     * The default implementation of this method returns the result of
+     * {@link #enumerator()}.
+     * </p>
+     * @return {@link Iterator} instance iterating over the current
+     * {@link Enumerable} instance.
+     * @see #enumerator()
+     * @see Iterable
+     */
     @Override
     public default Iterator<E> iterator() {
         return enumerator();
     }
 
+    /**
+     * Returns a new {@link Enumerator} instance that enumerates over the
+     * current {@link Enumerable}.
+     * <p>
+     * The default implementation of {@link #iterator()} calls this method.
+     * </p>
+     * @return {@link Enumerator} instance enumerating over the current
+     * {@link Enumerable} instance.
+     * @see #iterator()
+     * @see Enumerable
+     */
     public Enumerator<E> enumerator();
+    /**
+     * Returns whether {@link #enumerating()} has been called at least once.
+     * <p>
+     * Most non-static methods of {@link Enumerable} require that this method
+     * returns <c>false</c>.
+     * </p>
+     * @return <c>True</c> if {@link #enumerating()} has been called,
+     * <c>false</c> otherwise.
+     */
     public boolean enumerating();
 
+    /**
+     * Returns a copy of the current {@link Enumerable} instance.
+     * <p>
+     * Most non-static methods of {@link Enumerable} do not guarantee that a
+     * new instance is being returned. In order to make sure a
+     * {@link Enumerable} instance does not change, one needs to call
+     * {@link #clone()}.
+     * </p>
+     * @return Copy of the current instance.
+     * @throws IllegalStateException {@link #cloneable()} returns <c>false</c>.
+     */
     public Enumerable<E> clone();
+    /**
+     * Returns whether the current {@link Enumerable} instance is cloneable.
+     * <p>
+     * A cloneable enumerable does not throw {@link IllegalStateException}
+     * on {@link #clone()}.
+     * </p>
+     * @return <c>True</c> if the current instance if cloneable, <c>false</c>
+     * otherwise.
+     */
     public boolean cloneable();
 
     // ---------------------------------------------------------------------- //
