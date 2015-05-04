@@ -18,10 +18,12 @@ import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -273,6 +275,13 @@ public class EnumeratorTest {
     @Test
     public void testAs() {
         System.out.println("as");
+        assertEquals(Enumerator.on(1, 2, 3, 4, 5)
+                               .skip(2)
+                               .toArray(Integer.class)
+                               .length, 3);
+        assertNotNull(EnumeratorGenerator.generators()
+                                         .first().get()
+                                         .enumerator());
         EnumeratorGenerator
                 .generatorPairs()
                 .limit(100)

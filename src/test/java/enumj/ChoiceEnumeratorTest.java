@@ -40,7 +40,8 @@ public class ChoiceEnumeratorTest {
                                       this::nextIndex,
                                       shortIterator,
                                       longIterator,
-                                      veryLongIterator);
+                                      Enumerator.on(veryLongIterator)
+                                                .toList());
     }
     int shortLen = 3;
     int longLen = 5;

@@ -33,7 +33,7 @@ public class EnumerableTest {
 
     @Before
     public void setUp() {
-        iterator = Arrays.asList(1, 2, 3).iterator();
+        iterator = Enumerator.of(Arrays.asList(1, 2, 3).iterator());
         enumerable = new OnceEnumerable(iterator);
     }
     Iterator<Integer> iterator;

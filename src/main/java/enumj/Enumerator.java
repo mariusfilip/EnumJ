@@ -1060,11 +1060,12 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <T> boolean elementsEqual(Iterator<T> elements) {
         Utils.ensureNotNull(elements, Messages.NULL_ITERATOR);
         boolean thisHasNext;
-        boolean elementsHasNext = false;
-        while ((thisHasNext = hasNext())
-               || (elementsHasNext = elements.hasNext())) {
-            if (thisHasNext != elementsHasNext) {
-                return false;
+        boolean elementsHasNext;
+        while (true) {
+            thisHasNext = hasNext();
+            elementsHasNext = elements.hasNext();
+            if (!thisHasNext || !elementsHasNext) {
+                return thisHasNext == elementsHasNext;
             }
             final E thisElement = next();
             final T otherElement = elements.next();
@@ -1072,7 +1073,6 @@ public interface Enumerator<E> extends Iterator<E> {
                 return false;
             }
         }
-        return true;
     }
 
     /**
