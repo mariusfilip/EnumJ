@@ -49,21 +49,5 @@ abstract class AbstractEnumerable<E> implements Enumerable<E> {
         }
     }
 
-    @Override
-    public final Enumerable<E> clone() {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureCloneable(this);
-        AbstractEnumerable<E> result = internalNewClone();
-        result.internalCopyClone(this);
-        return result;
-    }
-    @Override
-    public final boolean cloneable() {
-        return internalCloneable();
-    }
-
     protected abstract Enumerator<E> internalEnumerator();
-    protected abstract AbstractEnumerable<E> internalNewClone();
-    protected abstract void internalCopyClone(AbstractEnumerable<E> source);
-    protected abstract boolean internalCloneable();
 }

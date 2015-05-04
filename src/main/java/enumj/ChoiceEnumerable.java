@@ -71,17 +71,4 @@ class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
                                               .map(Iterable::iterator)
                                               .toList());
     }
-
-    @Override
-    protected AbstractEnumerable<E> internalNewClone() {
-        return new ChoiceEnumerable(indexSupplier,
-                                    nextIndexSupplier,
-                                    first,
-                                    second,
-                                    rest);
-    }
-    @Override
-    protected void internalCopyClone(AbstractEnumerable<E> source) {}
-    @Override
-    protected boolean internalCloneable() { return true; }
 }

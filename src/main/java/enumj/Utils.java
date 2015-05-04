@@ -5,12 +5,6 @@
  */
 package enumj;
 
-import org.apache.commons.lang3.mutable.MutableBoolean;
-
-/**
- *
- * @author Marius Filip
- */
 class Utils {
     public static <T> void ensureNotNull(T something, String message) {
         if (something == null) {
@@ -36,11 +30,6 @@ class Utils {
     public static void ensureNonEnumerating(Enumerable<?> enumerable) {
         if (enumerable.enumerating()) {
             throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
-    }
-    public static void ensureCloneable(Enumerable<?> enumerable) {
-        if (!enumerable.cloneable()) {
-            throw new IllegalStateException(Messages.NON_CLONEABLE_ENUMERATOR);
         }
     }
 }

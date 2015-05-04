@@ -24,29 +24,17 @@
 package enumj;
 
 import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-final class LazyEnumerable<E> extends AbstractEnumerable<E> {
-
-    private Lazy<Enumerable<E>> enumerable;
-
-    private LazyEnumerable(Supplier<Iterable<E>> source) {
-        enumerable = new Lazy(() -> Enumerable.of(source.get()));
+class SuppliedEnumerable<E> extends AbstractEnumerable<E> {
+    Supplier<Enumerator<E>> supplier;
+    
+    SuppliedEnumerable(Supplier<Enumerator<E>> supplier) {
+        Utils.ensureNotNull(supplier, Messages.NULL_ENUMERATOR_GENERATOR);
+        this.supplier = supplier;
     }
-    private LazyEnumerable() {}
-
+    
     @Override
     protected Enumerator<E> internalEnumerator() {
-        try {
-            return enumerable.get().enumerator();
-        } catch(ConcurrentException ex) {
-            throw new UnsupportedOperationException(ex);
-        }
-    }
-
-    public static <E> LazyEnumerable<E> of(
-            Supplier<? extends Iterable<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerable(source);
+        return supplier.get();
     }
 }

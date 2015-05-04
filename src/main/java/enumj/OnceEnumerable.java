@@ -17,15 +17,6 @@ public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     @Override
-    protected AbstractEnumerable<E> internalNewClone() {
-        throw new IllegalStateException();
-    }
-    @Override
-    protected void internalCopyClone(AbstractEnumerable<E> source) {}
-    @Override
-    protected boolean internalCloneable() { return false; }
-
-    @Override
     public Enumerator<E> internalEnumerator() {
         Utils.ensureNonEnumerating(this);
         Enumerator<E> result = source;

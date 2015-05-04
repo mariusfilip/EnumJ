@@ -41,18 +41,6 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
         }
         return Enumerator.of(source.iterator());
     }
-    
-    @Override
-    protected AbstractEnumerable<E> internalNewClone() {
-        return new LateBindingEnumerable<E>();
-    }
-    @Override
-    protected void internalCopyClone(AbstractEnumerable<E> source) {
-        LateBindingEnumerable<E> src = (LateBindingEnumerable<E>)source;
-        this.source = src.source;
-    }
-    @Override
-    protected boolean internalCloneable() { return true; }
 
     // ---------------------------------------------------------------------- //
 

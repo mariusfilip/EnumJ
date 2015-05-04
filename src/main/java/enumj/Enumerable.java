@@ -94,29 +94,6 @@ public interface Enumerable<E> extends Iterable<E> {
      */
     public boolean enumerating();
 
-    /**
-     * Returns a copy of the current {@link Enumerable} instance.
-     * <p>
-     * Most non-static methods of {@link Enumerable} do not guarantee that a
-     * new instance is being returned. In order to make sure a
-     * {@link Enumerable} instance does not change, one needs to call
-     * {@link #clone()}.
-     * </p>
-     * @return Copy of the current instance.
-     * @throws IllegalStateException {@link #cloneable()} returns <c>false</c>.
-     */
-    public Enumerable<E> clone();
-    /**
-     * Returns whether the current {@link Enumerable} instance is cloneable.
-     * <p>
-     * A cloneable enumerable does not throw {@link IllegalStateException}
-     * on {@link #clone()}.
-     * </p>
-     * @return <c>True</c> if the current instance if cloneable, <c>false</c>
-     * otherwise.
-     */
-    public boolean cloneable();
-
     // ---------------------------------------------------------------------- //
 
     @SafeVarargs
@@ -205,7 +182,7 @@ public interface Enumerable<E> extends Iterable<E> {
     public default Enumerable<E> asTolerant(
             Consumer<? super Exception> handler,
             int retries) {
-        return new PipeEnumerable(this).asTolerant(handler, retries);
+        return PipeEnumerable.asTolerant(this, handler, retries);
     }
 
     // ---------------------------------------------------------------------- //
@@ -218,7 +195,7 @@ public interface Enumerable<E> extends Iterable<E> {
             Iterable<T> other) {
         Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(other, Messages.NULL_ENUMERATOR_SOURCE);
-        return new PipeEnumerable(this).cartesianProduct(other);
+        return PipeEnumerable.cartesianProduct(this, other);
     }
 
     public static <E> Enumerable<E> choiceOf(
@@ -249,7 +226,7 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public default Enumerable<E> concat(Iterable<? extends E> elements) {
-        return new PipeEnumerable(this).concat(elements);
+        return PipeEnumerable.concat(this, elements);
     }
 
     public default Enumerable<E> concatOn(E... elements) {
@@ -258,7 +235,7 @@ public interface Enumerable<E> extends Iterable<E> {
 
     public default Enumerable<E> distinct() {
         Utils.ensureNonEnumerating(this);
-        return new PipeEnumerable(this).distinct();
+        return PipeEnumerable.distinct(this);
     }
 
     public default <T> boolean elementsEqual(Iterable<T> elements) {
@@ -270,34 +247,34 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public default Enumerable<E> filter(Predicate<? super E> predicate) {
-        return new PipeEnumerable(this).filter(predicate);
+        return PipeEnumerable.filter(this, predicate);
     }
 
     public default <R> Enumerable<R> flatMap(
-            Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        return new PipeEnumerable(this).flatMap(mapper);
+            Function<? super E, ? extends Iterable<? extends R>> mapper) {
+        return PipeEnumerable.flatMap(this, mapper);
     }
 
     public default <R> Enumerable<R> indexedMap(
             BiFunction<? super E, ? super Long, ? extends R> mapper) {
-        return new PipeEnumerable(this).indexedMap(mapper);
+        return PipeEnumerable.indexedMap(this, mapper);
     }
 
     public static <E> Enumerable<E> iterate(E seed, UnaryOperator<E> f) {
-        return new PipeEnumerable(seed, f);
+        return new SuppliedEnumerable(() -> Enumerator.iterate(seed, f));
     }
 
     public default Enumerable<E> limit(long maxSize) {
-        return new PipeEnumerable(this).limit(maxSize);
+        return PipeEnumerable.limit(this, maxSize);
     }
 
     public default Enumerable<E> limitWhile(Predicate<? super E> predicate) {
-        return new PipeEnumerable(this).limitWhile(predicate);
+        return PipeEnumerable.limitWhile(this, predicate);
     }
 
     public default <R> Enumerable<R> map(
             Function<? super E, ? extends R> mapper) {
-        return new PipeEnumerable(this).map(mapper);
+        return PipeEnumerable.map(this, mapper);
     }
 
     public default Enumerable<E> prepend(Iterable<? extends E> elements) {
@@ -358,39 +335,38 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public static <E> Enumerable<E> repeat(E element, long count) {
-        return new PipeEnumerable(element, count);
+        return new SuppliedEnumerable(() -> Enumerator.repeat(element, count));
     }
 
-    public default Enumerable<E> repeatAll(long count) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        final Enumerable<E> clone = clone();
-        return rangeLong(0L, count).flatMap(l -> clone.enumerator());
+    public default Enumerable<E> repeatAll(int count) {
+        return rangeInt(0, count)
+                .map(i -> new OnceEnumerable(enumerator()))
+                .flatMap(e -> e);
     }
 
     public default Enumerable<E> repeatEach(long count) {
         Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        return flatMap(e -> Enumerator.repeat(e, count));
+        return flatMap(e -> repeat(e, count));
     }
 
     public default Enumerable<E> reverse() {
-        return new PipeEnumerable(this).reverse();
+        return PipeEnumerable.reverse(this);
     }
 
     public default Enumerable<E> skip(long n) {
-        return new PipeEnumerable(this).skip(n);
+        return PipeEnumerable.skip(this, n);
     }
 
     public default Enumerable<E> skipWhile(Predicate<? super E> predicate) {
-        return new PipeEnumerable(this).skipWhile(predicate);
+        return PipeEnumerable.skipWhile(this, predicate);
     }
 
     public default Enumerable<E> sorted() {
-        return new PipeEnumerable(this).sorted();
+        return PipeEnumerable.sorted(this);
     }
 
     public default Enumerable<E> sorted(Comparator<? super E> comparator) {
-        return new PipeEnumerable(this).sorted(comparator);
+        return PipeEnumerable.sorted(this, comparator);
     }
 
     public default Enumerable<E> take(long n) {
@@ -398,7 +374,7 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public default Enumerable<E> takeWhile(Predicate<? super E> predicate) {
-        return new PipeEnumerable(this).takeWhile(predicate);
+        return PipeEnumerable.takeWhile(this, predicate);
     }
 
     public default Enumerable<E> union(Iterable<E> others) {
@@ -444,6 +420,6 @@ public interface Enumerable<E> extends Iterable<E> {
     public default Enumerable<Optional<E>[]>
                    zipAll(Iterable<? extends E> first,
                           Iterable<? extends E>... rest) {
-        return new PipeEnumerable(this).zipAll(first, rest);
+        return PipeEnumerable.zipAll(this, first, rest);
     }
 }

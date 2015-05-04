@@ -31,235 +31,176 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import org.apache.commons.lang3.tuple.Pair;
 
-class PipeEnumerable<E> extends AbstractEnumerable<E> {
+class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
 
-    protected Optional<Enumerable<E>> enumerableSource;
-    protected Optional<Pair<E,UnaryOperator<E>>> iterationSource;
-    protected Optional<Pair<E,Long>> repetitionSource;
-    protected LinkedList<Function<Enumerator<?>,
-                                  Enumerator<?>>> builders;
+    protected Optional<Iterable<T>> source;
+    protected boolean isPipeSource;
+    protected Function<Enumerator<T>, Enumerator<E>> operator;
 
-    PipeEnumerable(Enumerable<? extends E> source) {
+    protected PipeEnumerable(Iterable<T> source,
+                             Function<Enumerator<T>, Enumerator<E>> operator) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
+        this.source = Optional.of(source);
+        this.isPipeSource = false;
+        this.operator = operator;
+    }
+    protected PipeEnumerable(Enumerable<E> source,
+                             Function<Enumerator<T>, Enumerator<E>> operator) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Utils.ensureNonEnumerating(source);
-        Initialise(Optional.of((Enumerable<E>)source),
-                   Optional.empty(),
-                   Optional.empty());
+        Utils.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
+        this.source = Optional.of((Iterable<T>)source);
+        this.isPipeSource = true;
+        this.operator = operator;
     }
-    PipeEnumerable(E seed, UnaryOperator<E> f) {
-        Utils.ensureNotNull(f, Messages.NULL_ENUMERATOR_GENERATOR);
-        Initialise(Optional.empty(),
-                   Optional.of(Pair.of(seed, f)),
-                   Optional.empty());
-    }
-    PipeEnumerable(E element, long count) {
-        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        Initialise(Optional.empty(),
-                   Optional.empty(),
-                   Optional.of(Pair.of(element, count)));
-    }
-    private PipeEnumerable() {}
 
-    private void Initialise(
-            Optional<Enumerable<E>>            enumerableSource,
-            Optional<Pair<E,UnaryOperator<E>>> iterationSource,
-            Optional<Pair<E,Long>>             repetitionSource) {
-        this.enumerableSource = enumerableSource;
-        this.iterationSource = iterationSource;
-        this.repetitionSource = repetitionSource;
-        this.builders = new LinkedList<>();
+    public static <T,E> PipeEnumerable<T,E> of(
+            Iterable<? extends T> source,
+            Function<Enumerator<T>, Enumerator<E>> operator) {
+        return (source instanceof PipeEnumerable<?,?>)
+                ? new PipeEnumerable((PipeEnumerable<T,E>)source, operator)
+                : new PipeEnumerable(source, operator);        
     }
 
     @Override
     protected Enumerator<E> internalEnumerator() {
-        Enumerator<?> result = initialEnumerator();
-        for(Function<Enumerator<?>,Enumerator<?>> builder: builders) {
-            result = builder.apply(result);
-        }
-        return (Enumerator<E>)result;
-    }
+        LinkedList<Function<Enumerator<?>,Enumerator<?>>> operators =
+                new LinkedList<>();
 
-    protected Enumerator<E> initialEnumerator() {
-        if (enumerableSource.isPresent()) {
-            return enumerableSource.get().enumerator();
+        PipeEnumerable<?,?> ptr = this;
+        while(ptr.isPipeSource) {
+            operators.addFirst((Function<Enumerator<?>,Enumerator<?>>)
+                               (Object)ptr.operator);
+            ptr = (PipeEnumerable<?,?>)ptr.source.get();
         }
-        if (iterationSource.isPresent()) {
-            return Enumerator.iterate(iterationSource.get().getLeft(),
-                                      iterationSource.get().getRight());
-        }
-        if (repetitionSource.isPresent()) {
-            return Enumerator.repeat(repetitionSource.get().getLeft(),
-                                     repetitionSource.get().getRight());
-        }
-        assert false;
-        return null;
-    }
+        operators.addFirst((Function<Enumerator<?>,Enumerator<?>>)
+                           (Object)ptr.operator);
 
-    @Override
-    protected AbstractEnumerable<E> internalNewClone() {
-        return new PipeEnumerable<E>();
+        Enumerator<?> oldIt = Enumerator.of(ptr.source.get().iterator());
+        Enumerator<?> newIt = null;
+        for(Function<Enumerator<?>,Enumerator<?>> op: operators) {
+            newIt = op.apply(oldIt);
+            oldIt = newIt;
+        }
+        assert oldIt == newIt;
+
+        return (Enumerator<E>)newIt;
     }
-    @Override
-    protected void internalCopyClone(AbstractEnumerable<E> source) {
-        PipeEnumerable<E> src = (PipeEnumerable<E>)source;
-        this.Initialise(src.enumerableSource,
-                        src.iterationSource,
-                        src.repetitionSource);
-    }
-    @Override
-    protected boolean internalCloneable() { return true; }
 
     // ---------------------------------------------------------------------- //
 
-    @Override
-    public Enumerable<E> asTolerant(Consumer<? super Exception> handler,
-                                    int retries) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(retries, Messages.NEGATIVE_RETRIES);
-        builders.add(in -> in.asTolerant(handler, retries));
-        return this;
+    static <E> Enumerable<E> asTolerant(
+            Enumerable<E> enumerable,
+            Consumer<? super Exception> handler,
+            int retries) {
+        return of(enumerable,
+                  in -> in.asTolerant(handler, retries));
     }
 
-    @Override
-    public <T> Enumerable<Pair<E,T>> cartesianProduct(Iterable<T> other) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(other, Messages.NULL_ENUMERATOR_SOURCE);
-        builders.add(in -> in.cartesianProduct(() -> other.iterator()));
-        return (Enumerable<Pair<E,T>>)this;
+    static <E,T> Enumerable<Pair<E,T>> cartesianProduct(
+            Enumerable<E> enumerable,
+            Iterable<T> other) {
+        return (Enumerable<Pair<E,T>>)of(enumerable,
+                in -> in.cartesianProduct(() -> other.iterator()));
     }
 
-    @Override
-    public Enumerable<E> concat(Iterable<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
-        builders.add(in -> ((Enumerator<E>)in).concat(elements.iterator()));
-        return this;
-    }
-    
-    @Override
-    public Enumerable<E> distinct() {
-        Utils.ensureNonEnumerating(this);
-        builders.add(in -> in.distinct());
-        return this;
+    static <E> Enumerable<E> concat(
+            Enumerable<E> enumerable,
+            Iterable<? extends E> elements) {
+        return of(enumerable, in -> in.concat(elements.iterator()));
     }
 
-    @Override
-    public Enumerable<E> filter(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
-        builders.add(in -> in.filter(e -> predicate.test((E)e)));
-        return this;
+    static <E> Enumerable<E> distinct(Enumerable<E> enumerable) {
+        return of(enumerable, in -> in.distinct());
     }
 
-    @Override
-    public <R> Enumerable<R> flatMap(
-            Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
-        builders.add(in -> in.flatMap(e -> mapper.apply((E)e)));
-        return (Enumerable<R>)this;
+    static <E> Enumerable<E> filter(
+            Enumerable<E> enumerable,
+            Predicate<? super E> predicate) {
+        return of(enumerable, in -> in.filter(predicate));
     }
-    
-    @Override
-    public <R> Enumerable<R> indexedMap(
+
+    static <E,R> Enumerable<R> flatMap(
+            Enumerable<E> enumerable,
+            Function<? super E, ? extends Iterable<? extends R>> mapper) {
+        return of(enumerable,
+                  in -> in.flatMap(e -> mapper.apply(e).iterator()));
+    }
+
+    static <E,R> Enumerable<R> indexedMap(
+            Enumerable<E> enumerable,
             BiFunction<? super E, ? super Long, ? extends R> mapper) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
-        builders.add(in -> ((Enumerator<E>)in).indexedMap(mapper));
-        return (Enumerable<R>)this;
+        return of(enumerable, in -> in.indexedMap(mapper));
     }
 
-    @Override
-    public Enumerable<E> limit(long maxSize) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        builders.add(in -> in.limit(maxSize));
-        return this;
+    static <E> Enumerable<E> limit(Enumerable<E> enumerable, long maxSize) {
+        return of(enumerable, in -> in.limit(maxSize));
     }
 
-    @Override
-    public Enumerable<E> limitWhile(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
-        builders.add(in -> ((Enumerator<E>)in).limitWhile(predicate));
-        return this;
+    static <E> Enumerable<E> limitWhile(
+            Enumerable<E> enumerable,
+            Predicate<? super E> predicate) {
+        return of(enumerable, in -> in.limitWhile(predicate));
     }
 
-    @Override
-    public <R> Enumerable<R> map(
+    static <E,R> Enumerable<R> map(
+            Enumerable<E> enumerable,
             Function<? super E, ? extends R> mapper) {
-        Utils.ensureNonEnumerating(this);
-        builders.add(in -> in.map(e -> mapper.apply((E)e)));
-        return (Enumerable<R>)this;
+        return of(enumerable, in -> in.map(mapper));
     }
 
-    @Override
-    public Enumerable<E> reverse() {
-        Utils.ensureNonEnumerating(this);
-        builders.add(in -> in.reverse());
-        return this;
+    static <E> Enumerable<E> reverse(Enumerable<E> enumerable) {
+        return of(enumerable, in -> in.reverse());
     }
 
-    @Override
-    public Enumerable<E> skip(long n) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        builders.add(in -> in.skip(n));
-        return this;
+    static <E> Enumerable<E> skip(Enumerable<E> enumerable, long n) {
+        return of(enumerable, in -> in.skip(n));
     }
 
-    @Override
-    public Enumerable<E> skipWhile(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
-        builders.add(in -> ((Enumerator<E>)in).skipWhile(predicate));
-        return this;
+    static <E> Enumerable<E> skipWhile(
+            Enumerable<E> enumerable,
+            Predicate<? super E> predicate) {
+        return of(enumerable, in -> in.skipWhile(predicate));
     }
 
-    @Override
-    public Enumerable<E> sorted() {
-        Utils.ensureNonEnumerating(this);
-        builders.add(in -> in.sorted());
-        return this;
+    static <E> Enumerable<E> sorted(Enumerable<E> enumerable) {
+        return of(enumerable, in -> in.sorted());
     }
 
-    @Override
-    public Enumerable<E> sorted(Comparator<? super E> comparator) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
-        builders.add(in -> ((Enumerator<E>)in).sorted(comparator));
-        return this;
-    }
-    
-    @Override
-    public Enumerable<E> takeWhile(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
-        builders.add(in -> ((Enumerator<E>)in).takeWhile(predicate));
-        return this;
+    static <E> Enumerable<E> sorted(
+            Enumerable<E> enumerable,
+            Comparator<? super E> comparator) {
+        return of(enumerable, in -> in.sorted(comparator));
     }
 
-    @Override
-    public Enumerable<Optional<E>[]> zipAll(Iterable<? extends E> first,
-                                            Iterable<? extends E>... rest) {
-        Utils.ensureNonEnumerating(this);
+    static <E> Enumerable<E> takeWhile(
+            Enumerable<E> enumerable,
+            Predicate<? super E> predicate) {
+        return of(enumerable, in -> in.takeWhile(predicate));
+    }
+
+    static <E> Enumerable<Optional<E>[]> zipAll(
+            Enumerable<E> enumerable,
+            Iterable<? extends E> first,
+            Iterable<? extends E>... rest) {
+        Utils.ensureNonEnumerating(enumerable);
         Utils.ensureNotNull(first, Messages.NULL_ITERATOR);
         for(Iterable<?> it: rest) {
             Utils.ensureNotNull(it, Messages.NULL_ITERATOR);
         }
-        builders.add(in -> {
-            final PipeEnumerator<E> pipeEnum =
-                    in instanceof PipeEnumerator<?>
-                    ? (PipeEnumerator<E>)in
-                    : new PipeEnumerator((Iterator<E>)in);
-            return pipeEnum.zipAll(first.iterator(),
-                                   Enumerator.on(rest)
-                                             .map(Iterable::iterator)
-                                             .toList());
+        return of(enumerable,
+                in -> {
+                    final PipeEnumerator<E> pipeEnum =
+                            in instanceof PipeEnumerator<?>
+                            ? (PipeEnumerator<E>)in
+                            : new PipeEnumerator((Iterator<E>)in);
+                    return pipeEnum.zipAll(first.iterator(),
+                            Enumerator.on(rest)
+                                      .map(Iterable::iterator)
+                                      .toList());
         });
-        return (Enumerable<Optional<E>[]>)this;
     }
 }
