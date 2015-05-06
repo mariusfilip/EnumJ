@@ -23,22 +23,22 @@ class WhilePipeProcessor<E> extends PipeProcessor<E,E> {
     }
 
     @Override
-    public void process(E value) {
+    protected void process(E value) {
         this.value = value;
     }
     @Override
-    public boolean hasValue() {
+    protected boolean hasValue() {
         if (!get) {
             return false;
         }
         return get = filter.test(value);
     }
     @Override
-    public E getValue() {
+    protected E getValue() {
         return value;
     }
     @Override
-    public boolean nextOnNoValue() {
+    protected boolean nextOnNoValue() {
         return false;
     }
 }

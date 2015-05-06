@@ -187,7 +187,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 return true;
             }
             if (!nextOnNoValue.get()) {
-                return false;
+                dequeue();
             }
         }
     }

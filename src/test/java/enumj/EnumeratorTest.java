@@ -459,11 +459,12 @@ public class EnumeratorTest {
                 .generators()
                 .limit(100)
                 .map(g -> g.enumerator())
+                .map(e -> e.limit(10))
                 .map(e -> e.asShareable())
                 .map(e -> e.share(4))
                 .forEach(es -> {
-                    final long count = es[1].count();
-                    final Enumerator<Double> first = es[0].take(count/2);
+                    final long count = es[0].count();
+                    final Enumerator<Double> first = es[1].take(count/2);
                     final Enumerator<Double> second = es[2].skip(count/2);
                     assertTrue(es[3].elementsEqual(first.concat(second)));
                 });
@@ -509,7 +510,7 @@ public class EnumeratorTest {
         EnumeratorGenerator
                 .generators()
                 .limit(100)
-                .map(g -> g.enumerator().asShareable().share(3))
+                .map(g -> g.enumerator().asShareable().share(2))
                 .forEach(es -> {
                     assertTrue(
                         Enumerator
