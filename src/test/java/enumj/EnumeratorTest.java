@@ -275,13 +275,6 @@ public class EnumeratorTest {
     @Test
     public void testAs() {
         System.out.println("as");
-        assertEquals(Enumerator.on(1, 2, 3, 4, 5)
-                               .skip(2)
-                               .toArray(Integer.class)
-                               .length, 3);
-        assertNotNull(EnumeratorGenerator.generators()
-                                         .first().get()
-                                         .enumerator());
         EnumeratorGenerator
                 .generatorPairs()
                 .limit(100)
@@ -409,8 +402,8 @@ public class EnumeratorTest {
     }
 
     @Test
-    public void testAsShareable() {
-        System.out.println("asShareable");
+    public void testAsShareable_SameElements() {
+        System.out.println("asShareable_SameElements");
         EnumeratorGenerator
                 .generatorPairs()
                 .limit(100)
@@ -420,6 +413,11 @@ public class EnumeratorTest {
                 .forEach(p -> {
                     assertTrue(p.getLeft().elementsEqual(p.getRight()));
                 });
+    }
+
+    @Test
+    public void testAsShareable_ConcatOfParts() {
+        System.out.println("asShareable_ConcatOfParts");
         EnumeratorGenerator
                 .generators()
                 .limit(100)
@@ -432,6 +430,11 @@ public class EnumeratorTest {
                     final long c3 = es[2].filter(x -> x>=0).count();
                     assertEquals(c1, c2+c3);
                 });
+    }
+
+    @Test
+    public void testAsShareable_SumOfOpposites() {
+        System.out.println("asShareable_SumOfOpposites");
         EnumeratorGenerator
                 .generators()
                 .limit(100)
@@ -447,21 +450,11 @@ public class EnumeratorTest {
                     assertTrue(sum < 0.000001);
                     assertTrue(sum > -0.000001);
                 });
-        EnumeratorGenerator
-                .generators()
-                .limit(100)
-                .map(g -> g.enumerator())
-                .map(e -> e.asShareable())
-                .map(e -> e.share(2))
-                .forEach(es -> {
-                    final Enumerator<Double> plus = es[0];
-                    final Enumerator<Double> minus = es[1].map(x -> -x);
-                    final double sum = plus.zipAny(minus)
-                            .map(p -> p.getLeft().get() + p.getRight().get())
-                            .reduce(0.0, (x,y) -> x+y);
-                    assertTrue(sum < 0.000001);
-                    assertTrue(sum > -0.000001);
-                });
+    }
+
+    @Test
+    public void testAsShareable_TakeSkip() {
+        System.out.println("asShareable_TakeSkip");
         EnumeratorGenerator
                 .generators()
                 .limit(100)

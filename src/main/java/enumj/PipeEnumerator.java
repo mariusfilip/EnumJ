@@ -98,10 +98,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     protected void dequeue() {
         if (!sources.isEmpty()) {
-            if (sources.isEmpty()) {
-                pipeline.clear();
-                multiPipeline.clear();
-            } else {
+            sources.remove();
+            if (!sources.isEmpty()) {
                 while(!pipeline.isEmpty()
                       && pipeline.peekFirst() != sources.peekFirst().getRef()) {
                     PipeProcessor head = pipeline.remove();
@@ -110,6 +108,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                         multiPipeline.remove();
                     }
                 }
+            } else {
+                pipeline.clear();
+                multiPipeline.clear();
             }
         }
     }
@@ -247,7 +248,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                                             Iterator<? extends E>... rest) {
         return zipAll(first, Arrays.asList(rest));
     }
-    
+
     // ---------------------------------------------------------------------- //
 
     Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
