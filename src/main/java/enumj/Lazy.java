@@ -35,7 +35,7 @@ class Lazy<T> extends LazyInitializer<T> {
         this.supplier = supplier;
         this.initialized = false;
     }
-    
+
     public boolean isInitialized() {
         return initialized;
     }
