@@ -28,7 +28,7 @@ import org.apache.commons.lang3.concurrent.LazyInitializer;
 
 class Lazy<T> extends LazyInitializer<T> {
 
-    private Supplier<T> supplier;
+    private Supplier<T> supplier;    
 
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;

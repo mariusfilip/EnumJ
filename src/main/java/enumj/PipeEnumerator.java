@@ -92,7 +92,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             last.next = processor;
         }
         if (!sources.isEmpty()) {
-            sources.pollLast().setRefIfNull(processor);
+            sources.peekLast().setRefIfNull(processor);
         }
         return (Enumerator<X>)this;
     }
