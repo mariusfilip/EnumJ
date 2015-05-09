@@ -24,26 +24,36 @@
 package enumj;
 
 import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-class Lazy<T> extends LazyInitializer<T> {
+class LazySupplier<T> implements Supplier<T> {
 
-    private Supplier<T> supplier;
-    private volatile boolean initialized;
+    volatile Lazy<T> lazy;
 
-    public Lazy(Supplier<T> supplier) {
-        this.supplier = supplier;
-        this.initialized = false;
+    LazySupplier(Supplier<T> supplier) {
+        lazy = new Lazy(supplier);
+    }
+
+    boolean isInitialized() {
+        Lazy<T> val = lazy;
+        return val.isInitialized();
     }
     
-    public boolean isInitialized() {
-        return initialized;
+    void refresh(Supplier<T> supplier) {
+        lazy = new Lazy(supplier);
+    }
+
+    void clear() {
+        lazy = null;
     }
 
     @Override
-    protected T initialize() {
-        T result = supplier.get();
-        initialized = true;
-        return result;
+    public T get() {
+        try {
+            Lazy<T> o = lazy;
+            return o.get();
+        } catch(ConcurrentException ex) {
+            throw new UnsupportedOperationException(ex);
+        }
     }
 }

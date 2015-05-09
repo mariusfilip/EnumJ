@@ -23,27 +23,30 @@
  */
 package enumj;
 
-import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
+import java.util.Optional;
 
-class Lazy<T> extends LazyInitializer<T> {
+final class CacheEnumerator<E> extends AbstractEnumerator<E> {
 
-    private Supplier<T> supplier;
-    private volatile boolean initialized;
-
-    public Lazy(Supplier<T> supplier) {
-        this.supplier = supplier;
-        this.initialized = false;
-    }
+    Optional<CachedElementWrapper<E>> cached;
     
-    public boolean isInitialized() {
-        return initialized;
+    CacheEnumerator(Optional<CachedElementWrapper<E>> cached) {
+        this.cached = cached;
     }
 
     @Override
-    protected T initialize() {
-        T result = supplier.get();
-        initialized = true;
+    protected boolean internalHasNext() {
+        return cached.isPresent();
+    }
+
+    @Override
+    protected E internalNext() {
+        E result = cached.get().getElement();
+        cached = cached.get().getNextWrapper();
         return result;
+    }
+    
+    @Override
+    protected void cleanup() {
+        cached = null;
     }
 }

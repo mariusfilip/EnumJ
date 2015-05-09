@@ -23,27 +23,37 @@
  */
 package enumj;
 
+import java.util.Optional;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
 
-class Lazy<T> extends LazyInitializer<T> {
+final class CachedElementWrapper<E> {
 
-    private Supplier<T> supplier;
-    private volatile boolean initialized;
+    private E elem;
+    private Lazy<Optional<CachedElementWrapper<E>>> next;
 
-    public Lazy(Supplier<T> supplier) {
-        this.supplier = supplier;
-        this.initialized = false;
+    CachedElementWrapper(E elem,
+                         Supplier<Nullable<E>> nextSupplier) {
+        this.elem = elem;
+        this.next = new Lazy(() -> 
+        {
+            Nullable<E> e = nextSupplier.get();
+            return e.isPresent()
+                    ? Optional.of(new CachedElementWrapper(e.get(),
+                                                           nextSupplier))
+                    : Optional.empty();
+        });
     }
-    
-    public boolean isInitialized() {
-        return initialized;
+
+    public E getElement() {
+        return elem;
     }
 
-    @Override
-    protected T initialize() {
-        T result = supplier.get();
-        initialized = true;
-        return result;
+    public Optional<CachedElementWrapper<E>> getNextWrapper() {
+        try {
+            return next.get();
+        } catch(ConcurrentException ex) {
+            throw new UnsupportedOperationException(ex);
+        }
     }
 }
