@@ -38,7 +38,7 @@ class LazySupplier<T> implements Supplier<T> {
         Lazy<T> val = lazy;
         return val.isInitialized();
     }
-    
+
     void refresh(Supplier<T> supplier) {
         lazy = new Lazy(supplier);
     }

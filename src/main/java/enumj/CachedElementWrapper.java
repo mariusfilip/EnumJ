@@ -29,19 +29,29 @@ import org.apache.commons.lang3.concurrent.ConcurrentException;
 
 final class CachedElementWrapper<E> {
 
-    private E elem;
-    private Lazy<Optional<CachedElementWrapper<E>>> next;
+    private final E elem;
+    private final Lazy<Optional<CachedElementWrapper<E>>> next;
 
     CachedElementWrapper(E elem,
-                         Supplier<Nullable<E>> nextSupplier) {
+                         Supplier<Nullable<E>> nextSupplier,
+                         long limit,
+                         long ordinal,
+                         Runnable disableProc) {
         this.elem = elem;
-        this.next = new Lazy(() -> 
-        {
+        this.next = new Lazy(() -> {
+            final long count = ordinal;
             Nullable<E> e = nextSupplier.get();
-            return e.isPresent()
+            Optional<CachedElementWrapper<E>> result = e.isPresent()
                     ? Optional.of(new CachedElementWrapper(e.get(),
-                                                           nextSupplier))
+                                                           nextSupplier,
+                                                           limit,
+                                                           count+1,
+                                                           disableProc))
                     : Optional.empty();
+            if (count == limit-1) {
+                disableProc.run();
+            }
+            return result;
         });
     }
 

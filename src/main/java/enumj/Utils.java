@@ -19,7 +19,9 @@ class Utils {
     public static void ensureLessThan(long something, long limit,
                                       String message) {
         if (something >= limit) {
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException(
+                    message + ": " + 
+                    something + " is not less than " + limit);
         }
     }
     public static void ensureNonEnumerating(Enumerator<?> enumerator) {

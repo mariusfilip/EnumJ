@@ -24,7 +24,8 @@
 package enumj;
 
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 /**
  *
@@ -34,37 +35,91 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     private final Enumerable<E> source;
     private final LazySupplier<Enumerator<E>> enumerator;
     private final LazySupplier<Optional<CachedElementWrapper<E>>> cache;
+    private final Supplier<Optional<CachedElementWrapper<E>>> cacheSupplier;
 
-    public CachedEnumerable(Enumerable<? extends E> source, long limit) {
-        this(source, limit, null);
+    private volatile long limit;
+    private volatile AtomicBoolean disabled;
+
+    public CachedEnumerable(Enumerable<? extends E> source) {
+        this(source, Long.MAX_VALUE, () -> {});
     }
-
     public CachedEnumerable(Enumerable<? extends E> source,
                             long limit,
-                            Consumer<Enumerable<E>> onReset) {
+                            Runnable onLimit) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonNegative(limit, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        Utils.ensureLessThan(0, limit, Messages.ILLEGAL_ENUMERATOR_STATE);
 
         this.source = (Enumerable<E>)source;
         this.enumerator = new LazySupplier(() -> this.source.enumerator());
-        this.cache = new LazySupplier(() ->
-        {
+        this.limit = limit;
+        this.disabled = new AtomicBoolean(false);
+        this.cacheSupplier = () -> {
             Enumerator<E> en = this.enumerator.get();
             if (!en.hasNext()) {
                 return Optional.empty();
             }
-            E e = en.next();
+            final E e = en.next();
+            final long lim = this.limit;
+            final AtomicBoolean dis = this.disabled;
             return Optional.of(
                     new CachedElementWrapper(
                             e,
                             () -> en.hasNext()
                                     ? Nullable.of(en.next())
-                                    : Nullable.empty()));
-        });
+                                    : Nullable.empty(),
+                            lim,
+                            1,
+                            () -> {
+                                dis.set(true);
+                                try {
+                                    onLimit.run();
+                                } catch (Exception ex) {
+                                    // do nothing
+                                };
+                            }));
+        };
+        this.cache = new LazySupplier(this.cacheSupplier);
+    }
+
+    public long reset() {
+        return resize(this.limit, true);
+    }
+    public long resize(long limit) {
+        return resize(limit, false);
     }
 
     @Override
     protected Enumerator<E> internalEnumerator() {
-        return new CacheEnumerator(cache.get());
+        AtomicBoolean dis = this.disabled;
+        return dis.get()
+                ? source.enumerator()
+                : new CacheEnumerator(cache.get());
     }
+
+    private long resize(long limit, boolean resetting) {
+        final long result = this.limit;
+        if (resetting) {
+            Utils.ensureLessThan(0,
+                                 limit,
+                                 Messages.ILLEGAL_ENUMERATOR_STATE);
+        } else {
+            Utils.ensureLessThan(result,
+                                 limit,
+                                 Messages.ILLEGAL_ENUMERATOR_STATE);
+        }
+
+        synchronized(this) {
+            this.disabled = new AtomicBoolean(true);
+            try {
+                this.limit = resetting ? result : limit;
+
+                this.enumerator.refresh(() -> this.source.enumerator());
+                this.cache.refresh(this.cacheSupplier);
+
+                return result;
+            } finally {
+                this.disabled.set(false);
+            }
+        }
+    }    
 }
