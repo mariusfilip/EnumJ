@@ -45,10 +45,10 @@ final class CachedElementWrapper<E> {
                     ? Optional.of(new CachedElementWrapper(e.get(),
                                                            nextSupplier,
                                                            limit,
-                                                           count+1,
+                                                           ordinal+1,
                                                            disableProc))
                     : Optional.empty();
-            if (count == limit-1) {
+            if (count == limit && result.isPresent()) {
                 disableProc.run();
             }
             return result;

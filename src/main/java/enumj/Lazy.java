@@ -44,6 +44,7 @@ class Lazy<T> extends LazyInitializer<T> {
     protected T initialize() {
         T result = supplier.get();
         initialized = true;
+        supplier = null;
         return result;
     }
 }
