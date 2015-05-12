@@ -27,15 +27,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-/**
- *
- */
 public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
     private final Enumerable<E> source;
     private final LazySupplier<Enumerator<E>> enumerator;
     private final LazySupplier<Optional<CachedElementWrapper<E>>> cache;
-    private final Supplier<Optional<CachedElementWrapper<E>>> cacheSupplier;
+    private final Runnable callback;
 
     private volatile long limit;
     private volatile AtomicBoolean disabled;
@@ -45,18 +42,53 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
     CachedEnumerable(Enumerable<E> source,
                      long limit,
-                     Runnable onLimit) {
+                     Runnable onLimitCallback) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Utils.ensureLessThan(0, limit, Messages.ILLEGAL_ENUMERATOR_STATE);
+        Utils.ensureNotNull(onLimitCallback, Messages.NULL_ENUMERATOR_HANDLER);
 
         this.source = source;
         this.enumerator = new LazySupplier(() -> this.source.enumerator());
+        this.callback = onLimitCallback;
         this.limit = limit;
         this.disabled = new AtomicBoolean(false);
-        this.cacheSupplier = () -> {
+        this.cache = new LazySupplier(getCacheSupplier());
+    }
+
+    public void disable() {
+        resize(0, true, true);
+    }
+    public void enable() {
+        reset();
+    }
+
+    public long reset() {
+        return resize(0, true, false);
+    }
+    public long resize(long newLimit) {
+        return resize(newLimit, false, false);
+    }
+
+    @Override
+    protected Enumerator<E> internalEnumerator() {
+        final AtomicBoolean dis = disabled;
+        if (dis.get()) {
+            return source.enumerator();
+        }
+        synchronized(cache) {
+            final AtomicBoolean dis1 = disabled;
+            return dis1.get()
+                    ? source.enumerator()
+                    : new CacheEnumerator(cache.get());
+        }
+    }
+
+    private Supplier<Optional<CachedElementWrapper<E>>> getCacheSupplier() {
+        return () -> {
             final Enumerator<E> en = this.enumerator.get();
             final long lim = this.limit;
             final AtomicBoolean dis = this.disabled;
+            final Runnable clbk = this.callback;
 
             if (!en.hasNext()) {
                 return Optional.empty();
@@ -73,56 +105,36 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
                             () -> {
                                 dis.set(true);
                                 try {
-                                    onLimit.run();
+                                    clbk.run();
                                 } catch (Exception ex) {
                                     // do nothing
                                 };
                             }));
         };
-        this.cache = new LazySupplier(this.cacheSupplier);
     }
 
-    public long reset() {
-        return resize(this.limit, true);
-    }
-    public long resize(long newLimit) {
-        return resize(newLimit, false);
-    }
-
-    @Override
-    protected Enumerator<E> internalEnumerator() {
+    private long resize(long newLimit, boolean resetting, boolean disable) {
         synchronized(cache) {
-            AtomicBoolean dis = disabled;
-            return dis.get()
-                    ? source.enumerator()
-                    : new CacheEnumerator(cache.get());
-        }
-    }
+            final long result = limit;
+            if (resetting) {
+                newLimit = result;
+            } else {
+                Utils.ensureLessThan(result,
+                                     newLimit,
+                                     Messages.ILLEGAL_ENUMERATOR_STATE);
+            }
 
-    private long resize(long newLimit, boolean resetting) {
-        final long result = limit;
-        if (resetting) {
-            Utils.ensureLessThan(0,
-                                 newLimit,
-                                 Messages.ILLEGAL_ENUMERATOR_STATE);
-        } else {
-            Utils.ensureLessThan(result,
-                                 newLimit,
-                                 Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
-
-        synchronized(cache) {
             disabled = new AtomicBoolean(true);
             try {
-                limit = resetting ? result : newLimit;
+                limit = newLimit;
 
                 enumerator.refresh(() -> source.enumerator());
-                cache.refresh(cacheSupplier);
+                cache.refresh(getCacheSupplier());
 
                 return result;
             } finally {
-                disabled.set(false);
+                disabled.set(disable);
             }
         }
-    }    
+    }
 }

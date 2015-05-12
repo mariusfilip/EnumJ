@@ -40,11 +40,11 @@ final class CacheEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     protected E internalNext() {
-        E result = cached.get().getElement();
+        final E result = cached.get().getElement();
         cached = cached.get().getNextWrapper();
         return result;
     }
-    
+
     @Override
     protected void cleanup() {
         cached = null;

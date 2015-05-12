@@ -29,21 +29,14 @@ import org.apache.commons.lang3.concurrent.LazyInitializer;
 class Lazy<T> extends LazyInitializer<T> {
 
     private Supplier<T> supplier;
-    private volatile boolean initialized;
 
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;
-        this.initialized = false;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 
     @Override
     protected T initialize() {
-        T result = supplier.get();
-        initialized = true;
+        final T result = supplier.get();
         supplier = null;
         return result;
     }

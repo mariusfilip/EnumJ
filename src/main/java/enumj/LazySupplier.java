@@ -31,12 +31,7 @@ class LazySupplier<T> implements Supplier<T> {
     volatile Lazy<T> lazy;
 
     LazySupplier(Supplier<T> supplier) {
-        lazy = new Lazy(supplier);
-    }
-
-    boolean isInitialized() {
-        Lazy<T> val = lazy;
-        return val.isInitialized();
+        refresh(supplier);
     }
 
     void refresh(Supplier<T> supplier) {

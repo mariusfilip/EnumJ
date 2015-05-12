@@ -40,8 +40,8 @@ final class CachedElementWrapper<E> {
         this.elem = elem;
         this.next = new Lazy(() -> {
             final long count = ordinal;
-            Nullable<E> e = nextSupplier.get();
-            Optional<CachedElementWrapper<E>> result = e.isPresent()
+            final Nullable<E> e = nextSupplier.get();
+            final Optional<CachedElementWrapper<E>> result = e.isPresent()
                     ? Optional.of(new CachedElementWrapper(e.get(),
                                                            nextSupplier,
                                                            limit,
