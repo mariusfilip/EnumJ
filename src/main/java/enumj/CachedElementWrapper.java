@@ -25,7 +25,6 @@ package enumj;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.ConcurrentException;
 
 final class CachedElementWrapper<E> {
 
@@ -60,10 +59,6 @@ final class CachedElementWrapper<E> {
     }
 
     public Optional<CachedElementWrapper<E>> getNextWrapper() {
-        try {
-            return next.get();
-        } catch(ConcurrentException ex) {
-            throw new UnsupportedOperationException(ex);
-        }
+        return next.get();
     }
 }

@@ -37,11 +37,7 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
 
     @Override
     protected Enumerator<E> internalEnumerator() {
-        try {
-            return enumerable.get().enumerator();
-        } catch(ConcurrentException ex) {
-            throw new UnsupportedOperationException(ex);
-        }
+        return enumerable.get().enumerator();
     }
 
     public static <E> LazyEnumerable<E> of(

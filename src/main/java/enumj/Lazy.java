@@ -24,6 +24,7 @@
 package enumj;
 
 import java.util.function.Supplier;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 
 class Lazy<T> extends LazyInitializer<T> {
@@ -32,6 +33,15 @@ class Lazy<T> extends LazyInitializer<T> {
 
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;
+    }
+
+    @Override
+    public T get() {
+        try {
+            return super.get();
+        } catch(ConcurrentException ex) {
+            throw new UnsupportedOperationException(ex);
+        }
     }
 
     @Override
