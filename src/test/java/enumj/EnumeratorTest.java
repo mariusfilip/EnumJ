@@ -1025,4 +1025,13 @@ public class EnumeratorTest {
                                .zipAny(Enumerator.rangeInt(100, 200))
                                .count(), 100);
     }
+    
+    @Test
+    public void testZipThree() {
+        System.out.println("zipThree");
+        assertEquals(Enumerator.rangeInt(0, 50)
+                               .zipAll(Enumerator.rangeInt(0, 75),
+                                       Enumerator.rangeInt(0, 100))
+                               .count(), 100);
+    }
 }

@@ -28,9 +28,10 @@ import java.util.function.Function;
 
 class FlatMapPipeProcessor<In,Out> extends PipeMultiProcessor<In,Out> {
 
-    protected Function<In,Iterator<Out>> mapper;
+    protected final Function<In,Iterator<Out>> mapper;
+    protected final Nullable<Out> value;
+    
     protected Iterator<Out> iterator;
-    protected Nullable<Out> value;
 
     public FlatMapPipeProcessor(Function<In,Iterator<Out>> mapper) {
         this.mapper = mapper;

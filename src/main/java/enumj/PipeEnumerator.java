@@ -173,9 +173,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (value.isPresent()) {
             return true;
         }
-        Nullable<Object> in = Nullable.empty();
-        Nullable<PipeProcessor> processor = Nullable.empty();
-        Nullable<Boolean> nextOnNoValue = Nullable.empty();
+        final Nullable<Object> in = Nullable.empty();
+        final Nullable<PipeProcessor> processor = Nullable.empty();
+        final Nullable<Boolean> nextOnNoValue = Nullable.empty();
         while(true) {
             if (!tryPipelineIn(in, processor)) {
                 return false;

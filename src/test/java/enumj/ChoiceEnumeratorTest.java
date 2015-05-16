@@ -67,6 +67,12 @@ public class ChoiceEnumeratorTest {
     }
 
     @Test
+    public void testHasNext() {
+        assertTrue(zipped.hasNext());
+        assertTrue(zipped.hasNext());
+    }
+
+    @Test
     public void testNext() {
         for(int i=0; i<shortLen; ++i) {
             assertTrue(zipped.hasNext());

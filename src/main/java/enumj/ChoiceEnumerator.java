@@ -6,7 +6,6 @@
 package enumj;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.IntSupplier;
@@ -20,9 +19,9 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
     protected IntSupplier indexSupplier;
     protected IntUnaryOperator nextIndexSupplier;
-    protected List<Iterator<E>> sources;
-    protected E value;
-    protected boolean isValue;
+
+    protected final List<Iterator<E>> sources;
+    protected final Nullable<E> value;
 
     public ChoiceEnumerator(IntSupplier indexSupplier,
                             IntUnaryOperator nextIndexSupplier,
@@ -41,15 +40,18 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         }
         this.indexSupplier = indexSupplier;
         this.nextIndexSupplier = nextIndexSupplier;
+
         this.sources = new ArrayList<>();
         this.sources.add(first);
         this.sources.add(second);
         this.sources.addAll(rest);
+        
+        this.value = Nullable.empty();
     }
 
     @Override
     protected boolean internalHasNext() {
-        if (isValue) {
+        if (value.isPresent()) {
             return true;
         }
         if (sources.size() > 0) {
@@ -58,8 +60,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
             while (count >= 0) {
                 if (sources.get(index) != null) {
                     if (sources.get(index).hasNext()) {
-                        value = sources.get(index).next();
-                        isValue = true;
+                        value.set(sources.get(index).next());
                         return true;
                     }
                     sources.set(index, null);
@@ -72,14 +73,16 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     protected E internalNext() {
-        isValue = false;
-        return value;
+        final E result = value.get();
+        value.clear();
+        return result;
     }
     @Override
     protected void cleanup() {
         indexSupplier = null;
         nextIndexSupplier = null;
-        sources = null;
-        value = null;
+
+        sources.clear();
+        value.clear();
     }
 }

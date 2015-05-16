@@ -30,10 +30,11 @@ import org.apache.commons.lang3.tuple.Pair;
 class CartesianProductPipeProcessor<In,T> extends
                                           PipeMultiProcessor<In,Pair<In,T>> {
 
+    protected final Supplier<Iterator<T>> source;
+    protected final Nullable<Pair<In,T>> value;
+    
     protected In in;
-    protected Supplier<Iterator<T>> source;
     protected Iterator<T> iterator;
-    protected Nullable<Pair<In,T>> value;
     
     CartesianProductPipeProcessor(Supplier<Iterator<T>> source) {
         this.in = null;

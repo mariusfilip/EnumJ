@@ -16,8 +16,9 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
     private Consumer<? super Exception> handler;
-    private int retries;
-    private Nullable<E> element;
+
+    private final int retries;
+    private final Nullable<E> element;
 
     public TolerantEnumerator(Iterator<E> source,
                               Consumer<? super Exception> handler,
@@ -84,13 +85,12 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
         element.clear();
         return result;
     }
-    
+
     @Override
     protected void cleanup() {
         source = null;
         handler = null;
         
         element.clear();
-        element = null;
     }
 }

@@ -5,6 +5,7 @@
  */
 package enumj;
 
+import java.util.Iterator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,6 +46,7 @@ public class UtilsTest {
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNotNull() {
         System.out.println("ensureNotNull");
+        Utils.ensureNotNull("not null", "");
         Utils.ensureNotNull(null, "");
     }
 
@@ -54,6 +56,7 @@ public class UtilsTest {
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNonNegative() {
         System.out.println("ensureNonNegative");
+        Utils.ensureNonNegative(1, "");
         Utils.ensureNonNegative(-1, "");
     }
 
@@ -63,7 +66,31 @@ public class UtilsTest {
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureLessThan() {
         System.out.println("ensureLessThan");
+        Utils.ensureLessThan(1, 2, "");
         Utils.ensureLessThan(1, 1, "");
+    }
+
+    /**
+     * Test of ensureNonEnumerating method, of class Utils.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testEnsureNonEnumerating_Enumerator() {
+        System.out.println("ensureNonEnumerating");
+        final Enumerator<Integer> e = Enumerator.on(1, 2, 3);
+        e.next();
+        Utils.ensureNonEnumerating(e);
+    }
+
+    /**
+     * Test of ensureNonEnumerating method, of class Utils.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testEnsureNonEnumerating_Enumerable() {
+        System.out.println("ensureNonEnumerating");
+        final Enumerable<Integer> e = Enumerable.on(1, 2, 3);
+        Utils.ensureNonEnumerating(e);
+        final Iterator<Integer> it = e.iterator();
+        Utils.ensureNonEnumerating(e);
     }
     
 }
