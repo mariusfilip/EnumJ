@@ -84,22 +84,18 @@ public final class CachedEnumerableState<E> {
         return disabled.get();
     }
     public CachedEnumerableState<E> enable() {
-        return disabled.compareAndSet(true, false)
-                ? new CachedEnumerableState(
+        return new CachedEnumerableState(
                         source,
                         limit,
                         callback,
-                        false)
-                : this;
+                        false);
     }
     public CachedEnumerableState<E> disable() {
-        return disabled.compareAndSet(false, true)
-                ? new CachedEnumerableState(
+        return new CachedEnumerableState(
                         source,
                         limit,
                         callback,
-                        true)
-                : this;
+                        true);
     }
 
     public CachedEnumerableState<E> reset() {
