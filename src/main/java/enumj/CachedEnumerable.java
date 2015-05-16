@@ -45,23 +45,23 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     public CachedEnumerableState<E> disable() {
-        final CachedEnumerableState<E> disabled = state.disable();
+        final CachedEnumerableState<E> disabled = state().disable();
         this.state = disabled;
         return disabled;
     }
     public CachedEnumerableState<E> enable() {
-        final CachedEnumerableState<E> enabled = state.enable();
+        final CachedEnumerableState<E> enabled = state().enable();
         this.state = enabled;
         return enabled;
     }
 
     public CachedEnumerableState<E> reset() {
-        final CachedEnumerableState<E> res = state.reset();
+        final CachedEnumerableState<E> res = state().reset();
         this.state = res;
         return res;
     }
     public CachedEnumerableState<E> resize(long newLimit) {
-        final CachedEnumerableState<E> res = state.resize(newLimit);
+        final CachedEnumerableState<E> res = state().resize(newLimit);
         this.state = res;
         return res;
     }
