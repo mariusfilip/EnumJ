@@ -246,13 +246,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     public Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
                                             Iterator<? extends E>... rest) {
-        return zipAll(first, Arrays.asList(rest));
+        return zipAll((Iterator<E>)first,
+                       (List<Iterator<E>>)(List<?>)Arrays.asList(rest));
     }
 
     // ---------------------------------------------------------------------- //
 
-    Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
-                                     List<Iterator<? extends E>> rest) {
+    Enumerator<Optional<E>[]> zipAll(Iterator<E> first,
+                                     List<Iterator<E>> rest) {
         PipeEnumerator<Optional<E>> optionalPipe =
                 (PipeEnumerator<Optional<E>>)map(e -> Optional.of(e))
                 .concat(Enumerator.of(() -> Optional.of(Optional.empty())));

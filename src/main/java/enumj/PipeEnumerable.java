@@ -23,9 +23,11 @@
  */
 package enumj;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -197,10 +199,13 @@ class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
                             in instanceof PipeEnumerator<?>
                             ? (PipeEnumerator<E>)in
                             : new PipeEnumerator((Iterator<E>)in);
-                    return pipeEnum.zipAll(first.iterator(),
-                            Enumerator.on(rest)
-                                      .map(Iterable::iterator)
-                                      .toList());
+                    final Iterator<E> firstIt = (Iterator<E>)first.iterator();
+                    final List<Iterator<E>> restList = 
+                            Enumerator.of(Arrays.asList(rest))
+                            .map(Iterable::iterator)
+                            .map(it -> (Iterator<E>)it)
+                            .toList();
+                    return pipeEnum.zipAll(firstIt, restList);
         });
     }
 }
