@@ -23,35 +23,14 @@
  */
 package enumj;
 
-import java.util.function.Supplier;
-import org.apache.commons.lang3.concurrent.ConcurrentException;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
-
-public final class Lazy<T> extends LazyInitializer<T> {
-
-    private Supplier<T> supplier;
-
-    public Lazy(Supplier<T> supplier) {
-        this.supplier = supplier;
+public class LazyException extends RuntimeException {
+    public LazyException() {
+        super();
     }
-
-    @Override
-    public T get() {
-        try {
-            return super.get();
-        } catch(ConcurrentException ex) {
-            throw new UnsupportedOperationException(ex.getCause());
-        }
+    public LazyException(String msg) {
+        super(msg);
     }
-
-    @Override
-    protected T initialize() throws ConcurrentException {
-        try {
-            final T result = supplier.get();
-            supplier = null;
-            return result;
-        } catch(LazyException ex) {
-            throw new ConcurrentException(ex.getCause());
-        }
+    public LazyException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

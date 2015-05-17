@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,22 +37,22 @@ import static org.junit.Assert.*;
  * @author Marius Filip
  */
 public class LazyTest {
-    
+
     public LazyTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -65,9 +66,39 @@ public class LazyTest {
         assertEquals("something", new Lazy(() -> "something").get());
     }
 
-    /**
-     * Test of initialize method, of class Lazy.
-     */
+    @Test(expected=ArithmeticException.class)
+    public void testGet_ThrowRuntimeException() {
+        System.out.println("get throw runtime exception");
+        assertEquals("something",
+                     new Lazy(LazyTest::throwArithmeticException).get());
+    }
+
+    @Test(expected=Error.class)
+    public void testGet_ThrowError() {
+        System.out.println("get throw error");
+        assertEquals("something",
+                     new Lazy(LazyTest::throwError).get());
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testGet_ThrowLazyException() {
+        System.out.println("get throw lazy exception");
+        assertEquals("something",
+                     new Lazy(LazyTest::throwLazyException).get());
+    }
+
+    private static String throwArithmeticException() {
+        throw new ArithmeticException();
+    }
+
+    private static String throwError() {
+        throw new Error();
+    }
+
+    private static String throwLazyException() {
+        throw new LazyException("", new IOException());
+    }
+
     @Test
     public void testInitialize() {
         System.out.println("initialize");
@@ -80,6 +111,5 @@ public class LazyTest {
             assertEquals("something", lazy.get());
         }
         assertEquals(1, count.get());
-    }
-    
+    }    
 }
