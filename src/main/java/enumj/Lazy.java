@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 
-class Lazy<T> extends LazyInitializer<T> {
+public final class Lazy<T> extends LazyInitializer<T> {
 
     private Supplier<T> supplier;
 
