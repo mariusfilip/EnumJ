@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  *
  * @author Marius Filip
  */
-class WhilePipeProcessor<E> extends PipeProcessor<E,E> {
+class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected E value;
     protected Predicate<E> filter;
     protected boolean get;
@@ -40,5 +40,9 @@ class WhilePipeProcessor<E> extends PipeProcessor<E,E> {
     @Override
     protected boolean nextOnNoValue() {
         return false;
+    }
+    @Override
+    protected boolean hasNextNeedsValue() {
+        return true;
     }
 }

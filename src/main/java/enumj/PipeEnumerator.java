@@ -33,12 +33,13 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.tuple.Pair;
 
-class PipeEnumerator<E> extends AbstractEnumerator<E> {
+final class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected LinkedList<PipeProcessor> pipeline;
+    protected LinkedList<AbstractPipeProcessor> pipeline;
     protected LinkedList<PipeMultiProcessor> multiPipeline;
     protected LinkedList<PipeReference> sources;
     protected Nullable<E> value;
+    protected long needValueForHasNext;
 
     PipeEnumerator(Iterator<E> source) {
         this();
@@ -63,9 +64,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     protected <X> Enumerator<X> enqueue(
-            PipeProcessor<? super E, ? extends X> processor) {
-        PipeProcessor last = pipeline.peekLast();
+            AbstractPipeProcessor<? super E, ? extends X> processor) {
+        AbstractPipeProcessor last = pipeline.peekLast();
         pipeline.addLast(processor);
+        if (processor.hasNextNeedsValue()) {
+            ++needValueForHasNext;
+        }
         if (last != null) {
             last.next = processor;
         }
@@ -76,7 +80,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     protected <X> Enumerator<X> enqueue(
             PipeMultiProcessor<? super E, ? extends X> processor) {
-        PipeProcessor last = pipeline.peekLast();
+        AbstractPipeProcessor last = pipeline.peekLast();
         boolean added = false;
         try {
             pipeline.addLast(processor);
@@ -87,6 +91,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 pipeline.removeLast();
             }
             throw ex;
+        }
+        if (processor.hasNextNeedsValue()) {
+            ++needValueForHasNext;
         }
         if (last != null) {
             last.next = processor;
@@ -99,23 +106,30 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected void dequeue() {
         if (!sources.isEmpty()) {
             sources.remove();
+            value.clear();
             if (!sources.isEmpty()) {
                 while(!pipeline.isEmpty()
                       && pipeline.peekFirst() != sources.peekFirst().getRef()) {
-                    PipeProcessor head = pipeline.remove();
+                    AbstractPipeProcessor head = pipeline.remove();
                     if (!multiPipeline.isEmpty()
                         && head == multiPipeline.peekFirst()) {
                         multiPipeline.remove();
+                    }
+                    if (head.hasNextNeedsValue()) {
+                        --needValueForHasNext;
                     }
                 }
             } else {
                 pipeline.clear();
                 multiPipeline.clear();
             }
+        } else {
+            assert !value.isPresent();
         }
     }
-    protected boolean tryPipelineIn(Nullable<Object>        in,
-                                    Nullable<PipeProcessor> processor) {
+    protected boolean tryPipelineIn(
+            Nullable<Object>                in,
+            Nullable<AbstractPipeProcessor> processor) {
         in.clear();
         processor.clear();
 
@@ -143,10 +157,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.set(pipeline.peekFirst());
         return true;
     }
-    protected boolean tryPipelineOut(Object            in,
-                                     PipeProcessor     processor,
-                                     Nullable<E>       out,
-                                     Nullable<Boolean> nextOnNoValue) {
+    protected boolean tryPipelineOut(Object                    in,
+                                     AbstractPipeProcessor     processor,
+                                     Nullable<E>               out,
+                                     Nullable<Boolean>         nextOnNoValue) {
         out.clear();
         nextOnNoValue.clear();
 
@@ -173,8 +187,51 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (value.isPresent()) {
             return true;
         }
+        if (needValueForHasNext > 0) {
+            return tryGetNext();
+        }
+
+        assert needValueForHasNext == 0;
+        return straightHasNext();
+    }
+    @Override
+    protected E internalNext() {
+        if (value.isPresent()) {
+            final E result = value.get();
+            value.clear();
+            return result;
+        }
+
+        assert needValueForHasNext == 0;
+        final boolean hasNext = tryGetNext();
+        assert hasNext;
+        assert value.isPresent();
+        
+        final E result = value.get();
+        value.clear();
+        return result;
+    }
+    @Override
+    protected void cleanup() {
+        pipeline.clear();
+        pipeline = null;
+        multiPipeline.clear();
+        multiPipeline = null;
+        sources.clear();
+        sources = null;
+        value.clear();
+        value = null;
+    }
+
+    protected final boolean straightHasNext() {
+        while(!sources.isEmpty() && !sources.peekFirst().hasNext()) {
+            dequeue();
+        }
+        return !sources.isEmpty();
+    }
+    protected final boolean tryGetNext() {
         final Nullable<Object> in = Nullable.empty();
-        final Nullable<PipeProcessor> processor = Nullable.empty();
+        final Nullable<AbstractPipeProcessor> processor = Nullable.empty();
         final Nullable<Boolean> nextOnNoValue = Nullable.empty();
         while(true) {
             if (!tryPipelineIn(in, processor)) {
@@ -190,23 +247,6 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 dequeue();
             }
         }
-    }
-    @Override
-    protected E internalNext() {
-        E result = value.get();
-        value.clear();
-        return result;
-    }
-    @Override
-    protected void cleanup() {
-        pipeline.clear();
-        pipeline = null;
-        multiPipeline.clear();
-        multiPipeline = null;
-        sources.clear();
-        sources = null;
-        value.clear();
-        value = null;
     }
 
     // ---------------------------------------------------------------------- //

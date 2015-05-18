@@ -74,4 +74,8 @@ class CartesianProductPipeProcessor<In,T> extends
     protected boolean nextOnNoValue() {
         return true;
     }
+    @Override
+    protected boolean hasNextNeedsValue() {
+        return true;
+    }
 }

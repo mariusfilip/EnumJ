@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  *
  * @author Marius Filip
  */
-class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
+class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected E value;
     protected Predicate<E> filter;
     
@@ -34,6 +34,10 @@ class FilterPipeProcessor<E> extends PipeProcessor<E,E> {
     }
     @Override
     protected boolean nextOnNoValue() {
+        return true;
+    }
+    @Override
+    protected boolean hasNextNeedsValue() {
         return true;
     }
 }

@@ -69,4 +69,8 @@ class FlatMapPipeProcessor<In,Out> extends PipeMultiProcessor<In,Out> {
     protected boolean nextOnNoValue() {
         return true;
     }
+    @Override
+    protected boolean hasNextNeedsValue() {
+        return true;
+    }
 }

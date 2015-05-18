@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class ZipPipeProcessor<E> extends PipeProcessor<Optional<E>,
+public class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
                                                        Optional<E>[]> {
     
     protected Iterator<E>[] iterators;
@@ -69,5 +69,9 @@ public class ZipPipeProcessor<E> extends PipeProcessor<Optional<E>,
     @Override
     protected boolean nextOnNoValue() {
         return false;
+    }
+    @Override
+    protected boolean hasNextNeedsValue() {
+        return true;
     }
 }

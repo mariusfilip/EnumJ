@@ -31,16 +31,16 @@ import java.util.Iterator;
  */
 class PipeReference<E> extends IteratorEnumerator<E> {
 
-    private PipeProcessor<?,?> reference;
+    private AbstractPipeProcessor<?,?> reference;
 
     protected PipeReference(Iterator<E> source) {
         super(source);
     }
 
-    PipeProcessor<?,?> getRef() {
+    AbstractPipeProcessor<?,?> getRef() {
         return this.reference;
     }
-    void setRefIfNull(PipeProcessor<?,?> reference) {
+    void setRefIfNull(AbstractPipeProcessor<?,?> reference) {
         Utils.ensureNotNull(reference, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
         if (this.reference == null) {
             this.reference = reference;
