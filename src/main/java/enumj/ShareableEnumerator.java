@@ -69,14 +69,16 @@ import java.util.WeakHashMap;
  * @see Enumerator
  * @see SharingEnumerator
  */
-public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
+public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
     private boolean isEnumerating;
     private boolean isSharing;
     private boolean isSharedEnumerating;
-    private LinkedList<ShareableElement<E>> buffer;
-    private WeakHashMap<SharingEnumerator<E>, ShareableElement<E>> waiting;
+
+    private final LinkedList<ShareableElement<E>> buffer;
+    private final WeakHashMap<SharingEnumerator<E>,
+                              ShareableElement<E>> waiting;
 
     /**
      * Constructs an shareable enumerator out of a provided {@link Iterator}.
@@ -130,7 +132,7 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         isSharing = true;
         final SharingEnumerator<E>[] enumerators = new SharingEnumerator[count];
         for(int i=0; i<count; ++i) {
-            enumerators[i] = new SharingEnumerator(this);
+            enumerators[i] = newSharingEnumerator();
             waiting.put(enumerators[i], null);
         }
         return enumerators;
@@ -142,17 +144,12 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
             throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
         }
         isEnumerating = true;
-        if (source == null || buffer == null) {
-            return false;
-        }
         return source.hasNext();
     }
 
     @Override
     protected E internalNext() {
-        if (isSharing || isSharedEnumerating) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
+        assert !isSharing && !isSharedEnumerating;
         isEnumerating = true;
         return source.next();
     }
@@ -161,13 +158,11 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     protected void cleanup() {
         source = null;
         buffer.clear();
-        buffer = null;
+        waiting.clear();
     }
 
     boolean hasNext(ShareableElement<E> consumedPtr) {
-        if (isEnumerating) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
+        assert !isEnumerating;
         isSharedEnumerating = true;
         return consumedPtr != null && consumedPtr.next != null
                || consumedPtr == null && !buffer.isEmpty()
@@ -176,10 +171,9 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
 
     ShareableElement<E> next(SharingEnumerator<E> enumerator,
                              ShareableElement<E> consumedPtr) {
-        if (isEnumerating) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
+        assert !isEnumerating;
         isSharedEnumerating = true;
+        boolean refAdded = false;
         boolean ok = false;
         assert consumedPtr != null || waiting.containsKey(enumerator);
 
@@ -188,6 +182,8 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
 
         try {
             newPtr.addRef(enumerator);
+            refAdded = true;
+
             if (consumedPtr != null) {
                 consumedPtr.release(enumerator);
             }
@@ -198,7 +194,9 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
             ok = true;
         }
         catch (Exception ex) {
-            newPtr.release(enumerator);
+            if (refAdded) {
+                newPtr.release(enumerator);
+            }
 
             assert !buffer.isEmpty();
             if (newPtr == buffer.getLast()) {
@@ -244,8 +242,8 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     private void getNextElement() {
-        final ShareableElement<E> nextPtr = new ShareableElement(source.next(),
-                                                                 waiting);
+        final ShareableElement<E> nextPtr = newShareableElement(source.next(),
+                                                                waiting);
         final ShareableElement<E> tail = buffer.isEmpty()
                                          ? null
                                          : buffer.getLast();
@@ -253,5 +251,18 @@ public final class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         if (tail != null) {
             tail.next = nextPtr;
         }
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    protected SharingEnumerator<E> newSharingEnumerator() {
+        return new SharingEnumerator(this);
+    }
+
+    protected ShareableElement<E> newShareableElement(
+            E value,
+            WeakHashMap<SharingEnumerator<E>,
+                        ShareableElement<E>> waiting) {
+        return new ShareableElement(value, waiting);
     }
 }

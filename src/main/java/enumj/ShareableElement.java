@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
  *
  * @author Marius Filip
  */
-final class ShareableElement<E> {
+class ShareableElement<E> {
 
     private final E value;
     private Set<SharingEnumerator<E>> sharingOwners;
@@ -36,16 +36,26 @@ final class ShareableElement<E> {
 
     void addRef(SharingEnumerator<E> owner) {
         assert owner != null;
-        sharingOwners.add(owner);
+        addSharingOwner(owner);
     }
 
     public void release(SharingEnumerator<E> owner) {
         assert owner != null;
         assert sharingOwners.contains(owner);
-        sharingOwners.remove(owner);
+        removeSharingOwner(owner);
     }
 
     public boolean isFree() {
         return waiting.isEmpty() && sharingOwners.isEmpty();
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    protected void addSharingOwner(SharingEnumerator<E> owner) {
+        sharingOwners.add(owner);
+    }
+
+    protected void removeSharingOwner(SharingEnumerator<E> owner) {
+        sharingOwners.remove(owner);
     }
 }
