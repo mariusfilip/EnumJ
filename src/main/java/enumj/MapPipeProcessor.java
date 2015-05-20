@@ -7,11 +7,7 @@ package enumj;
 
 import java.util.function.Function;
 
-/**
- *
- * @author Marius Filip
- */
-class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
+final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
 
     protected Function<In,Out> mapper;
     protected Out value;
