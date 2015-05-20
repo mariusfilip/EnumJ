@@ -252,11 +252,6 @@ final class PipeEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    public <T> Enumerator<Pair<E,T>> cartesianProduct(
-            Supplier<Iterator<T>> source) {
-        return enqueue(new CartesianProductPipeProcessor(source));
-    }
-    @Override
     public Enumerator<E> concat(Iterator<? extends E> elements) {
         sources.addLast(PipeReference.of(elements));
         return this;

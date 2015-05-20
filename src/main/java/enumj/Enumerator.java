@@ -712,10 +712,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>.
      */
     public default <T> Enumerator<Pair<E,T>> cartesianProduct(
-            Supplier<Iterator<T>> source) {
-        Utils.ensureNonEnumerating(this);
+            Iterable<T> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new PipeEnumerator(this).cartesianProduct(source);
+        return flatMap(u -> Enumerator.of(source.iterator())
+                                      .map(v -> Pair.of(u, v)));
     }
 
     /**
