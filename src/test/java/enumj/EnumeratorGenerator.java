@@ -104,6 +104,10 @@ public class EnumeratorGenerator {
         return Enumerator.ofLazySpliterator(
                 () -> ofStreamEnumerator().asSpliterator());
     }
+    
+    public LateBindingEnumerator<Double> ofLateBindingEnumerator() {
+        return Enumerator.ofLateBinding(Double.class);
+    }
 
     public Enumerator<Double> enumerator() {
         final Enumerator[] subEnumerators = {

@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Spliterator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -269,6 +270,27 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
+    @Test
+    public void testOfLateBinding() {
+        System.out.println("ofLateBinding");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLateBindingEnumerator(),
+                                  p.getRight().enumerator()
+                                              .asShareable()
+                                              .share(2)))
+                .map(p -> {
+                    final LateBindingEnumerator<Double> en1 = p.getLeft();
+                    final SharingEnumerator<Double>[] sens = p.getRight();
+                    
+                    en1.bind(sens[0]);
+                    return Pair.of(en1, sens[1]);
+                })
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
+    }
+
     /**
      * Test of as method, of class Enumerator.
      */
@@ -338,6 +360,22 @@ public class EnumeratorTest {
                     }
                     assertEquals(0, c);
                 });
+    }
+
+    @Test
+    public void testAsOptional() {
+        System.out.println("asOptional");
+        EnumeratorGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerator()
+                                             .asOptional(),
+                                  p.getRight().enumerator()))
+                .map(p -> Pair.of(p.getLeft().takeWhile(e -> e.isPresent())
+                                             .map(e -> e.get()),
+                                  p.getRight()))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()));
     }
 
     /**
@@ -482,6 +520,18 @@ public class EnumeratorTest {
                 .map(g -> g.enumerator())
                 .map(e -> e.map(x -> x*x))
                 .forEach(e -> { assertTrue(e.allMatch(x -> x>=0)); });
+        final Random rnd = new Random(100);
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.append(-1.0, -0.5, 0.0, 0.25, 0.75))
+                .map(e -> e.map((Double d) -> Pair.of(d, rnd.nextDouble()))
+                           .sorted((p1, p2) -> Double.compare(p1.getRight(),
+                                                              p2.getRight()))
+                           .map(p -> p.getLeft()))
+                .map(e -> e.map(x -> x*x))
+                .forEach(e -> { assertFalse(e.allMatch(x -> x>1)); });
     }
 
     /**
@@ -499,6 +549,12 @@ public class EnumeratorTest {
                                 .concat(Enumerator.on(Math.abs(es[2].first()
                                                                     .get()))))
                 .forEach(e -> { assertTrue(e.anyMatch(x -> x >= 0)); });
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .map(e -> e.map(d -> -Math.abs(d)))
+                .forEach(e -> { assertFalse(e.anyMatch(x -> x > 0)); });
     }
 
     /**
@@ -519,6 +575,21 @@ public class EnumeratorTest {
                                 es[0].append(1.0, 2.0, 3.0)
                                      .skip(es[1].count())));
                 });
+    }
+
+    @Test
+    public void testCartesianProduct() {
+        System.out.println("cartesianProduct");
+        final Enumerator<Integer> en1 = Enumerator.on(0, 1, 2);
+        final Enumerator<Pair<Integer,Integer>> cpen = en1.cartesianProduct(
+                () -> {
+                    return Enumerator.on(2, 3, 4);
+                });
+        assertTrue(cpen.elementsEqual(Enumerator.on(
+                Pair.of(0, 2), Pair.of(0, 3), Pair.of(0, 4),
+                Pair.of(1, 2), Pair.of(1, 3), Pair.of(1, 4),
+                Pair.of(2, 2), Pair.of(2, 3), Pair.of(2, 4))
+        ));
     }
 
     /**
@@ -543,20 +614,25 @@ public class EnumeratorTest {
      */
     @Test
     public void testConcat_Iterator() {
-        System.out.println("concat");
+        System.out.println("concat iterator");
         assertTrue(Enumerator.on(1, 2, 3)
                              .concat(Enumerator.on(4, 5))
                              .elementsEqual(Enumerator.rangeInt(1, 6)));
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testConcat_Iterable() {
-        System.out.println("concat");
+        System.out.println("concat iterable");
         assertEquals(Enumerator.on(1, 2, 3)
                                .concat(Enumerator.on(4, 5).asEnumerable())
+                               .count(), 5);
+    }
+
+    @Test
+    public void testConcat_Enumeration() {
+        System.out.println("concat enumeration");
+        assertEquals(Enumerator.on(1, 2, 3)
+                               .concat(Enumerator.on(4, 5).asEnumeration())
                                .count(), 5);
     }
 
@@ -565,7 +641,7 @@ public class EnumeratorTest {
      */
     @Test
     public void testConcat_Stream() {
-        System.out.println("concat");
+        System.out.println("concat stream");
         assertEquals(Enumerator.on(1, 2, 3)
                                .concat(Enumerator.on(4, 5).asStream())
                                .count(), 5);
@@ -576,20 +652,25 @@ public class EnumeratorTest {
      */
     @Test
     public void testConcat_Spliterator() {
-        System.out.println("concat");
+        System.out.println("concat spliterator");
         assertEquals(Enumerator.on(1, 2, 3)
                                .concat(Enumerator.on(4, 5).asSpliterator())
                                .count(), 5);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testConcat_Supplier() {
-        System.out.println("concat");
+        System.out.println("concat supplier");
         assertEquals(Enumerator.on(1, 2, 3)
                                .concat(Enumerator.on(4, 5).asSupplier())
+                               .count(), 5);
+    }
+
+    @Test
+    public void testConcat_On() {
+        System.out.println("concat on");
+        assertEquals(Enumerator.on(1, 2, 3)
+                               .concatOn(4, 5)
                                .count(), 5);
     }
 
@@ -682,6 +763,9 @@ public class EnumeratorTest {
         assertTrue(Enumerator.rangeInt(0, 10)
                              .flatMap(i -> Enumerator.rangeInt(i*10, (i+1)*10))
                              .elementsEqual(Enumerator.rangeInt(0, 100)));
+        assertTrue(Enumerator.on(1, 2, 3)
+                             .flatMap(i -> Enumerator.rangeInt(i*10, (i+1)*10))
+                             .elementsEqual(Enumerator.rangeInt(10, 40)));
     }
 
     /**
@@ -694,6 +778,14 @@ public class EnumeratorTest {
         Enumerator.rangeInt(0, 100)
                   .forEach(i -> m.setValue(m.intValue()+1));
         assertEquals(m.intValue(), Enumerator.rangeInt(0, 100).count());
+    }
+
+    @Test
+    public void testIndexedMap() {
+        System.out.println("indexedMap");
+        assertTrue(Enumerator.rangeInt(0, 100)
+                             .indexedMap((x,i) -> x - i)
+                             .allMatch(x -> x == 0));
     }
 
     /**
@@ -738,7 +830,7 @@ public class EnumeratorTest {
     public void testLimitWhile() {
         System.out.println("limitWhile");
         assertTrue(Enumerator.rangeInt(0, 100)
-                             .takeWhile(i -> i < 10)
+                             .limitWhile(i -> i < 10)
                              .elementsEqual(Enumerator.rangeInt(0, 10)));
     }
 
@@ -802,14 +894,68 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of prepend method, of class Enumerator.
+     * Test of concat method, of class Enumerator.
      */
     @Test
-    public void testPrepend() {
-        System.out.println("prepend");
-        assertTrue(Enumerator.on(3, 4, 5)
-                             .prependOn(0, 1, 2)
-                             .elementsEqual(Enumerator.rangeInt(0, 6)));
+    public void testPrepend_Iterator() {
+        System.out.println("prepend iterator");
+        assertTrue(Enumerator.on(4, 5)
+                             .prepend(Enumerator.on(1, 2, 3))
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    @Test
+    public void testPrepend_Iterable() {
+        System.out.println("prepend iterable");
+        assertEquals(Enumerator.on(4, 5)
+                               .prepend(Enumerator.on(1, 2, 3).asEnumerable())
+                               .count(), 5);
+    }
+
+    @Test
+    public void testPrepend_Enumeration() {
+        System.out.println("prepend enumeration");
+        assertEquals(Enumerator.on(4, 5)
+                               .prepend(Enumerator.on(1, 2, 3).asEnumeration())
+                               .count(), 5);
+    }
+
+    /**
+     * Test of concat method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Stream() {
+        System.out.println("prepend stream");
+        assertEquals(Enumerator.on(4, 5)
+                               .prepend(Enumerator.on(1, 2, 3).asStream())
+                               .count(), 5);
+    }
+
+    /**
+     * Test of concat method, of class Enumerator.
+     */
+    @Test
+    public void testPrepend_Spliterator() {
+        System.out.println("prepend spliterator");
+        assertEquals(Enumerator.on(4, 5)
+                               .prepend(Enumerator.on(1, 2, 3).asSpliterator())
+                               .count(), 5);
+    }
+
+    @Test
+    public void testPrepend_Supplier() {
+        System.out.println("prepend supplier");
+        assertEquals(Enumerator.on(4, 5)
+                               .prepend(Enumerator.on(1, 2, 3).asSupplier())
+                               .count(), 5);
+    }
+
+    @Test
+    public void testPrepend_On() {
+        System.out.println("prepend on");
+        assertEquals(Enumerator.on(4, 5)
+                               .prependOn(1, 2, 3)
+                               .count(), 5);
     }
 
     /**
@@ -837,6 +983,48 @@ public class EnumeratorTest {
                                .reduce(0L, (x, y) -> x+y)
                                .longValue(),
                      10L*(10+1)/2);
+    }
+
+    @Test
+    public void testRepeat() {
+        System.out.println("repeat");
+        assertTrue(Enumerator.repeat(1, 3)
+                             .elementsEqual(Enumerator.on(1, 1, 1)));
+    }
+
+    @Test
+    public void testRepeatAll_Static() {
+        System.out.println("repeat all static");
+        assertTrue(Enumerator.repeatAll(() -> Enumerator.on(1, 2, 3),
+                                        3)
+                             .elementsEqual(Enumerator.on(1, 2, 3,
+                                                          1, 2, 3,
+                                                          1, 2, 3)));
+    }
+
+    @Test
+    public void testRepeatAll() {
+        System.out.println("repeat all");
+        assertTrue(
+                Enumerator.on(1, 2, 3, 4, 5)
+                          .repeatAll(10)
+                          .elementsEqual(
+                                  Enumerator.repeatAll(
+                                          () -> Enumerator.on(1, 2, 3, 4, 5),
+                                          10)));
+    }
+
+    @Test
+    public void testRepeatEach() {
+        System.out.println("repeat each");
+        assertTrue(
+                Enumerator
+                        .on(1, 2, 3, 4, 5)
+                        .repeatEach(10)
+                        .elementsEqual(
+                                Enumerator.on(1, 2, 3, 4, 5)
+                                          .flatMap(x ->
+                                                   Enumerator.repeat(x, 10))));
     }
 
     /**
@@ -966,14 +1154,75 @@ public class EnumeratorTest {
     }
 
     /**
-     * Test of union method, of class Enumerator.
+     * Test of concat method, of class Enumerator.
      */
     @Test
-    public void testUnion() {
-        System.out.println("union");
-        assertTrue(Enumerator.rangeInt(0, 100)
-                             .union(Enumerator.rangeInt(50, 150))
-                             .elementsEqual(Enumerator.rangeInt(0, 150)));
+    public void testUnion_Iterator() {
+        System.out.println("union iterator");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3))
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    @Test
+    public void testUnion_Iterable() {
+        System.out.println("union iterable");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3).asEnumerable())
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    @Test
+    public void testUnion_Enumeration() {
+        System.out.println("union enumeration");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3).asEnumeration())
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    /**
+     * Test of concat method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Stream() {
+        System.out.println("union stream");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3).asStream())
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    /**
+     * Test of concat method, of class Enumerator.
+     */
+    @Test
+    public void testUnion_Spliterator() {
+        System.out.println("union spliterator");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3).asSpliterator())
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    @Test
+    public void testUnion_Supplier() {
+        System.out.println("union supplier");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .union(Enumerator.on(1, 2, 3).asSupplier())
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
+    }
+
+    @Test
+    public void testUnion_On() {
+        System.out.println("union on");
+        assertTrue(Enumerator.on(3, 4, 5)
+                             .unionOn(1, 2, 3)
+                             .sorted()
+                             .elementsEqual(Enumerator.rangeInt(1, 6)));
     }
 
     /**
@@ -1025,7 +1274,7 @@ public class EnumeratorTest {
                                .zipAny(Enumerator.rangeInt(100, 200))
                                .count(), 100);
     }
-    
+
     @Test
     public void testZipThree() {
         System.out.println("zipThree");
@@ -1033,5 +1282,9 @@ public class EnumeratorTest {
                                .zipAll(Enumerator.rangeInt(0, 75),
                                        Enumerator.rangeInt(0, 100))
                                .count(), 100);
+        assertEquals(Enumerator.on(1, 2, 3)
+                               .zipAll(Enumerator.on(1, 2, 3, 4),
+                                       Enumerator.on(1, 2, 3, 4, 5))
+                               .count(), 5);
     }
 }
