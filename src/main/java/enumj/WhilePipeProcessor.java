@@ -14,24 +14,32 @@ import java.util.function.Predicate;
 class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected E value;
     protected Predicate<E> filter;
-    protected boolean get;
+    protected boolean keepGoing;
 
     public WhilePipeProcessor(Predicate<E> filter) {
         Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
-        this.get = true;
+        this.keepGoing = true;
     }
 
     @Override
     protected void process(E value) {
-        this.value = value;
+        if (keepGoing) {
+            this.value = value;
+        }
     }
     @Override
     protected boolean hasValue() {
-        if (!get) {
+        if (!keepGoing) {
             return false;
         }
-        return get = filter.test(value);
+
+        keepGoing = filter.test(value);
+        if (!keepGoing) {
+            value = null;
+            filter = null;
+        }
+        return keepGoing;
     }
     @Override
     protected E getValue() {

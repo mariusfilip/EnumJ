@@ -271,10 +271,6 @@ final class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return enqueue(new MapPipeProcessor(mapper));
     }
     @Override
-    public Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        return enqueue(new SkipPipeProcessor(predicate));
-    }
-    @Override
     public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
         return enqueue(new WhilePipeProcessor(predicate));
     }

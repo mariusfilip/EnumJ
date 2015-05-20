@@ -1797,7 +1797,16 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default Enumerator<E> skipWhile(Predicate<? super E> predicate) {
         Utils.ensureNonEnumerating(this);
-        return new PipeEnumerator(this).skipWhile(predicate);
+        final MutableBoolean skip = new MutableBoolean(true);
+        final Function<E,Nullable<E>> mapper = e -> {
+            if (skip.isTrue()) {
+                skip.setValue(predicate.test(e));
+            }
+            return skip.isTrue() ? Nullable.empty() : Nullable.of(e);
+        };
+        return this.map(mapper)
+                   .filter(e -> e.isPresent())
+                   .map(e -> e.get());
     }
 
     /**
