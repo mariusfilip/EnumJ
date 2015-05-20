@@ -26,7 +26,7 @@ package enumj;
 import java.util.Iterator;
 import java.util.function.Function;
 
-class FlatMapPipeProcessor<In,Out> extends PipeMultiProcessor<In,Out> {
+final class FlatMapPipeProcessor<In,Out> extends PipeMultiProcessor<In,Out> {
 
     protected final Function<In,Iterator<Out>> mapper;
     protected final Nullable<Out> value;
