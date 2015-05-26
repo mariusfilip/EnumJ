@@ -23,7 +23,7 @@
  */
 package enumj;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -31,20 +31,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
-    private AtomicBoolean enumerating = new AtomicBoolean(false);
+    private AtomicLong enumerating = new AtomicLong(0);
 
     @Override
     public final boolean enumerating() {
-        return enumerating.get();
+        return enumerating.get() > 0;
     }
 
     @Override
     public final Enumerator<E> enumerator() {
-        boolean previous = !enumerating.compareAndSet(false, true);
+        enumerating.incrementAndGet();
         try {
             return internalEnumerator();
         } catch(Exception ex) {
-            enumerating.set(previous);
+            enumerating.decrementAndGet();
             throw ex;
         }
     }
