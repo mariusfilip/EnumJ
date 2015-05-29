@@ -33,8 +33,7 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
     private LazyEnumerable(Supplier<Iterable<E>> source) {
         enumerable = new Lazy(() -> Enumerable.of(source.get()));
     }
-    private LazyEnumerable() {}
-
+    
     @Override
     protected Enumerator<E> internalEnumerator() {
         return enumerable.get().enumerator();

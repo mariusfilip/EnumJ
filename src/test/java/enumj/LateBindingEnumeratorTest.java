@@ -24,7 +24,6 @@
 package enumj;
 
 import java.util.Iterator;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
