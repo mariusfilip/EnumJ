@@ -116,8 +116,21 @@ public class CachedEnumerableStateTest {
                                                   () -> {});
                 assertTrue(Enumerator.rangeInt(0, count)
                                      .elementsEqual(ces.enumerator()));
+                final CachedEnumerableState<Integer> ces0 =
+                        new CachedEnumerableState(Enumerable.empty(),
+                                                  limit,
+                                                  () -> {});
+                assertTrue(Enumerator.empty()
+                                     .elementsEqual(ces0.enumerator()));
             }
         }
+        final CachedEnumerableState<Integer> ces_ =
+                new CachedEnumerableState(
+                        Enumerable.on(1, 2, 3, 4, 5),
+                        3,
+                        () -> { throw new IllegalArgumentException(); });
+        assertTrue(Enumerator.on(1, 2, 3, 4, 5)
+                             .elementsEqual(ces_.enumerator()));
     }
     
 }
