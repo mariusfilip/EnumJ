@@ -26,10 +26,6 @@ package enumj;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-/**
- *
- * @author Marius Filip
- */
 public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
     private Iterable<E> source;

@@ -24,23 +24,55 @@
 package enumj;
 
 import java.util.function.Supplier;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-final class LazyEnumerable<E> extends AbstractEnumerable<E> {
-
-    private Lazy<Enumerable<E>> enumerable;
-
-    private LazyEnumerable(Supplier<Iterable<E>> source) {
-        enumerable = new Lazy(() -> Enumerable.of(source.get()));
+/**
+ *
+ * @author Marius Filip
+ */
+public class LazyEnumerableTest {
+    
+    public LazyEnumerableTest() {
+    }
+    
+    @BeforeClass
+    public static void setUpClass() {
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
     }
 
-    @Override
-    protected Enumerator<E> internalEnumerator() {
-        return enumerable.get().enumerator();
+    /**
+     * Test of internalEnumerator method, of class LazyEnumerable.
+     */
+    @Test
+    public void testInternalEnumerator() {
+        System.out.println("internalEnumerator");
+        final Enumerable<Integer> en = LazyEnumerable.of(() ->
+                Enumerable.on(1, 2, 3));
+        assertTrue(en.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    public static <E> LazyEnumerable<E> of(
-            Supplier<? extends Iterable<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return new LazyEnumerable(source);
-    }
+    /**
+     * Test of of method, of class LazyEnumerable.
+     */
+    @Test
+    public void testOf() {
+        System.out.println("of");
+        assertNotNull(Enumerable.on(1, 2, 3));
+    }    
 }

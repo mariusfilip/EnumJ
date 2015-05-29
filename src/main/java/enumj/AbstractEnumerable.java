@@ -25,28 +25,19 @@ package enumj;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- *
- * @author Marius Filip
- */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
-    private AtomicLong enumerating = new AtomicLong(0);
+    private volatile boolean enumerating;
 
     @Override
     public final boolean enumerating() {
-        return enumerating.get() > 0;
+        return enumerating;
     }
 
     @Override
     public final Enumerator<E> enumerator() {
-        enumerating.incrementAndGet();
-        try {
-            return internalEnumerator();
-        } catch(Exception ex) {
-            enumerating.decrementAndGet();
-            throw ex;
-        }
+        enumerating = true;
+        return internalEnumerator();
     }
 
     protected abstract Enumerator<E> internalEnumerator();
