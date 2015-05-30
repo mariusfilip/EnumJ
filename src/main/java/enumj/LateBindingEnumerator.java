@@ -26,11 +26,6 @@ package enumj;
 import java.util.Iterator;
 import java.util.Optional;
 
-/**
- * Enumerator capable of late binding.
- *
- * @param <E> type of enumerated elements
- */
 public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;

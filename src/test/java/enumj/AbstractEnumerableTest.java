@@ -81,12 +81,21 @@ public class AbstractEnumerableTest {
 
     public class AbstractEnumerableThrow extends AbstractEnumerable<Integer> {
 
+        @Override
+        protected boolean internalOnceOnly() {
+            return false;
+        }        
+        @Override
         protected Enumerator<Integer> internalEnumerator() {
             throw new UnsupportedOperationException();
         }
     }
 
     public class AbstractEnumerableNonThrow extends AbstractEnumerableThrow {
+        @Override
+        protected boolean internalOnceOnly() {
+            return false;
+        }
         @Override
         protected Enumerator<Integer> internalEnumerator() {
             return Enumerator.on(1, 2, 3, 4);

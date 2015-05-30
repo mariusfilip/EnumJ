@@ -17,7 +17,12 @@ public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     @Override
-    public Enumerator<E> internalEnumerator() {
+    protected boolean internalOnceOnly() {
+        return true;
+    }
+
+    @Override
+    protected Enumerator<E> internalEnumerator() {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Enumerator<E> result = source;
         source = null;

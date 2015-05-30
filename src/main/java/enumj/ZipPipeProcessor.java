@@ -27,13 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
-                                                       Optional<E>[]> {
-    
-    protected Iterator<E>[] iterators;
-    protected Optional<E>[] value;
-    protected boolean hasAny;
-    
+final class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
+                                                              Optional<E>[]> {
+
+    private final Iterator<E>[] iterators;
+    private final Optional<E>[] value;
+    private boolean hasAny;
+
     public ZipPipeProcessor(Iterator<E> first,
                             List<Iterator<E>> rest) {
         iterators = new Iterator[1+rest.size()];

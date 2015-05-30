@@ -67,6 +67,11 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     @Override
+    protected boolean internalOnceOnly() {
+        return state().onceOnly();
+    }
+
+    @Override
     protected Enumerator<E> internalEnumerator() {
         return state().enumerator();
     }

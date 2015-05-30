@@ -69,7 +69,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of enqueue method, of class PipeEnumerator.
+     * Test of enqueueProcessor method, of class PipeEnumerator.
      */
     @Test
     public void testEnqueue_AbstractPipeProcessor() {
@@ -78,7 +78,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of enqueue method, of class PipeEnumerator.
+     * Test of enqueueProcessor method, of class PipeEnumerator.
      */
     @Test(expected=IllegalStateException.class)
     public void testEnqueue_PipeMultiProcessor() {

@@ -31,10 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class LazyEnumerableTest {
     
     public LazyEnumerableTest() {
@@ -62,9 +58,9 @@ public class LazyEnumerableTest {
     @Test
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
-        final Enumerable<Integer> en = LazyEnumerable.of(() ->
+        final LazyEnumerable<Integer> lazy = LazyEnumerable.of(() ->
                 Enumerable.on(1, 2, 3));
-        assertTrue(en.elementsEqual(Enumerable.on(1, 2, 3)));
+        assertTrue(lazy.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
     /**
@@ -73,6 +69,6 @@ public class LazyEnumerableTest {
     @Test
     public void testOf() {
         System.out.println("of");
-        assertNotNull(Enumerable.on(1, 2, 3));
-    }    
+        assertNotNull(LazyEnumerable.of(() -> Enumerable.on(1, 2, 3)));
+    }
 }

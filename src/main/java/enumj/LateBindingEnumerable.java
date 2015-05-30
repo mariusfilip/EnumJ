@@ -28,10 +28,17 @@ import java.util.Optional;
 
 public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
-    private Iterable<E> source;
+    private volatile Iterable<E> source;
+
+    @Override
+    protected boolean internalOnceOnly() {
+        final Iterable<E> source = this.source;
+        return Enumerable.onceOnly(source);
+    }
 
     @Override
     protected Enumerator<E> internalEnumerator() {
+        final Iterable<E> source = this.source;
         if (source == null) {
             throw new NoSuchElementException();
         }

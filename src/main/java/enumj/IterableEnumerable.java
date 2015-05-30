@@ -23,12 +23,17 @@
  */
 package enumj;
 
-class IterableEnumerable<E> extends AbstractEnumerable<E> {
+final class IterableEnumerable<E> extends AbstractEnumerable<E> {
 
     protected Iterable<E> source;
 
     protected IterableEnumerable(Iterable<E> source) {
         this.source = source;
+    }
+
+    @Override
+    protected boolean internalOnceOnly() {
+        return false;
     }
 
     @Override

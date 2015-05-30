@@ -19,12 +19,10 @@ import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 /**
  *
@@ -575,19 +573,6 @@ public class EnumeratorTest {
                                 es[0].append(1.0, 2.0, 3.0)
                                      .skip(es[1].count())));
                 });
-    }
-
-    @Test
-    public void testCartesianProduct() {
-        System.out.println("cartesianProduct");
-        final Enumerator<Integer> en1 = Enumerator.on(0, 1, 2);
-        final Enumerator<Pair<Integer,Integer>> cpen = en1.cartesianProduct(
-                Enumerable.on(2, 3, 4));
-        assertTrue(cpen.elementsEqual(Enumerator.on(
-                Pair.of(0, 2), Pair.of(0, 3), Pair.of(0, 4),
-                Pair.of(1, 2), Pair.of(1, 3), Pair.of(1, 4),
-                Pair.of(2, 2), Pair.of(2, 3), Pair.of(2, 4))
-        ));
     }
 
     /**

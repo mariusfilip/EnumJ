@@ -23,22 +23,41 @@
  */
 package enumj;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
-    private volatile boolean enumerating;
+    private final AtomicBoolean enumerating = new AtomicBoolean(false);
 
     @Override
     public final boolean enumerating() {
-        return enumerating;
+        return enumerating.get();
+    }
+
+    @Override
+    public final boolean onceOnly() {
+        return internalOnceOnly();
     }
 
     @Override
     public final Enumerator<E> enumerator() {
-        enumerating = true;
+        return onceOnly() ? onceEnumerator() : multipleEnumerator();
+    }
+
+    private final Enumerator<E> onceEnumerator() {
+        final boolean alreadyEnumerating =
+                !this.enumerating.compareAndSet(false, true);
+        if (alreadyEnumerating) {
+            Utils.ensureNonEnumerating(this);
+        }
         return internalEnumerator();
     }
 
+    private final Enumerator<E> multipleEnumerator() {
+        enumerating.set(true);
+        return internalEnumerator();
+    }
+
+    protected abstract boolean internalOnceOnly();
     protected abstract Enumerator<E> internalEnumerator();
 }

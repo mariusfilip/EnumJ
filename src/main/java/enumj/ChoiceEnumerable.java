@@ -27,17 +27,14 @@ import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 
-/**
- *
- * @author Marius Filip
- */
-class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
+final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
 
-    protected IntSupplier indexSupplier;
-    protected IntUnaryOperator nextIndexSupplier;
-    protected Iterable<E> first;
-    protected Iterable<? extends E> second;
-    protected List<Iterable<E>> rest;
+    private final IntSupplier indexSupplier;
+    private final IntUnaryOperator nextIndexSupplier;
+    private final Iterable<E> first;
+    private final Iterable<? extends E> second;
+    private final List<Iterable<E>> rest;
+    private final Lazy<Boolean> onceOnly;
 
     ChoiceEnumerable(IntSupplier indexSupplier,
                      IntUnaryOperator nextIndexSupplier,
@@ -59,6 +56,16 @@ class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
         this.first = first;
         this.second = second;
         this.rest = rest;
+        this.onceOnly = new Lazy(() ->
+                Enumerable.onceOnly(this.first)
+                || Enumerable.onceOnly(this.second)
+                || Enumerator.of(rest)
+                             .anyMatch(Enumerable::onceOnly));
+    }
+
+    @Override
+    protected boolean internalOnceOnly() {
+        return onceOnly.get();
     }
 
     @Override

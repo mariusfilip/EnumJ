@@ -31,10 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class LateBindingEnumerableTest {
     
     public LateBindingEnumerableTest() {
@@ -56,29 +52,39 @@ public class LateBindingEnumerableTest {
     public void tearDown() {
     }
 
+    /**
+     * Test of internalEnumerator method, of class LateBindingEnumerable.
+     */
     @Test(expected = NoSuchElementException.class)
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
-        assertNotNull(Enumerable.ofLateBinding(Integer.class).iterator());
+        final LateBindingEnumerable<Integer> lben =
+                new LateBindingEnumerable<>();
+        assertNull(lben.enumerator());
     }
 
+    /**
+     * Test of bind method, of class LateBindingEnumerable.
+     */
     @Test
     public void testBind() {
         System.out.println("bind");
-        final LateBindingEnumerable<Integer> en = 
-                Enumerable.ofLateBinding(Integer.class);
-        en.bind(Enumerable.on(1, 2, 3));
-        assertTrue(en.elementsEqual(Enumerable.on(1, 2, 3)));
+        final LateBindingEnumerable<Integer> lben =
+                new LateBindingEnumerable<>();
+        lben.bind(Enumerable.on(1, 2, 3));
+        assertTrue(lben.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
+    /**
+     * Test of binding method, of class LateBindingEnumerable.
+     */
     @Test
     public void testBinding() {
         System.out.println("binding");
-        final LateBindingEnumerable<Integer> lb = 
-                Enumerable.ofLateBinding(Integer.class);
-        final Enumerable<Integer> en = Enumerable.on(1, 2, 3);
-        lb.bind(en);
-        assertTrue(lb.binding().isPresent());
-        assertSame(en, lb.binding().get());
-    }    
+        final LateBindingEnumerable<Integer> lben =
+                new LateBindingEnumerable<>();
+        assertFalse(lben.binding().isPresent());
+        lben.bind(Enumerable.on(1, 2, 3));
+        assertTrue(lben.binding().isPresent());
+    }
 }

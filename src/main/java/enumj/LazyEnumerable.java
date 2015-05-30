@@ -34,6 +34,11 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     @Override
+    protected boolean internalOnceOnly() {
+        return enumerable.get().onceOnly();
+    }
+
+    @Override
     protected Enumerator<E> internalEnumerator() {
         return enumerable.get().enumerator();
     }

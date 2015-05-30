@@ -23,12 +23,35 @@
  */
 package enumj;
 
-/**
- *
- * @author Marius Filip
- */
 abstract class AbstractPipeProcessor<T,R> {
-    AbstractPipeProcessor next;
+    private AbstractPipeProcessor<? extends R,?> next;
+    private PipeReference reference;
+
+    public AbstractPipeProcessor<? extends R,?> getNext() {
+        return next;
+    }
+    public void setNext(AbstractPipeProcessor<? extends R,?> next) {
+        if (next == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.next != null) {
+            throw new UnsupportedOperationException();
+        }
+        this.next = next;
+    }
+
+    public PipeReference getReference() {
+        return reference;
+    }
+    public void setReference(PipeReference reference) {
+        if (reference == null) {
+            throw new IllegalArgumentException();
+        }
+        if (this.reference != null) {
+            throw new UnsupportedOperationException();
+        }
+        this.reference = reference;
+    }
 
     protected AbstractPipeProcessor() {}
     abstract void process(T value);

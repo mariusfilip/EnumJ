@@ -108,6 +108,10 @@ public final class CachedEnumerableState<E> {
         return new CachedEnumerableState(source, newLimit, callback);
     }
 
+    public boolean onceOnly() {
+        return source.onceOnly();
+    }
+    
     public Enumerator<E> enumerator() {
         return disabled.get()
                 ? source.enumerator()

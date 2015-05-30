@@ -699,26 +699,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator enumerating over the Cartesian product between the
-     * elements of the current enumerator and the iterator supplied lazily.
-     * <p>
-     * <em>This operation is highly composable.</em>
-     * </p>
-     * @param <T> type of elements to make cartesianProduct with
-     * @param source iterator to make cartesianProduct with
-     * @return the cartesianProduct enumerator
-     * @exception IllegalStateException the current enumerator is enumerating
-     * @throws IllegalArgumentException <code>source</code> is
-     * <code>null</code>.
-     */
-    public default <T> Enumerator<Pair<E,T>> cartesianProduct(
-            Iterable<T> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return flatMap(u -> Enumerator.of(source.iterator())
-                                      .map(v -> Pair.of(u, v)));
-    }
-
-    /**
      * Returns an enumerator that chooses elements from the provided iterators.
      * <p>
      * This method works like
@@ -1010,8 +990,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see Stream
      */
     public default Enumerator<E> distinct() {
-        final Set<E> existing = new HashSet<E>(256);
-        return filter(existing::add);
+        return AbstractEnumerator.distinct(this, false);
     }
 
     /**
@@ -1173,13 +1152,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default <R> Enumerator<R> indexedMap(
             BiFunction<? super E, ? super Long, ? extends R> mapper) {
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
-        final MutableLong index = new MutableLong(0);
-        return map(e -> {
-            final R result = mapper.apply(e, index.toLong());
-            index.add(1);
-            return result;
-        });
+        return AbstractEnumerator.indexedMap(this, mapper, false);
     }
 
     /**
@@ -1236,16 +1209,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @exception IllegalArgumentException <code>maxSize</code> is negative
      */
     public default Enumerator<E> limit(long maxSize) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        final MutableLong size = new MutableLong(0);
-        return takeWhile(e -> {
-            if (size.longValue() >= maxSize) {
-                return false;
-            }
-            size.setValue(1+size.longValue());
-            return true;
-        });
+        return AbstractEnumerator.limit(this, maxSize, false);
     }
 
     /**
@@ -1368,9 +1332,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> peek(Consumer<? super E> action) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(action, Messages.NULL_ENUMERATOR_CONSUMER);
-        return map(e -> { action.accept(e); return e; });
+        return AbstractEnumerator.peek(this, action, false);
     }
 
     /**
@@ -1773,16 +1735,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the truncated enumerator
      */
     public default Enumerator<E> skip(long n) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        final MutableLong size = new MutableLong(0);
-        return skipWhile(e -> {
-            if (size.longValue() >= n) {
-                return false;
-            }
-            size.add(1);
-            return true;
-        });
+        return AbstractEnumerator.skip(this, n, false);
     }
 
     /**
@@ -1796,17 +1749,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the enumerator with front elements dropped
      */
     public default Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
-        final MutableBoolean skip = new MutableBoolean(true);
-        final Function<E,Nullable<E>> mapper = e -> {
-            if (skip.isTrue()) {
-                skip.setValue(predicate.test(e));
-            }
-            return skip.isTrue() ? Nullable.empty() : Nullable.of(e);
-        };
-        return this.map(mapper)
-                   .filter(e -> e.isPresent())
-                   .map(e -> e.get());
+        return AbstractEnumerator.skipWhile(this, predicate, false);
     }
 
     /**

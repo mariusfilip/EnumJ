@@ -23,24 +23,22 @@
  */
 package enumj;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-class SuppliedEnumerable<E> extends AbstractEnumerable<E> {
+final class PipeOperator<T,E> implements Function<Enumerator<T>,
+                                                  Enumerator<E>> {
+    public final Lazy<Boolean> onceOnly;
+    private final Function<Enumerator<T>, Enumerator<E>> operator;
 
-    Supplier<Enumerator<E>> supplier;
-
-    SuppliedEnumerable(Supplier<Enumerator<E>> supplier) {
-        Utils.ensureNotNull(supplier, Messages.NULL_ENUMERATOR_GENERATOR);
-        this.supplier = supplier;
+    public PipeOperator(Function<Enumerator<T>, Enumerator<E>> operator,
+                         Supplier<Boolean> onceOnly) {
+        this.onceOnly = new Lazy(onceOnly);
+        this.operator = operator;
     }
 
     @Override
-    protected boolean internalOnceOnly() {
-        return false;
-    }
-
-    @Override
-    protected Enumerator<E> internalEnumerator() {
-        return supplier.get();
+    public Enumerator<E> apply(Enumerator<T> enumerator) {
+        return operator.apply(enumerator);
     }
 }

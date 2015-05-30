@@ -25,10 +25,6 @@ package enumj;
 
 import java.util.Iterator;
 
-/**
- *
- * @author Marius Filip
- */
 class PipeReference<E> extends IteratorEnumerator<E> {
 
     private AbstractPipeProcessor<?,?> reference;
@@ -37,12 +33,13 @@ class PipeReference<E> extends IteratorEnumerator<E> {
         super(source);
     }
 
-    AbstractPipeProcessor<?,?> getRef() {
+    AbstractPipeProcessor<?,?> getReference() {
         return this.reference;
     }
-    void setRefIfNull(AbstractPipeProcessor<?,?> reference) {
+    void setReferenceIfNull(AbstractPipeProcessor<?,?> reference) {
         Utils.ensureNotNull(reference, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
         if (this.reference == null) {
+            reference.setReference(this);
             this.reference = reference;
         }
     }

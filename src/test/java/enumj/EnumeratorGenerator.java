@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2015 Marius Filip.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package enumj;
 
@@ -10,101 +28,94 @@ import java.util.Random;
 import java.util.function.IntSupplier;
 import org.apache.commons.lang3.tuple.Pair;
 
-/**
- *
- * @author Marius Filip
- */
 public class EnumeratorGenerator {
 
-    public static final int SIZE = 100;
+    public static final int SIZE = EnumerableGenerator.SIZE;
 
-    private final long seed;
     private final Random rnd;
+    private final EnumerableGenerator gen;
 
     public EnumeratorGenerator(long seed) {
-        this.seed = seed;
-        this.rnd = new Random(this.seed);
+        this.rnd = new Random(seed);
+        this.gen = new EnumerableGenerator(seed);
+    }
+    private EnumeratorGenerator(EnumerableGenerator gen) {
+        this.gen = gen;
+        this.rnd = this.gen.rnd;
     }
 
     public static Enumerator<EnumeratorGenerator> generators() {
-        final Random rnd = new Random(9691);
-        return Enumerator.of(
-                () -> Optional.of(new EnumeratorGenerator(rnd.nextLong())));
+        return EnumerableGenerator.generators()
+                                  .map(gen -> new EnumeratorGenerator(gen))
+                                  .enumerator();
     }
 
     public static Enumerator<Pair<EnumeratorGenerator, EnumeratorGenerator>>
             generatorPairs() {
-        return generators().zipBoth(generators());
+        return EnumerableGenerator
+                .generatorPairs()
+                .map(p -> Pair.of(new EnumeratorGenerator(p.getLeft()),
+                                  new EnumeratorGenerator(p.getRight())))
+                .enumerator();
     }
 
     public Double[] elems() {
-        final Double[] ret = new Double[SIZE];
-        final Random rnd = new Random(this.rnd.nextLong());
-        for(int i=0; i<SIZE; ++i) {
-            ret[i] = rnd.nextDouble();
-        }
-        return ret;
+        return gen.elems();
     }
 
     public IntSupplier boundRnd(int bound) {
-        final Random rnd = new Random(this.rnd.nextLong());
-        return () -> rnd.nextInt(bound);
+        return gen.boundRnd(bound);
     }
 
     public Enumerator<Double> onEnumerator() {
-        return Enumerator.on(elems());
+        return gen.onEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofIteratorEnumerator() {
-        return Enumerator.of(onEnumerator().asStream()
-                                           .iterator());
+        return gen.ofIteratorEnumerable()
+                  .enumerator();
     }
 
     public Enumerator<Double> ofIterableEnumerator() {
-        return Enumerator.of(ofIteratorEnumerator().asEnumerable());
+        return gen.ofIterableEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofEnumerationEnumerator() {
-        return Enumerator.of(ofIterableEnumerator().asEnumeration());
+        return gen.ofEnumerationEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofStreamEnumerator() {
-        return Enumerator.of(ofEnumerationEnumerator().asStream());
+        return gen.ofStreamEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofSpliteratorEnumerator() {
-        return Enumerator.of(ofStreamEnumerator().asSpliterator());
+        return gen.ofSpliteratorEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofSupplierEnumerator() {
-        return Enumerator.of(ofSpliteratorEnumerator().asSupplier());
+        return gen.ofSupplierEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofLazyIteratorEnumerator() {
-        return Enumerator.ofLazyIterator(
-                () -> ofIteratorEnumerator().asStream().iterator());
+        return gen.ofLazyIteratorEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofLazyIterableEnumerator() {
-        return Enumerator.ofLazyIterable(
-                () -> ofIterableEnumerator().asEnumerable());
+        return Enumerator.ofLazyIterable(gen::ofIterableEnumerable);
     }
 
     public Enumerator<Double> ofLazyEnumerationEnumerator() {
-        return Enumerator.ofLazyEnumeration(
-                () -> ofEnumerationEnumerator().asEnumeration());
+        return gen.ofLazyEnumerationEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofLazyStreamEnumerator() {
-        return Enumerator.ofLazyStream(
-                () -> ofStreamEnumerator().asStream());
+        return gen.ofLazyStreamEnumerable().enumerator();
     }
 
     public Enumerator<Double> ofLazySpliteratorEnumerator() {
-        return Enumerator.ofLazySpliterator(
-                () -> ofStreamEnumerator().asSpliterator());
+        return gen.ofLazySpliteratorEnumerable().enumerator();
     }
-    
+
     public LateBindingEnumerator<Double> ofLateBindingEnumerator() {
         return Enumerator.ofLateBinding(Double.class);
     }
