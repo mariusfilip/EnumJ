@@ -35,22 +35,22 @@ import static org.junit.Assert.*;
  * @author Marius Filip
  */
 public class AbstractEnumerableTest {
-    
+
     public AbstractEnumerableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -69,6 +69,21 @@ public class AbstractEnumerableTest {
         assertNull(instance.enumerator());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testOnceEnumeratorThrow() {
+        System.out.println("onceEnumerator throw");
+        final AbstractEnumerable instance = new AbstractEnumerableOnce();
+        assertTrue(instance.elementsEqual(Enumerable.on(1, 2, 3)));
+        assertTrue(instance.elementsEqual(Enumerable.on(1, 2, 3)));
+    }
+
+    @Test
+    public void testOnceEnumeratorNonThrow() {
+        System.out.println("onceEnumerator");
+        final AbstractEnumerable instance = new AbstractEnumerableOnce();
+        assertTrue(instance.elementsEqual(Enumerable.on(1, 2, 3)));
+    }
+
     /**
      * Test of internalEnumerator method, of class AbstractEnumerable.
      */
@@ -79,12 +94,24 @@ public class AbstractEnumerableTest {
         assertTrue(instance.enumerator().elementsEqual(instance.iterator()));
     }
 
+    public class AbstractEnumerableOnce extends AbstractEnumerable<Integer> {
+
+        @Override
+        protected boolean internalOnceOnly() {
+            return true;
+        }
+        @Override
+        protected Enumerator<Integer> internalEnumerator() {
+            return Enumerator.on(1, 2, 3);
+        }
+    }
+
     public class AbstractEnumerableThrow extends AbstractEnumerable<Integer> {
 
         @Override
         protected boolean internalOnceOnly() {
             return false;
-        }        
+        }
         @Override
         protected Enumerator<Integer> internalEnumerator() {
             throw new UnsupportedOperationException();

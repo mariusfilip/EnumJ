@@ -45,12 +45,11 @@ class Messages {
 
     public static final String ILLEGAL_ENUMERATOR_STATE =
             "Illegal enumerator state";
+    public static final String ILLEGAL_MULTIPLE_ENUMERATIONS =
+            "Illegal multiple enumerations";
 
     public static final String NO_SINGLE_ENUMERATOR_ELEMENT =
             "No single enumerator element";
     public static final String OVERFLOWED_ENUMERATOR_INDEX =
             "Overflowed enumerator index";
-
-    public static final String ILLEGAL_MULTIPLE_CALLS =
-            "Illegal multiple calls";
 }

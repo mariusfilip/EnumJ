@@ -46,9 +46,10 @@ abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
     private final Enumerator<E> onceEnumerator() {
         final boolean alreadyEnumerating =
-                !this.enumerating.compareAndSet(false, true);
+                !enumerating.compareAndSet(false, true);
         if (alreadyEnumerating) {
-            Utils.ensureNonEnumerating(this);
+            throw new IllegalStateException(
+                    Messages.ILLEGAL_MULTIPLE_ENUMERATIONS);
         }
         return internalEnumerator();
     }

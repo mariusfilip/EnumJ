@@ -26,12 +26,14 @@ class Utils {
     }
     public static void ensureNonEnumerating(Enumerator<?> enumerator) {
         if (enumerator.enumerating()) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
+            throw new IllegalStateException(
+                    Messages.ILLEGAL_MULTIPLE_ENUMERATIONS);
         }
     }
     public static void ensureNonEnumerating(Enumerable<?> enumerable) {
         if (enumerable.enumerating()) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
+            throw new IllegalStateException(
+                    Messages.ILLEGAL_MULTIPLE_ENUMERATIONS);
         }
     }
 }
