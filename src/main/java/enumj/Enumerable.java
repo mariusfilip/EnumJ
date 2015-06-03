@@ -284,6 +284,10 @@ public interface Enumerable<E> extends Iterable<E> {
             Function<? super E, ? extends R> mapper) {
         return PipeEnumerable.map(this, mapper);
     }
+    
+    public default Enumerable<E> peek(Consumer<? super E> action) {
+        return PipeEnumerable.peek(this, action);
+    }
 
     public default Enumerable<E> prepend(Iterable<? extends E> elements) {
         Utils.ensureNonEnumerating(this);

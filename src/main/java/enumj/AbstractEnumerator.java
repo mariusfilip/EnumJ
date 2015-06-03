@@ -7,7 +7,6 @@ package enumj;
 
 import java.util.HashSet;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -18,17 +17,19 @@ import org.apache.commons.lang3.mutable.MutableLong;
 
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
-    private boolean enumerating;
-    private boolean yielding;
+    private boolean started;
+    private boolean hasNextCalled;
+    private boolean hasNextError;
     private boolean done;
 
     @Override
     public final boolean enumerating() {
-        return enumerating;
+        return started;
     }
 
     @Override
     public final boolean hasNext() {
+        started = true;
         try {
             if (done) {
                 return false;
@@ -37,25 +38,30 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
             if (done) {
                 cleanup();
             }
+
+            hasNextError = false;
             return !done;
+        }
+        catch(Exception ex) {
+            hasNextError = true;
+            throw ex;
         } finally {
-            enumerating = true;
-            yielding = true;
+            hasNextCalled = true;
         }
     }
 
     @Override
     public final E next() {
-        if (!yielding) {
+        if (!hasNextCalled) {
             hasNext();
         }
-        if (done) {
+        if (done || hasNextError) {
             throw new NoSuchElementException();
         }
         try {
             return internalNext();
         } finally {
-            yielding = false;
+            hasNextCalled = false;
         }
     }
 
@@ -162,8 +168,8 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         };
         if (reversed) {
             final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(e -> ((Optional<E>)e).get())
-                       .reversedFilter(e -> ((Optional<E>)e).isPresent())
+            return pipe.reversedMap(e -> ((Nullable<E>)e).get())
+                       .reversedFilter(e -> ((Nullable<E>)e).isPresent())
                        .reversedMap(mapper);
         }
         return source.map(mapper)
