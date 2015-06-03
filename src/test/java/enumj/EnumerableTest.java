@@ -8,6 +8,9 @@ package enumj;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -443,9 +446,12 @@ public class EnumerableTest {
     @Test
     public void testChoiceOf_4args() {
         System.out.println("choiceOf");
-        final Random rnd = new Random(1001);
+        final Supplier<IntSupplier> indexSupplier = () -> {
+            final Random rnd = new Random(1001);
+            return () -> rnd.nextInt(4);
+        };
         assertTrue(Enumerable
-                .choiceOf(() -> rnd.nextInt(4),
+                .choiceOf(indexSupplier,
                           Enumerable.on(1, 2, 3),
                           Enumerable.on(4, 5, 6),
                           Enumerable.on(7, 8, 9),
@@ -461,10 +467,16 @@ public class EnumerableTest {
     @Test
     public void testChoiceOf_5args() {
         System.out.println("choiceOf");
-        final Random rnd = new Random(1001);
+        final Supplier<IntSupplier> indexSupplier = () -> {
+            final Random rnd = new Random(1001);
+            return () -> rnd.nextInt(4);
+        };
+        final Supplier<IntUnaryOperator> nextSupplier = () -> {
+            return i -> (i+1)%4;
+        };
         assertTrue(Enumerable
-                .choiceOf(() -> rnd.nextInt(4),
-                          i -> (i+1)%4,
+                .choiceOf(indexSupplier,
+                          nextSupplier,
                           Enumerable.on(1, 2, 3),
                           Enumerable.on(4, 5, 6),
                           Enumerable.on(7, 8, 9),
@@ -556,8 +568,8 @@ public class EnumerableTest {
         EnumerableGenerator
                 .generatorPairs()
                 .limit(100)
-                .map(p -> Pair.of(p.getLeft().onEnumerable(),
-                                  p.getRight().onEnumerable()))
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
                 .map(p -> Pair.of(p.getLeft(),
                                   p.getRight()
                                    .reverse()
@@ -649,7 +661,7 @@ public class EnumerableTest {
         EnumerableGenerator
                 .generators()
                 .limit(100)
-                .map(gen -> gen.onEnumerable())
+                .map(gen -> gen.repeatable())
                 .map(en -> Pair.of(en,
                                    en.limit(10)
                                      .concat(en.skip(10))))
@@ -666,7 +678,7 @@ public class EnumerableTest {
         EnumerableGenerator
                 .generators()
                 .limit(100)
-                .map(gen -> gen.onEnumerable())
+                .map(gen -> gen.repeatable())
                 .map(en -> Pair.of(en,
                                    en.limitWhile(x -> x<100)
                                      .concat(en.skipWhile(x -> x<100))))
@@ -700,8 +712,8 @@ public class EnumerableTest {
         EnumerableGenerator
                 .generatorPairs()
                 .limit(100)
-                .map(p -> Pair.of(p.getLeft().onEnumerable(),
-                                  p.getRight().onEnumerable()))
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
                 .map(p -> Pair.of(p.getLeft(),
                                   p.getRight()
                                    .skip(10)

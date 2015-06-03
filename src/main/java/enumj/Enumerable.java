@@ -207,22 +207,22 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     public static <E> Enumerable<E> choiceOf(
-            IntSupplier indexSupplier,
+            Supplier<IntSupplier> indexSupplier,
             Iterable<E> first,
             Iterable<? extends E> second,
             Iterable<? extends E>... rest) {
         final int size = 1 + 1 + rest.length;
         final IntUnaryOperator altIndexSupplier = i -> (i+1)%size;
         return choiceOf(indexSupplier,
-                        altIndexSupplier,
+                        () -> altIndexSupplier,
                         first,
                         second,
                         rest);
     }
 
     public static <E> Enumerable<E> choiceOf(
-            IntSupplier indexSupplier,
-            IntUnaryOperator altIndexSupplier,
+            Supplier<IntSupplier> indexSupplier,
+            Supplier<IntUnaryOperator> altIndexSupplier,
             Iterable<E> first,
             Iterable<? extends E> second,
             Iterable<? extends E>... rest) {

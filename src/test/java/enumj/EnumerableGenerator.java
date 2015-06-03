@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class EnumerableGenerator {
@@ -59,9 +60,12 @@ public class EnumerableGenerator {
         return ret;
     }
 
-    public IntSupplier boundRnd(int bound) {
-        final Random rnd = new Random(this.rnd.nextLong());
-        return () -> rnd.nextInt(bound);
+    public Supplier<IntSupplier> boundRnd(int bound) {
+        final long seed = rnd.nextLong();
+        return () -> {
+            final Random rnd = new Random(seed);
+            return () -> rnd.nextInt(bound);
+        };
     }
 
     public Enumerable<Double> onEnumerable() {

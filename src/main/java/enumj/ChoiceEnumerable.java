@@ -26,18 +26,19 @@ package enumj;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 
 final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
 
-    private final IntSupplier indexSupplier;
-    private final IntUnaryOperator nextIndexSupplier;
+    private final Supplier<IntSupplier> indexSupplier;
+    private final Supplier<IntUnaryOperator> nextIndexSupplier;
     private final Iterable<E> first;
     private final Iterable<? extends E> second;
     private final List<Iterable<E>> rest;
     private final Lazy<Boolean> onceOnly;
 
-    ChoiceEnumerable(IntSupplier indexSupplier,
-                     IntUnaryOperator nextIndexSupplier,
+    ChoiceEnumerable(Supplier<IntSupplier> indexSupplier,
+                     Supplier<IntUnaryOperator> nextIndexSupplier,
                      Iterable<E> first,
                      Iterable<? extends E> second,
                      List<Iterable<E>> rest) {
@@ -70,8 +71,8 @@ final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
 
     @Override
     protected Enumerator<E> internalEnumerator() {
-        return new ChoiceEnumerator(indexSupplier,
-                                    nextIndexSupplier,
+        return new ChoiceEnumerator(indexSupplier.get(),
+                                    nextIndexSupplier.get(),
                                     first.iterator(),
                                     second.iterator(),
                                     Enumerator.of(rest)
