@@ -94,14 +94,14 @@ public interface Enumerable<E> extends Iterable<E> {
      * <c>false</c> otherwise.
      */
     public boolean enumerating();
-    
+
     /**
      * Returns whether the enumerable may generate only one iterator or not.
-     * @return <c>True</c> if the enumerable may generate only one iterator or
-     * not, <c>false</c> otherwise;
+     * @return <c>True</c> if the enumerable may generate only one iterator,
+     * <c>false</c> otherwise.
      */
     public boolean onceOnly();
-    
+
     public static boolean onceOnly(Iterable<?> iterable) {
         return (iterable instanceof Enumerable)
                 ? ((Enumerable<?>)iterable).onceOnly()

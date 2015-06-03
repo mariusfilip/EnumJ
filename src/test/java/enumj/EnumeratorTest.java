@@ -49,9 +49,16 @@ public class EnumeratorTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of on method, of class Enumerator.
-     */
+    @Test
+    public void testEnumerating() {
+        System.out.println("enumerating");
+        EnumeratorGenerator
+                .generators()
+                .limit(100)
+                .map(g -> g.enumerator())
+                .forEach(en -> assertFalse(en.enumerating()));
+    }
+
     @Test
     public void testOn() {
         System.out.println("on");

@@ -6,17 +6,8 @@
 package enumj;
 
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import java.util.Random;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -69,13 +60,16 @@ public class EnumerableTest {
     @Test
     public void testEnumerator() {
         System.out.println("enumerator");
-        EnumerableGenerator.generators()
+        EnumerableGenerator.generatorPairs()
                            .limit(100)
-                           .map(gen -> gen.onEnumerable())
-                           .enumerator()
-                           .forEach(en ->
-                               assertTrue(en.enumerator()
-                                            .elementsEqual(en.iterator())));
+                           .map(p -> Pair.of(p.getLeft().repeatable(),
+                                             p.getRight().repeatable()))
+                           .forEach(p -> {
+                               assertTrue(p.getLeft()
+                                           .enumerator()
+                                           .elementsEqual(p.getRight()
+                                                           .iterator()));
+                           });
     }
 
     /**
@@ -84,6 +78,10 @@ public class EnumerableTest {
     @Test
     public void testEnumerating() {
         System.out.println("enumerating");
+        EnumerableGenerator.generators()
+                           .limit(100)
+                           .map(gen -> gen.enumerable())
+                           .forEach(en -> assertFalse(en.enumerating()));
     }
 
     /**
@@ -92,6 +90,13 @@ public class EnumerableTest {
     @Test
     public void testOn() {
         System.out.println("on");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().onEnumerable(),
+                                  p.getRight().onEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -100,6 +105,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Iterable() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIterableEnumerable(),
+                                  p.getRight().ofIterableEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -108,6 +120,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Iterator() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofIteratorEnumerable(),
+                                  p.getRight().ofIteratorEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -116,6 +135,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Enumeration() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofEnumerationEnumerable(),
+                                  p.getRight().ofEnumerationEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -124,6 +150,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Stream() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofStreamEnumerable(),
+                                  p.getRight().ofStreamEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -132,6 +165,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Spliterator() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSpliteratorEnumerable(),
+                                  p.getRight().ofSpliteratorEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -140,6 +180,13 @@ public class EnumerableTest {
     @Test
     public void testOf_Supplier() {
         System.out.println("of");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofSupplierEnumerable(),
+                                  p.getRight().ofSupplierEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -148,6 +195,13 @@ public class EnumerableTest {
     @Test
     public void testOfLazyIterable() {
         System.out.println("ofLazyIterable");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyIterableEnumerable(),
+                                  p.getRight().ofLazyIterableEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -156,6 +210,13 @@ public class EnumerableTest {
     @Test
     public void testOfLazyIterator() {
         System.out.println("ofLazyIterator");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyIteratorEnumerable(),
+                                  p.getRight().ofLazyIteratorEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -164,6 +225,13 @@ public class EnumerableTest {
     @Test
     public void testOfLazyEnumeration() {
         System.out.println("ofLazyEnumeration");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyEnumerationEnumerable(),
+                                  p.getRight().ofLazyEnumerationEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -172,6 +240,13 @@ public class EnumerableTest {
     @Test
     public void testOfLazyStream() {
         System.out.println("ofLazyStream");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazyEnumerationEnumerable(),
+                                  p.getRight().ofLazyEnumerationEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -180,6 +255,13 @@ public class EnumerableTest {
     @Test
     public void testOfLazySpliterator() {
         System.out.println("ofLazySpliterator");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().ofLazySpliteratorEnumerable(),
+                                  p.getRight().ofLazySpliteratorEnumerable()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -188,6 +270,19 @@ public class EnumerableTest {
     @Test
     public void testOfLateBinding() {
         System.out.println("ofLateBinding");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> {
+                    final Enumerable<Double> left = p.getLeft().repeatable();
+                    final LateBindingEnumerable<Double> right =
+                            p.getRight()
+                             .ofLateBindingEnumerable();
+                    right.bind(p.getRight().repeatable());
+                    return Pair.of(left, right);
+                })
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -196,6 +291,16 @@ public class EnumerableTest {
     @Test
     public void testAs() {
         System.out.println("as");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  p.getRight()
+                                   .enumerable()
+                                   .as(Integer.class)
+                                   .as(Double.class)))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -204,6 +309,12 @@ public class EnumerableTest {
     @Test
     public void testAsFiltered() {
         System.out.println("asFiltered");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.enumerable())
+                .map(en -> en.asFiltered(Integer.class))
+                .forEach(en -> assertEquals(0, en.enumerator().count()));
     }
 
     /**
@@ -212,6 +323,15 @@ public class EnumerableTest {
     @Test
     public void testAsEnumeration() {
         System.out.println("asEnumeration");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  Enumerable.of(p.getRight()
+                                                 .enumerable()
+                                                 .asEnumeration())))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -220,6 +340,15 @@ public class EnumerableTest {
     @Test
     public void testAsSpliterator() {
         System.out.println("asSpliterator");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  Enumerable.of(p.getRight()
+                                                 .enumerable()
+                                                 .asSpliterator())))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -228,6 +357,15 @@ public class EnumerableTest {
     @Test
     public void testAsStream() {
         System.out.println("asStream");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  Enumerable.of(p.getRight()
+                                                 .enumerable()
+                                                 .asStream())))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -236,6 +374,15 @@ public class EnumerableTest {
     @Test
     public void testAsTolerant_Consumer() {
         System.out.println("asTolerant");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  Enumerable.of(p.getRight()
+                                                 .enumerable()
+                                                 .asTolerant(ex -> {}))))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -244,6 +391,15 @@ public class EnumerableTest {
     @Test
     public void testAsTolerant_Consumer_int() {
         System.out.println("asTolerant");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  Enumerable.of(p.getRight()
+                                                 .enumerable()
+                                                 .asTolerant(ex -> {}, 100))))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -252,6 +408,33 @@ public class EnumerableTest {
     @Test
     public void testAppend() {
         System.out.println("append");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .append(4, 5, 6)
+                             .elementsEqual(Enumerable.on(1, 2, 3, 4, 5, 6)));
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  p.getRight().enumerable()))
+                .forEach(p -> {
+                    assertTrue(Enumerable.empty()
+                                         .append(p.getLeft()
+                                                  .enumerator()
+                                                  .toArray(Double.class))
+                                         .elementsEqual(p.getRight()));
+                });
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  p.getRight().enumerable()))
+                .forEach(p -> {
+                    assertTrue(p.getLeft()
+                                .append(Enumerator.empty()
+                                                  .as(Double.class)
+                                                  .toArray(Double.class))
+                                .elementsEqual(p.getRight()));
+                });
     }
 
     /**
@@ -260,6 +443,16 @@ public class EnumerableTest {
     @Test
     public void testChoiceOf_4args() {
         System.out.println("choiceOf");
+        final Random rnd = new Random(1001);
+        assertTrue(Enumerable
+                .choiceOf(() -> rnd.nextInt(4),
+                          Enumerable.on(1, 2, 3),
+                          Enumerable.on(4, 5, 6),
+                          Enumerable.on(7, 8, 9),
+                          Enumerable.on(10, 11, 12))
+                .sorted()
+                .elementsEqual(Enumerable.on(1, 2, 3, 4, 5, 6,
+                                             7, 8, 9, 10, 11, 12)));
     }
 
     /**
@@ -268,6 +461,17 @@ public class EnumerableTest {
     @Test
     public void testChoiceOf_5args() {
         System.out.println("choiceOf");
+        final Random rnd = new Random(1001);
+        assertTrue(Enumerable
+                .choiceOf(() -> rnd.nextInt(4),
+                          i -> (i+1)%4,
+                          Enumerable.on(1, 2, 3),
+                          Enumerable.on(4, 5, 6),
+                          Enumerable.on(7, 8, 9),
+                          Enumerable.on(10, 11, 12))
+                .sorted()
+                .elementsEqual(Enumerable.on(1, 2, 3, 4, 5, 6,
+                                             7, 8, 9, 10, 11, 12)));
     }
 
     /**
@@ -276,6 +480,23 @@ public class EnumerableTest {
     @Test
     public void testConcat() {
         System.out.println("concat");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getLeft().concat(p.getRight())))
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()))
+                .map(p -> Pair.of(p.getLeft()
+                                   .reduce(0.0, (x,y) -> x+y),
+                                  p.getRight()
+                                   .reduce(0.0, (x,y) -> x+y)))
+                .forEach(p -> assertEquals("",
+                                           p.getLeft()*2,
+                                           p.getRight(),
+                                           0.000001));
     }
 
     /**
@@ -284,6 +505,25 @@ public class EnumerableTest {
     @Test
     public void testConcatOn() {
         System.out.println("concatOn");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getLeft().concatOn(p.getRight()
+                                                        .enumerator()
+                                                        .toArray(Double.class))))
+                .map(p -> Pair.of(p.getLeft().enumerator(),
+                                  p.getRight().enumerator()))
+                .map(p -> Pair.of(p.getLeft()
+                                   .reduce(0.0, (x,y) -> x+y),
+                                  p.getRight()
+                                   .reduce(0.0, (x,y) -> x+y)))
+                .forEach(p -> assertEquals("",
+                                           p.getLeft()*2,
+                                           p.getRight(),
+                                           0.000001));
     }
 
     /**
@@ -292,6 +532,19 @@ public class EnumerableTest {
     @Test
     public void testDistinct() {
         System.out.println("distinct");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getLeft().concatOn(p.getRight()
+                                                        .enumerator()
+                                                        .toArray(Double.class))))
+                .map(p -> Pair.of(p.getLeft().distinct(),
+                                  p.getRight().distinct()))
+                .forEach(p -> assertTrue(p.getLeft()
+                                          .elementsEqual(p.getRight())));
     }
 
     /**
@@ -300,6 +553,16 @@ public class EnumerableTest {
     @Test
     public void testElementsEqual() {
         System.out.println("elementsEqual");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().onEnumerable(),
+                                  p.getRight().onEnumerable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getRight()
+                                   .reverse()
+                                   .reverse()))
+                .forEach(p -> p.getLeft().elementsEqual(p.getRight()));
     }
 
     /**
@@ -308,6 +571,7 @@ public class EnumerableTest {
     @Test
     public void testEmpty() {
         System.out.println("empty");
+        assertEquals(0, Enumerable.empty().enumerator().count());
     }
 
     /**
@@ -316,6 +580,13 @@ public class EnumerableTest {
     @Test
     public void testFilter() {
         System.out.println("filter");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.enumerable())
+                .map(en -> en.filter(x -> x > 0))
+                .forEach(en -> en.enumerator()
+                                 .allMatch(x -> x > 0));
     }
 
     /**
@@ -324,6 +595,14 @@ public class EnumerableTest {
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.enumerable())
+                .map(en -> en.flatMap(x -> Enumerable.on(x, -x)))
+                .map(en -> en.enumerator()
+                             .reduce((x,y) -> x+y))
+                .forEach(x -> assertEquals("", 0, x.orElse(0.0), 0.000001));
     }
 
     /**
@@ -332,6 +611,21 @@ public class EnumerableTest {
     @Test
     public void testIndexedMap() {
         System.out.println("indexedMap");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.repeatable())
+                .map(en -> en.indexedMap((x,i) -> Pair.of(1+i.intValue(), x)))
+                .map(en -> Pair.of(en.map(q -> q.getLeft())
+                                     .enumerator()
+                                     .reduce((x,y) -> x+y),
+                                   en.enumerator().count()))
+                .map(p -> Pair.of(p.getLeft().orElse(0),
+                                  p.getRight()*(p.getRight()+1)/2))
+                .forEach(p -> assertEquals("",
+                                           p.getLeft(),
+                                           p.getRight().intValue(),
+                                           0.000001));
     }
 
     /**
@@ -340,6 +634,10 @@ public class EnumerableTest {
     @Test
     public void testIterate() {
         System.out.println("iterate");
+        assertTrue(Enumerable.iterate(0, i -> i+2)
+                             .takeWhile(i -> i<100)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .filter(i -> 0 == i%2)));
     }
 
     /**
@@ -348,6 +646,15 @@ public class EnumerableTest {
     @Test
     public void testLimit() {
         System.out.println("limit");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.onEnumerable())
+                .map(en -> Pair.of(en,
+                                   en.limit(10)
+                                     .concat(en.skip(10))))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()));
     }
 
     /**
@@ -356,6 +663,15 @@ public class EnumerableTest {
     @Test
     public void testLimitWhile() {
         System.out.println("limitWhile");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> gen.onEnumerable())
+                .map(en -> Pair.of(en,
+                                   en.limitWhile(x -> x<100)
+                                     .concat(en.skipWhile(x -> x<100))))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()));
     }
 
     /**
@@ -364,6 +680,15 @@ public class EnumerableTest {
     @Test
     public void testMap() {
         System.out.println("map");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().enumerable(),
+                                  p.getRight().enumerable()))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()
+                                               .map(x -> -x)
+                                               .map(x -> -x)));
     }
 
     /**
@@ -372,6 +697,17 @@ public class EnumerableTest {
     @Test
     public void testPrepend() {
         System.out.println("prepend");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().onEnumerable(),
+                                  p.getRight().onEnumerable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getRight()
+                                   .skip(10)
+                                   .prepend(p.getRight().take(10))))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()));
     }
 
     /**

@@ -122,6 +122,21 @@ public class EnumerableGenerator {
         return Enumerable.ofLateBinding(Double.class);
     }
 
+    public Enumerable<Double> repeatable() {
+        final Enumerable[] repeatables = {
+            onEnumerable(),
+            ofIterableEnumerable(),
+            ofLazyIterableEnumerable()
+        };
+        assert Enumerator.on(repeatables).allMatch(en -> !en.onceOnly());
+        return Enumerable.choiceOf(
+                boundRnd(repeatables.length),
+                repeatables[0].as(Double.class),
+                repeatables[1].as(Double.class),
+                Enumerator.on(repeatables)
+                          .skip(2)
+                          .toArray(Enumerable.class));
+    }
     public Enumerable<Double> enumerable() {
         final Enumerable[] subEnumerators = {
             onEnumerable(),
