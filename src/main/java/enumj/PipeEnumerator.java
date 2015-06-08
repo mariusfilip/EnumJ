@@ -155,11 +155,6 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         assert removed.getReference() != null
                || firstReference.getReference() == null
                || firstReference.getReference() == firstInPipeline;
-        assert removed.getReference() != null
-               || firstReference.getReference() != null
-               || firstInPipeline == null
-               || firstInPipeline.getReference() != removed
-                  && firstInPipeline.getReference() != firstReference;
 
         if (firstReference.getReference() == null) {
             if (removed.getReference() != null) {

@@ -31,12 +31,8 @@ abstract class AbstractPipeProcessor<T,R> {
         return next;
     }
     public void setNext(AbstractPipeProcessor<? extends R,?> next) {
-        if (next == null) {
-            throw new IllegalArgumentException();
-        }
-        if (this.next != null) {
-            throw new UnsupportedOperationException();
-        }
+        assert next != null;
+        assert this.next == null;
         this.next = next;
     }
 
@@ -44,12 +40,8 @@ abstract class AbstractPipeProcessor<T,R> {
         return reference;
     }
     public void setReference(PipeReference reference) {
-        if (reference == null) {
-            throw new IllegalArgumentException();
-        }
-        if (this.reference != null) {
-            throw new UnsupportedOperationException();
-        }
+        assert reference != null;
+        assert this.reference == null;
         this.reference = reference;
     }
 

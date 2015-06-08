@@ -6,6 +6,7 @@
 package enumj;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.IntSupplier;
@@ -912,5 +913,37 @@ public class EnumerableTest {
     @Test
     public void testZipAll() {
         System.out.println("zipAll");
+        EnumerableGenerator
+                .generators()
+                .limit(100)
+                .map(gen -> Enumerator.on((Enumerable)gen.repeatable(),
+                                          gen.repeatable(),
+                                          gen.repeatable(),
+                                          gen.repeatable())
+                                      .toArray(Enumerable.class))
+                .map(arr -> {
+                    final Enumerable<Double> first = arr[0];
+                    final Enumerable<Double> second = arr[1];
+                    final Enumerable<Double> third = arr[2];
+                    final Enumerable<Double> fourth = arr[3];
+                    final Enumerable[] result = new Enumerable[5];
+
+                    result[0] = first;
+                    result[1] = second;
+                    result[2] = third;
+                    result[3] = fourth;
+                    result[4] = first.zipAll(second, third, fourth);
+
+                    return result;
+                })
+                .forEach(arr -> assertEquals(
+                        "",
+                        arr[4].enumerator().count(),
+                        Enumerator.on(arr[0].enumerator().count(),
+                                      arr[1].enumerator().count(),
+                                      arr[2].enumerator().count())
+                                  .max(Comparator.comparingLong(x->x))
+                                  .get(),
+                        0.000001));
     }
 }
