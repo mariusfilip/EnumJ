@@ -729,6 +729,20 @@ public class EnumerableTest {
     @Test
     public void testPrependOn() {
         System.out.println("prependOn");
+        EnumerableGenerator
+                .generatorPairs()
+                .limit(100)
+                .map(p -> Pair.of(p.getLeft().repeatable(),
+                                  p.getRight().repeatable()))
+                .map(p -> Pair.of(p.getLeft(),
+                                  p.getRight()
+                                   .skip(10)
+                                   .prependOn(p.getRight()
+                                               .take(10)
+                                               .enumerator()
+                                               .toArray(Double.class))))
+                .forEach(p -> p.getLeft()
+                               .elementsEqual(p.getRight()));
     }
 
     /**
@@ -737,6 +751,19 @@ public class EnumerableTest {
     @Test
     public void testRange() {
         System.out.println("range");
+        assertTrue(Enumerable
+                .rangeInt(0, 100)
+                .elementsEqual(Enumerable
+                        .range(0,
+                               100,
+                               x -> x+2,
+                               Comparator.comparingInt(x->x))
+                        .concat(
+                        Enumerable.range(1,
+                                         100,
+                                         x -> x+2,
+                                         Comparator.comparingInt(x->x)))
+                        .sorted()));
     }
 
     /**
@@ -745,6 +772,19 @@ public class EnumerableTest {
     @Test
     public void testRangeClosed() {
         System.out.println("rangeClosed");
+        assertTrue(Enumerable
+                .rangeIntClosed(0, 100)
+                .elementsEqual(Enumerable
+                        .rangeClosed(0,
+                                     100,
+                                     x -> x+2,
+                                     Comparator.comparingInt(x->x))
+                        .concat(
+                        Enumerable.rangeClosed(1,
+                                               100,
+                                               x -> x+2,
+                                               Comparator.comparingInt(x->x)))
+                        .sorted()));
     }
 
     /**
@@ -753,6 +793,8 @@ public class EnumerableTest {
     @Test
     public void testRangeInt() {
         System.out.println("rangeInt");
+        assertTrue(Enumerable.on(0, 1, 2, 3, 4, 5)
+                             .elementsEqual(Enumerable.rangeInt(0, 6)));
     }
 
     /**
@@ -761,6 +803,8 @@ public class EnumerableTest {
     @Test
     public void testRangeIntClosed() {
         System.out.println("rangeIntClosed");
+        assertTrue(Enumerable.on(0, 1, 2, 3, 4, 5)
+                             .elementsEqual(Enumerable.rangeIntClosed(0, 5)));
     }
 
     /**
@@ -769,6 +813,8 @@ public class EnumerableTest {
     @Test
     public void testRangeLong() {
         System.out.println("rangeLong");
+        assertTrue(Enumerable.on(0L, 1L, 2L, 3L, 4L, 5L)
+                             .elementsEqual(Enumerable.rangeLong(0, 6)));
     }
 
     /**
@@ -777,6 +823,8 @@ public class EnumerableTest {
     @Test
     public void testRangeLongClosed() {
         System.out.println("rangeLongClosed");
+        assertTrue(Enumerable.on(0L, 1L, 2L, 3L, 4L, 5L)
+                             .elementsEqual(Enumerable.rangeLongClosed(0, 5)));
     }
 
     /**
@@ -785,6 +833,8 @@ public class EnumerableTest {
     @Test
     public void testRepeat() {
         System.out.println("repeat");
+        assertTrue(Enumerable.on(1, 1, 1, 1, 1)
+                             .elementsEqual(Enumerable.repeat(1, 5)));
     }
 
     /**
@@ -793,6 +843,9 @@ public class EnumerableTest {
     @Test
     public void testRepeatAll() {
         System.out.println("repeatAll");
+        assertTrue(Enumerable.on(1, 2, 1, 2, 1, 2)
+                             .elementsEqual(Enumerable.on(1, 2)
+                                                      .repeatAll(3)));
     }
 
     /**
@@ -801,6 +854,9 @@ public class EnumerableTest {
     @Test
     public void testRepeatEach() {
         System.out.println("repeatEach");
+        assertTrue(Enumerable.on(1, 1, 1, 2, 2, 2)
+                             .elementsEqual(Enumerable.on(1, 2)
+                                                      .repeatEach(3)));
     }
 
     /**
@@ -809,6 +865,9 @@ public class EnumerableTest {
     @Test
     public void testReverse() {
         System.out.println("reverse");
+        assertTrue(Enumerable.on(5, 4, 3, 2, 1)
+                             .elementsEqual(Enumerable.on(1, 2, 3, 4, 5)
+                                                      .reverse()));
     }
 
     /**
@@ -817,6 +876,9 @@ public class EnumerableTest {
     @Test
     public void testSkip() {
         System.out.println("skip");
+        assertTrue(Enumerable.rangeInt(50, 100)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .skip(50)));
     }
 
     /**
@@ -825,6 +887,9 @@ public class EnumerableTest {
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
+        assertTrue(Enumerable.rangeInt(50, 100)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .skipWhile(x -> x<50)));
     }
 
     /**
@@ -833,6 +898,10 @@ public class EnumerableTest {
     @Test
     public void testSorted_0args() {
         System.out.println("sorted");
+        assertTrue(Enumerable.rangeInt(-99, 1)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .map(x -> -x)
+                                                      .sorted()));
     }
 
     /**
@@ -841,6 +910,11 @@ public class EnumerableTest {
     @Test
     public void testSorted_Comparator() {
         System.out.println("sorted");
+        assertTrue(Enumerable.rangeInt(-99, 1)
+                             .map(x -> -x)
+                             .elementsEqual(Enumerable
+                                     .rangeInt(0, 100)
+                                     .sorted(Comparator.comparingInt(x->-x))));
     }
 
     /**
@@ -849,6 +923,9 @@ public class EnumerableTest {
     @Test
     public void testTake() {
         System.out.println("take");
+        assertTrue(Enumerable.rangeInt(0, 50)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .take(50)));
     }
 
     /**
@@ -857,6 +934,9 @@ public class EnumerableTest {
     @Test
     public void testTakeWhile() {
         System.out.println("takeWhile");
+        assertTrue(Enumerable.rangeInt(0, 50)
+                             .elementsEqual(Enumerable.rangeInt(0, 100)
+                                                      .takeWhile(x -> x<50)));
     }
 
     /**
@@ -865,6 +945,14 @@ public class EnumerableTest {
     @Test
     public void testUnion() {
         System.out.println("union");
+        assertTrue(Enumerable
+                .rangeInt(0, 100)
+                .elementsEqual(
+                        Enumerable.rangeInt(0, 100+1)
+                                  .map(i -> Enumerable.rangeInt(0, i))
+                                  .enumerator()
+                                  .reduce((en1,en2) -> en1.union(en2))
+                                  .get()));
     }
 
     /**
@@ -873,6 +961,10 @@ public class EnumerableTest {
     @Test
     public void testUnionOn() {
         System.out.println("unionOn");
+        assertTrue(Enumerable.on(1, 2, 3, 4, 5)
+                             .elementsEqual(Enumerable
+                                     .on(1, 2, 3)
+                                     .unionOn(3, 4, 5)));
     }
 
     /**
@@ -881,6 +973,11 @@ public class EnumerableTest {
     @Test
     public void testZipAny() {
         System.out.println("zipAny");
+        assertEquals(5,
+                     Enumerable.on(1, 2, 3)
+                               .zipAny(Enumerable.on(1, 2, 3, 4, 5))
+                               .enumerator()
+                               .count());
     }
 
     /**
@@ -889,6 +986,11 @@ public class EnumerableTest {
     @Test
     public void testZipBoth() {
         System.out.println("zipBoth");
+        assertEquals(3,
+                     Enumerable.on(1, 2, 3)
+                               .zipBoth(Enumerable.on(1, 2, 3, 4, 5))
+                               .enumerator()
+                               .count());
     }
 
     /**
@@ -897,6 +999,11 @@ public class EnumerableTest {
     @Test
     public void testZipLeft() {
         System.out.println("zipLeft");
+        assertEquals(3,
+                     Enumerable.on(1, 2, 3)
+                               .zipLeft(Enumerable.on(1, 2, 3, 4, 5))
+                               .enumerator()
+                               .count());
     }
 
     /**
@@ -905,6 +1012,11 @@ public class EnumerableTest {
     @Test
     public void testZipRight() {
         System.out.println("zipRight");
+        assertEquals(5,
+                     Enumerable.on(1, 2, 3)
+                               .zipRight(Enumerable.on(1, 2, 3, 4, 5))
+                               .enumerator()
+                               .count());
     }
 
     /**

@@ -1584,7 +1584,7 @@ public interface Enumerator<E> extends Iterator<E> {
         if (!hasNext()) {
             return Optional.empty();
         }
-        E first = next();
+        final E first = next();
         return Optional.of(reduce(first, accumulator));
     }
 
