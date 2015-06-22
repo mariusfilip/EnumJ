@@ -37,7 +37,6 @@ class PipeReference<E> extends IteratorEnumerator<E> {
         return this.reference;
     }
     void setReferenceIfNull(AbstractPipeProcessor<?,?> reference) {
-        Utils.ensureNotNull(reference, Messages.NULL_PIPE_PROCESSOR_REFERENCE);
         if (this.reference == null) {
             reference.setReference(this);
             this.reference = reference;

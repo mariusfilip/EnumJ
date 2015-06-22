@@ -23,22 +23,10 @@
  */
 package enumj;
 
-import java.util.function.Function;
+public enum TimingTestKind {
 
-public abstract class EnumeratorStringTimingTestBase
-                extends EnumeratorTimingTestBase<StringTimingTestArgs,String> {
+    CONSTRUCTION,
+    CONSUMPTION,
+    BOTH
 
-    @Override
-    protected void consumeEnumerator(String element) {}
-    @Override
-    protected void consumeStream(String element) {}
-
-    protected static Enumerator<StringTimingTestArgs> oneDimArgs(
-            long from, long to, long step,
-            Function<Long,StringTimingTestArgs> builder) {
-        return Enumerator
-                .rangeClosed(from, to, x -> x+step, Long::compare)
-                .filter(x -> x != from)
-                .map(builder);
-    }
 }

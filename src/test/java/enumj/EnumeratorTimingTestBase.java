@@ -73,17 +73,17 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
 
     // ---------------------------------------------------------------------- //
 
-    protected abstract TArgs[] comparisonArgs();
-    protected abstract double comparisonConstructionFactor(TArgs args);
-    protected abstract double comparisonConsumptionFactor(TArgs args);
+    protected abstract TArgs[] comparisonArgs(TimingTestKind kind);
+    protected abstract double comparisonFactor(TArgs args,
+                                               TimingTestKind kind);
 
     private <U,V> void streamComparisonProc(
             String testName,
-            Function<TArgs[],Pair<Long,Long>[]> test,
-            Function<TArgs,Double> factor) {
+            TimingTestKind testKind,
+            Function<TArgs[],Pair<Long,Long>[]> test) {
         System.out.println(testName);
 
-        final TArgs[] args = comparisonArgs();
+        final TArgs[] args = comparisonArgs(testKind);
         final Pair<Long,Long>[] results = test.apply(args);
         assertEquals(args.length, results.length);
 
@@ -100,7 +100,8 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                (results[i].getRight()/size) + "," +
                                percentage(results[i]));
             assertTrue(results[i].getLeft() <=
-                       factor.apply(args[i]) * results[i].getRight());
+                       comparisonFactor(args[i], testKind) *
+                       results[i].getRight());
         }
     }
 
@@ -108,49 +109,48 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     public void streamComparisonConstructionTest() {
         streamComparisonProc(
                 "streamComparisonConstructionTest",
+                TimingTestKind.CONSTRUCTION,
                 args -> NanoTimer.nanos(
                         this::testEnumeratorConstruction,
                         this::testStreamConstruction,
-                        args),
-                this::comparisonConstructionFactor);
+                        args));
     }
     @Test
     public void streamComparisonConsumptionTest() {
         streamComparisonProc(
                 "streamComparisonConsumptionTest",
+                TimingTestKind.CONSUMPTION,
                 args -> NanoTimer.buildNanos(
                         this::testEnumeratorConstruction,
                         this::testEnumeratorConsumption,
                         this::testStreamConstruction,
                         this::testStreamConsumption,
-                        args),
-                this::comparisonConsumptionFactor);
+                        args));
     }
     @Test
     public void streamComparisonBothTest() {
         streamComparisonProc(
                 "streamComparisonBothTest",
+                TimingTestKind.BOTH,
                 args -> NanoTimer.nanos(
                         this::testEnumeratorBoth,
                         this::testStreamBoth,
-                        args),
-                args -> Math.max(comparisonConstructionFactor(args),
-                                 comparisonConsumptionFactor(args)));
+                        args));
     }
 
     // ---------------------------------------------------------------------- //
 
-    protected abstract TArgs[] scalabilityArgs();
-    protected abstract double scalabilityConstructionFactor(TArgs args);
-    protected abstract double scalabilityConsumptionFactor(TArgs args);
+    protected abstract TArgs[] scalabilityArgs(TimingTestKind kind);
+    protected abstract double scalabilityFactor(TArgs args,
+                                                TimingTestKind kind);
 
     private void scalabilityProc(
             String testName,
-            Function<TArgs[],long[]> test,
-            Function<TArgs,Double> factor) {
+            TimingTestKind testKind,
+            Function<TArgs[],long[]> test) {
         System.out.println(testName);
         
-        final TArgs[] args = scalabilityArgs();
+        final TArgs[] args = scalabilityArgs(testKind);
         final long[] results = test.apply(args);
         assertEquals(args.length, results.length);
 
@@ -167,7 +167,9 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                perInst);
             if (i > Math.max(5, args.length/2)) {
                 final double avg = sum / count;
-                assertTrue(perInst <= factor.apply(args[i]) * avg);
+                assertTrue(perInst <=
+                           scalabilityFactor(args[i], testKind) *
+                           avg);
             }
             sum += results[i];
             count += size;
@@ -178,25 +180,24 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     public void scalabilityConstructionTest() {
         scalabilityProc(
                 "scalabilityConstructionTest",
+                TimingTestKind.CONSTRUCTION,
                 args -> NanoTimer.nanos(this::testEnumeratorConstruction,
-                                        args),
-                this::scalabilityConstructionFactor);
+                                        args));
     }
     @Test
     public void scalabilityConsumptionTest() {
         scalabilityProc(
                 "scalabilityConsumptionTest",
+                TimingTestKind.CONSUMPTION,
                 args -> NanoTimer.buildNanos(this::testEnumeratorConstruction,
                                              this::testEnumeratorConsumption,
-                                             args),
-                this::scalabilityConsumptionFactor);
+                                             args));
     }
     @Test
     public void scalabilityBothTest() {
         scalabilityProc(
                 "scalabilityBothTest",
-                args -> NanoTimer.nanos(this::testEnumeratorBoth, args),
-                args -> Math.max(scalabilityConstructionFactor(args),
-                                 scalabilityConsumptionFactor(args)));
+                TimingTestKind.BOTH,
+                args -> NanoTimer.nanos(this::testEnumeratorBoth, args));
     }
 }
