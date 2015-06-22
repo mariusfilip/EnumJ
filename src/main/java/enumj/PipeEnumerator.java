@@ -158,7 +158,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
         if (firstReference.getReference() == null) {
             if (removed.getReference() != null) {
-                dequeueProcessor();
+                while(firstInPipeline != null) {
+                    firstInPipeline = dequeueProcessor();
+                }
             }
             return;
         }

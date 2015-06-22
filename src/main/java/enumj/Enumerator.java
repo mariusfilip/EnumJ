@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,7 +53,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -91,9 +89,8 @@ import org.apache.commons.lang3.tuple.Pair;
  * <ul>
  *   <li>{@link #as(java.lang.Class)}</li>
  *   <li>{@link #asFiltered(java.lang.Class)}</li>
- *   <li>{@link #asOptional()</li>
+ *   <li>{@link #asOptional()}</li>
  *   <li>{@link #append(java.lang.Object...)}</li>
- *   <li>{@link #cartesianProduct(java.util.function.Supplier)</li>
  *   <li>{@link #concatOn(java.lang.Object...)}</li>
  *   <li>{@link #concat(java.util.Enumeration)}</li>
  *   <li>{@link #concat(java.lang.Iterable)}</li>
@@ -103,7 +100,7 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #concat(java.util.function.Supplier)}</li>
  *   <li>{@link #filter(java.util.function.Predicate)}</li>
  *   <li>{@link #flatMap(java.util.function.Function)}</li>
- *   <li>{@link #indexedMap(java.util.function.BiFunction)</li>
+ *   <li>{@link #indexedMap(java.util.function.BiFunction)}</li>
  *   <li>{@link #limit(long)}</li>
  *   <li>{@link #limitWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #map(java.util.function.Function)}</li>
@@ -115,16 +112,16 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #prepend(java.util.Spliterator)}</li>
  *   <li>{@link #prepend(java.util.stream.Stream)}</li>
  *   <li>{@link #prepend(java.util.function.Supplier)}</li>
- *   <li>{@link #repeatEach(int)</li>
+ *   <li>{@link #repeatEach(int)}</li>
  *   <li>{@link #skip(long)}</li>
  *   <li>{@link #skipWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #take(long)}</li>
  *   <li>{@link #takeWhile(java.util.function.Predicate)}</li>
- *   <li>{@link #zipAll(java.util.Iterator, java.util.Iterator...)</li>
- *   <li>{@link #zipAny(java.util.Iterator)</li>
- *   <li>{@link #zipBoth(java.util.Iterator)</li>
- *   <li>{@link #zipLeft(java.util.Iterator)</li>
- *   <li>{@link #zipRight(java.util.Iterator)</li>
+ *   <li>{@link #zipAll(java.util.Iterator, java.util.Iterator...)}</li>
+ *   <li>{@link #zipAny(java.util.Iterator)}</li>
+ *   <li>{@link #zipBoth(java.util.Iterator)}</li>
+ *   <li>{@link #zipLeft(java.util.Iterator)}</li>
+ *   <li>{@link #zipRight(java.util.Iterator)}</li>
  * </ul>
  * <p>
  * <strong>Shareability</strong>
@@ -211,7 +208,11 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     @SafeVarargs
     public static <E> Enumerator<E> on(E... elements) {
-        return of(Arrays.asList(elements));
+        return new ArrayEnumerator(elements);
+    }
+    
+    public static <E> Enumerator<E> of(E[] elements) {
+        return new ArrayEnumerator(elements);
     }
 
     /**
