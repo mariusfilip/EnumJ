@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     protected LinkedList<AbstractPipeProcessor> pipeline;
-    protected LinkedList<PipeMultiProcessor> multiPipeline;
+    protected LinkedList<AbstractPipeMultiProcessor> multiPipeline;
     protected LinkedList<PipeReference> sources;
     protected Nullable<E> value;
     protected long needValueForHasNext;
@@ -89,7 +89,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return this;
     }
     protected <X> Enumerator<X> enqueueProcessor(
-            PipeMultiProcessor<? super E, ? extends X> processor) {
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last = pipeline.peekLast();
         boolean added = false;
         try {
@@ -114,7 +114,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return (Enumerator<X>)this;
     }
     protected <X> PipeEnumerator<E> pushFrontProcessor(
-            PipeMultiProcessor<? super X, ?> processor) {
+            AbstractPipeMultiProcessor<? super X, ?> processor) {
         final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
         boolean added = false;
         try {
@@ -188,9 +188,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.clear();
 
         if (!multiPipeline.isEmpty()) {
-            Iterator<PipeMultiProcessor> multiProcessorIterator =
+            Iterator<AbstractPipeMultiProcessor> multiProcessorIterator =
                     multiPipeline.descendingIterator();
-            PipeMultiProcessor multiProcessor;
+            AbstractPipeMultiProcessor multiProcessor;
             while(multiProcessorIterator.hasNext()) {
                 multiProcessor = multiProcessorIterator.next();
                 if (!multiProcessor.needsValue()) {
@@ -245,11 +245,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         pipeline.addFirst(processor);
     }
     protected <X> void multiPipelineAddLast(
-            PipeMultiProcessor<? super E, ? extends X> processor) {
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         multiPipeline.addLast(processor);
     }
     protected <X> void multiPipelineAddFirst(
-            PipeMultiProcessor<? super X, ?> processor) {
+            AbstractPipeMultiProcessor<? super X, ?> processor) {
         multiPipeline.addFirst(processor);
     }
 

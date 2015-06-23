@@ -122,7 +122,7 @@ public class PipeEnumeratorTest {
         }
         @Override
         protected <X> void multiPipelineAddLast(
-            PipeMultiProcessor<? super E, ? extends X> processor) {
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
             throw new IllegalStateException();
         }
     }
@@ -144,7 +144,7 @@ public class PipeEnumeratorTest {
         }
         @Override
         protected <X> void multiPipelineAddFirst(
-            PipeMultiProcessor<? super X, ?> processor) {
+            AbstractPipeMultiProcessor<? super X, ?> processor) {
             throw new IllegalStateException();
         }
     }

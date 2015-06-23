@@ -23,7 +23,8 @@
  */
 package enumj;
 
-abstract class PipeMultiProcessor<T,R> extends AbstractPipeProcessor<T,R> {    
-    protected PipeMultiProcessor() {}
+abstract class AbstractPipeMultiProcessor<T,R>
+               extends AbstractPipeProcessor<T,R> {    
+    protected AbstractPipeMultiProcessor() {}
     abstract boolean needsValue();
 }
