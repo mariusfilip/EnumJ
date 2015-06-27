@@ -210,7 +210,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public static <E> Enumerator<E> on(E... elements) {
         return new ArrayEnumerator(elements);
     }
-    
+
     public static <E> Enumerator<E> of(E[] elements) {
         return new ArrayEnumerator(elements);
     }

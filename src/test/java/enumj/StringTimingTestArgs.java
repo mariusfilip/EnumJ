@@ -31,7 +31,8 @@ public class StringTimingTestArgs {
     public String toString() {
         final StringBuilder builder = new StringBuilder("{")
                 .append("concatCount:").append(concatCount).append(";")
-                .append("deepMapCount:").append(deepMapCount).append("}");
+                .append("deepMapCount:").append(deepMapCount).append(";")
+                .append("wideMapCount:").append(wideMapCount).append("}");
         return builder.toString();
     }
 
@@ -40,21 +41,32 @@ public class StringTimingTestArgs {
 
     public final Optional<Long> concatCount;
     public final Optional<Long> deepMapCount;
+    public final Optional<Long> wideMapCount;
 
     private StringTimingTestArgs(Optional<Long> concatCount,
-                                 Optional<Long> deepMapCount) {
+                                 Optional<Long> deepMapCount,
+                                 Optional<Long> wideMapCount) {
         this.concatCount = concatCount;
         this.deepMapCount = deepMapCount;
+        this.wideMapCount = wideMapCount;
     }
 
     public static StringTimingTestArgs ofConcat(long concatCount) {
         return new StringTimingTestArgs(
                 Optional.of(concatCount),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofDeepMap(long deepMapCount) {
         return new StringTimingTestArgs(
                 Optional.empty(),
-                Optional.of(deepMapCount));
+                Optional.of(deepMapCount),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofWideMap(long wideMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(wideMapCount));
     }
 }
