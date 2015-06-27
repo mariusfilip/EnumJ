@@ -32,7 +32,8 @@ public class StringTimingTestArgs {
         final StringBuilder builder = new StringBuilder("{")
                 .append("concatCount:").append(concatCount).append(";")
                 .append("deepMapCount:").append(deepMapCount).append(";")
-                .append("wideMapCount:").append(wideMapCount).append("}");
+                .append("wideMapCount:").append(wideMapCount).append(";")
+                .append("squareMapCount:").append(squareMapCount).append("}");
         return builder.toString();
     }
 
@@ -42,18 +43,23 @@ public class StringTimingTestArgs {
     public final Optional<Long> concatCount;
     public final Optional<Long> deepMapCount;
     public final Optional<Long> wideMapCount;
+    public final Optional<Long> squareMapCount;
+    
 
     private StringTimingTestArgs(Optional<Long> concatCount,
                                  Optional<Long> deepMapCount,
-                                 Optional<Long> wideMapCount) {
+                                 Optional<Long> wideMapCount,
+                                 Optional<Long> squareMapCount) {
         this.concatCount = concatCount;
         this.deepMapCount = deepMapCount;
         this.wideMapCount = wideMapCount;
+        this.squareMapCount = squareMapCount;
     }
 
     public static StringTimingTestArgs ofConcat(long concatCount) {
         return new StringTimingTestArgs(
                 Optional.of(concatCount),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty());
     }
@@ -61,12 +67,21 @@ public class StringTimingTestArgs {
         return new StringTimingTestArgs(
                 Optional.empty(),
                 Optional.of(deepMapCount),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofWideMap(long wideMapCount) {
         return new StringTimingTestArgs(
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of(wideMapCount));
+                Optional.of(wideMapCount),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofSquareMap(long squareMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(squareMapCount));
     }
 }

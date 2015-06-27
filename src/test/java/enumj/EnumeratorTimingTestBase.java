@@ -110,7 +110,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
         streamComparisonProc(
                 "streamComparisonConstructionTest",
                 TimingTestKind.CONSTRUCTION,
-                args -> NanoTimer.nanos(
+                args -> NanoTimer.compareNanos(
                         this::testEnumeratorConstruction,
                         this::testStreamConstruction,
                         args));
@@ -120,7 +120,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
         streamComparisonProc(
                 "streamComparisonConsumptionTest",
                 TimingTestKind.CONSUMPTION,
-                args -> NanoTimer.buildNanos(
+                args -> NanoTimer.compareBuildNanos(
                         this::testEnumeratorConstruction,
                         this::testEnumeratorConsumption,
                         this::testStreamConstruction,
@@ -132,7 +132,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
         streamComparisonProc(
                 "streamComparisonBothTest",
                 TimingTestKind.BOTH,
-                args -> NanoTimer.nanos(
+                args -> NanoTimer.compareNanos(
                         this::testEnumeratorBoth,
                         this::testStreamBoth,
                         args));
@@ -182,6 +182,9 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                 "scalabilityConstructionTest",
                 TimingTestKind.CONSTRUCTION,
                 args -> NanoTimer.nanos(this::testEnumeratorConstruction,
+                                        arg -> "scale construction " + 
+                                               arg +
+                                               " ...",
                                         args));
     }
     @Test
@@ -191,6 +194,9 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                 TimingTestKind.CONSUMPTION,
                 args -> NanoTimer.buildNanos(this::testEnumeratorConstruction,
                                              this::testEnumeratorConsumption,
+                                             arg -> "scale consumption " + 
+                                                    arg +
+                                                    " ...",
                                              args));
     }
     @Test
@@ -198,6 +204,10 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
         scalabilityProc(
                 "scalabilityBothTest",
                 TimingTestKind.BOTH,
-                args -> NanoTimer.nanos(this::testEnumeratorBoth, args));
+                args -> NanoTimer.nanos(this::testEnumeratorBoth,
+                                        arg -> "scale both " +
+                                               arg +
+                                               " ...",
+                                        args));
     }
 }

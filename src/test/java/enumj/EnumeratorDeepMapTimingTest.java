@@ -29,11 +29,11 @@ import java.util.stream.Stream;
 public class EnumeratorDeepMapTimingTest
              extends EnumeratorStringTimingTestBase {
 
-    public static final long STREAM_DEEP_MAP_COUNT = 10000;
+    public static final long STREAM_DEEP_MAP_COUNT = 10_000;
     public static final long STREAM_DEEP_MAP_STEP = 1000;
-    public static final long ENUM_DEEP_MAP_COUNT = 1000000;
-    public static final long ENUM_DEEP_MAP_STEP = 100000;
-    public static final long LARGE_DEEP_MAP_COUNT = 10000000;
+    public static final long ENUM_DEEP_MAP_COUNT = 1000_000;
+    public static final long ENUM_DEEP_MAP_STEP = 100_000;
+    public static final long LARGE_DEEP_MAP_COUNT = 10_000_000;
 
     private final Function<String,String> mapper = Function.identity();
 
