@@ -117,6 +117,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return this;
     }
+    
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
     protected <X> void safePipelineAddLast(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
@@ -145,8 +147,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
     }
 
+    // ---------------------------------------------------------------------- //
+
     protected void dequeueSourceWithProcessors() {
-        assert !sources.isEmpty();
         dequeueSourceProcessors(sources.remove());
         value.clear();
     }
@@ -159,12 +162,6 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
         AbstractPipeProcessor firstInPipeline = pipeline.peekFirst();
         final PipeReference firstReference = sources.getFirst();
-
-        assert removed.getReference() == null
-               || removed.getReference() == firstInPipeline;
-        assert removed.getReference() != null
-               || firstReference.getReference() == null
-               || firstReference.getReference() == firstInPipeline;
 
         if (firstReference.getReference() == null) {
             if (removed.getReference() != null) {
@@ -221,10 +218,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.set(pipeline.peekFirst());
         return true;
     }
-    protected boolean tryPipelineOut(Object                    in,
-                                     AbstractPipeProcessor     processor,
-                                     Nullable<E>               out,
-                                     Nullable<Boolean>         nextOnNoValue) {
+    protected boolean tryPipelineOut(Object                in,
+                                     AbstractPipeProcessor processor,
+                                     Nullable<E>           out,
+                                     Nullable<Boolean>     nextOnNoValue) {
         out.clear();
         nextOnNoValue.clear();
 
@@ -254,8 +251,6 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (needValueForHasNext > 0) {
             return tryGetNext();
         }
-
-        assert needValueForHasNext == 0;
         return straightHasNext();
     }
     @Override
@@ -265,11 +260,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             value.clear();
             return result;
         }
-
-        assert needValueForHasNext == 0;
-        final boolean hasNext = tryGetNext();
-        assert hasNext;
-        assert value.isPresent();
+        tryGetNext();
 
         final E result = value.get();
         value.clear();
@@ -277,13 +268,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     protected void cleanup() {
-        pipeline.clear();
         pipeline = null;
-        multiPipeline.clear();
         multiPipeline = null;
-        sources.clear();
         sources = null;
-        value.clear();
         value = null;
     }
 
