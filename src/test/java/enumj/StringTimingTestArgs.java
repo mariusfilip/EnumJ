@@ -30,10 +30,18 @@ public class StringTimingTestArgs {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder("{")
-                .append("concatCount:").append(concatCount).append(";")
-                .append("deepMapCount:").append(deepMapCount).append(";")
-                .append("wideMapCount:").append(wideMapCount).append(";")
-                .append("squareMapCount:").append(squareMapCount).append("}");
+                .append("concatCount:").append(concatCount)
+                .append(";")
+                .append("deepMapCount:").append(deepMapCount)
+                .append(";")
+                .append("wideMapCount:").append(wideMapCount)
+                .append(";")
+                .append("deepFlatMapCount:").append(deepFlatMapCount)
+                .append(";")
+                .append("wideFlatMapCount:").append(wideFlatMapCount)
+                .append(";")
+                .append("innerFlatMapCount:").append(innerFlatMapCount)
+                .append("}");
         return builder.toString();
     }
 
@@ -43,22 +51,29 @@ public class StringTimingTestArgs {
     public final Optional<Long> concatCount;
     public final Optional<Long> deepMapCount;
     public final Optional<Long> wideMapCount;
-    public final Optional<Long> squareMapCount;
-    
+    public final Optional<Long> deepFlatMapCount;
+    public final Optional<Long> wideFlatMapCount;
+    public final Optional<Long> innerFlatMapCount;
 
     private StringTimingTestArgs(Optional<Long> concatCount,
                                  Optional<Long> deepMapCount,
                                  Optional<Long> wideMapCount,
-                                 Optional<Long> squareMapCount) {
+                                 Optional<Long> deepFlatMapCount,
+                                 Optional<Long> wideFlatMapCount,
+                                 Optional<Long> innerFlatMapCount) {
         this.concatCount = concatCount;
         this.deepMapCount = deepMapCount;
         this.wideMapCount = wideMapCount;
-        this.squareMapCount = squareMapCount;
+        this.deepFlatMapCount = deepFlatMapCount;
+        this.wideFlatMapCount = wideFlatMapCount;
+        this.innerFlatMapCount = innerFlatMapCount;
     }
 
     public static StringTimingTestArgs ofConcat(long concatCount) {
         return new StringTimingTestArgs(
                 Optional.of(concatCount),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty());
@@ -68,6 +83,8 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.of(deepMapCount),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofWideMap(long wideMapCount) {
@@ -75,13 +92,53 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(wideMapCount),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofSquareMap(long squareMapCount) {
         return new StringTimingTestArgs(
                 Optional.empty(),
+                Optional.of(squareMapCount),
+                Optional.of(squareMapCount),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of(squareMapCount));
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofDeepFlatMap(long deepFlatMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(deepFlatMapCount),
+                Optional.empty(),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofWideFlatMap(long wideFlatMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(wideFlatMapCount),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofInnerFlatMap(long innerFlatMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(innerFlatMapCount));
+    }
+    public static StringTimingTestArgs ofCubeFlatMap(long cubeFlatMapCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(cubeFlatMapCount),
+                Optional.of(cubeFlatMapCount),
+                Optional.of(cubeFlatMapCount));
     }
 }
