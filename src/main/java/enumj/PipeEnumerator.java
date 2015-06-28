@@ -64,7 +64,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last = pipeline.peekLast();
-        pipelineAddLast(processor);
+        safePipelineAddLast(processor);
         if (processor.hasNextNeedsValue()) {
             ++needValueForHasNext;
         }
@@ -79,7 +79,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeProcessor<? super X, ?> processor) {
         final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
-        pipelineAddFirst(processor);
+        safePipelineAddFirst(processor);
         if (processor.hasNextNeedsValue()) {
             ++needValueForHasNext;
         }
@@ -91,17 +91,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last = pipeline.peekLast();
-        boolean added = false;
-        try {
-            pipelineAddLast(processor);
-            added = true;
-            multiPipelineAddLast(processor);
-        } catch(Exception ex) {
-            if (added) {
-                pipeline.removeLast();
-            }
-            throw ex;
-        }
+        safePipelineAddLast(processor);
+        safeMultiPipelineAddLast(processor);
         if (processor.hasNextNeedsValue()) {
             ++needValueForHasNext;
         }
@@ -116,17 +107,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
         final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
-        boolean added = false;
-        try {
-            pipelineAddFirst(processor);
-            added = true;
-            multiPipelineAddFirst(processor);
-        } catch(Exception ex) {
-            if (added) {
-                pipeline.removeFirst();
-            }
-            throw ex;
-        }
+        safePipelineAddFirst(processor);
+        safeMultiPipelineAddFirst(processor);
         if (processor.hasNextNeedsValue()) {
             ++needValueForHasNext;
         }
@@ -135,6 +117,34 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return this;
     }
+
+    protected <X> void safePipelineAddLast(
+            AbstractPipeProcessor<? super E, ? extends X> processor) {
+        pipeline.addLast(processor);
+    }
+    protected <X> void safeMultiPipelineAddLast(
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
+        try {
+            multiPipeline.addLast(processor);
+        } catch(Throwable err) {
+            pipeline.removeLast();
+            throw err;
+        }
+    }
+    protected <X> void safePipelineAddFirst(
+            AbstractPipeProcessor<? super X, ?> processor) {
+        pipeline.addFirst(processor);
+    }
+    protected <X> void safeMultiPipelineAddFirst(
+            AbstractPipeMultiProcessor<? super X, ?> processor) {
+        try {
+            multiPipeline.addFirst(processor);
+        } catch(Throwable err) {
+            pipeline.removeFirst();
+            throw err;
+        }
+    }
+
     protected void dequeueSourceWithProcessors() {
         assert !sources.isEmpty();
         dequeueSourceProcessors(sources.remove());
@@ -232,25 +242,6 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
         out.set((E)in);
         return true;
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -//
-
-    protected <X> void pipelineAddLast(
-            AbstractPipeProcessor<? super E, ? extends X> processor) {
-        pipeline.addLast(processor);
-    }
-    protected <X> void pipelineAddFirst(
-            AbstractPipeProcessor<? super X, ?> processor) {
-        pipeline.addFirst(processor);
-    }
-    protected <X> void multiPipelineAddLast(
-            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
-        multiPipeline.addLast(processor);
-    }
-    protected <X> void multiPipelineAddFirst(
-            AbstractPipeMultiProcessor<? super X, ?> processor) {
-        multiPipeline.addFirst(processor);
     }
 
     // ---------------------------------------------------------------------- //

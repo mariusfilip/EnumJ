@@ -18,8 +18,8 @@ import org.apache.commons.lang3.mutable.MutableLong;
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
     private boolean started;
-    private boolean hasNextCalled;
-    private boolean hasNextError;
+    private boolean hasNextHasBeenCalled;
+    private boolean hasNextHasThrown;
     private boolean done;
 
     @Override
@@ -29,39 +29,52 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
     @Override
     public final boolean hasNext() {
-        started = true;
-        try {
-            if (done) {
-                return false;
-            }
-            done = !internalHasNext();
-            if (done) {
-                cleanup();
-            }
-
-            hasNextError = false;
-            return !done;
+        if (done) {
+            return false;
         }
-        catch(Exception ex) {
-            hasNextError = true;
-            throw ex;
-        } finally {
-            hasNextCalled = true;
+
+        started = true;
+        done = !safeHasNext();
+        if (done) {
+            safeCleanup();
+        }
+
+        hasNextHasThrown = false;
+        hasNextHasBeenCalled = true;
+        return !done;
+    }
+
+    private boolean safeHasNext() {
+        try {
+            return internalHasNext();
+        } catch(Throwable err) {
+            hasNextHasThrown = true;
+            hasNextHasBeenCalled = true;
+            throw err;
+        }
+    }
+    private void safeCleanup() {
+        try {
+            cleanup();
+        } catch(Throwable err) {
+            hasNextHasThrown = true;
+            hasNextHasBeenCalled = true;
+            throw err;
         }
     }
 
     @Override
     public final E next() {
-        if (!hasNextCalled) {
+        if (!hasNextHasBeenCalled) {
             hasNext();
         }
-        if (done || hasNextError) {
+        if (done || hasNextHasThrown) {
             throw new NoSuchElementException();
         }
         try {
             return internalNext();
         } finally {
-            hasNextCalled = false;
+            hasNextHasBeenCalled = false;
         }
     }
 

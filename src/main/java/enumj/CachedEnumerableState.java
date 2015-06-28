@@ -73,7 +73,7 @@ public final class CachedEnumerableState<E> {
                         dis.set(true);
                         try {
                             clbk.run();
-                        } catch(Exception ex) {
+                        } catch(Throwable ex) {
                             // do nothing
                         }
                     }));

@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.experimental.categories.Category;
 
 public abstract class EnumeratorTimingTestBase<TArgs,E> {
 
@@ -106,6 +107,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     }
 
     @Test
+    @Category(TimingTests.class)
     public void streamComparisonConstructionTest() {
         streamComparisonProc(
                 "streamComparisonConstructionTest",
@@ -116,6 +118,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                         args));
     }
     @Test
+    @Category(TimingTests.class)
     public void streamComparisonConsumptionTest() {
         streamComparisonProc(
                 "streamComparisonConsumptionTest",
@@ -128,6 +131,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                         args));
     }
     @Test
+    @Category(TimingTests.class)
     public void streamComparisonBothTest() {
         streamComparisonProc(
                 "streamComparisonBothTest",
@@ -177,6 +181,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     }
 
     @Test
+    @Category(TimingTests.class)
     public void scalabilityConstructionTest() {
         scalabilityProc(
                 "scalabilityConstructionTest",
@@ -188,6 +193,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                         args));
     }
     @Test
+    @Category(TimingTests.class)
     public void scalabilityConsumptionTest() {
         scalabilityProc(
                 "scalabilityConsumptionTest",
@@ -200,6 +206,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                              args));
     }
     @Test
+    @Category(TimingTests.class)
     public void scalabilityBothTest() {
         scalabilityProc(
                 "scalabilityBothTest",

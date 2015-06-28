@@ -193,7 +193,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
             }
             ok = true;
         }
-        catch (Exception ex) {
+        catch (Throwable err) {
             if (refAdded) {
                 newPtr.release(enumerator);
             }
@@ -208,7 +208,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
                 }
             }
 
-            throw ex;
+            throw err;
         }
         finally {
             if (!buffer.isEmpty() && buffer.getFirst().isFree()) {

@@ -121,7 +121,7 @@ public class PipeEnumeratorTest {
             super(source);
         }
         @Override
-        protected <X> void multiPipelineAddLast(
+        protected <X> void safeMultiPipelineAddLast(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
             throw new IllegalStateException();
         }
@@ -132,7 +132,7 @@ public class PipeEnumeratorTest {
             super(source);
         }
         @Override
-        protected <X> void pipelineAddFirst(
+        protected <X> void safePipelineAddFirst(
             AbstractPipeProcessor<? super X, ?> processor) {
             throw new IllegalStateException();
         }
@@ -143,7 +143,7 @@ public class PipeEnumeratorTest {
             super(source);
         }
         @Override
-        protected <X> void multiPipelineAddFirst(
+        protected <X> void safeMultiPipelineAddFirst(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
             throw new IllegalStateException();
         }
@@ -181,7 +181,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of pipelineAddLast method, of class PipeEnumerator.
+     * Test of safePipelineAddLast method, of class PipeEnumerator.
      */
     @Test
     public void testPipelineAddLast() {
@@ -189,7 +189,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of multiPipelineAddLast method, of class PipeEnumerator.
+     * Test of safeMultiPipelineAddLast method, of class PipeEnumerator.
      */
     @Test
     public void testMultiPipelineAddLast() {
@@ -316,7 +316,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of pipelineAddFirst method, of class PipeEnumerator.
+     * Test of safePipelineAddFirst method, of class PipeEnumerator.
      */
     @Test
     public void testPipelineAddFirst() {
@@ -324,7 +324,7 @@ public class PipeEnumeratorTest {
     }
 
     /**
-     * Test of multiPipelineAddFirst method, of class PipeEnumerator.
+     * Test of safeMultiPipelineAddFirst method, of class PipeEnumerator.
      */
     @Test
     public void testMultiPipelineAddFirst() {
