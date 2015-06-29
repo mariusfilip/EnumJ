@@ -8,10 +8,6 @@ package enumj;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/**
- *
- * @author Marius Filip
- */
 final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Optional<E>> source;
@@ -31,7 +27,7 @@ final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     protected E internalNext() {
-        E val = value.get();
+        final E val = value.get();
         value = null;
         return val;
     }

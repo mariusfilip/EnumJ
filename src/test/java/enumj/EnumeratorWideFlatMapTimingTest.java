@@ -27,37 +27,51 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class EnumeratorWideMapTimigTest
+public class EnumeratorWideFlatMapTimingTest
              extends EnumeratorStringTimingTestBase {
 
-    private final Function<String,String> mapper = Function.identity();
+    public final static long[] sizes = {
+        1,
+        10,
+        100,
+        1000,
+        10_000,
+        100_000,
+        1000_000,
+        10_000_000,
+        100_000_000
+    };
+
+    {
+        buildBuffers(sizes);
+    }
+
+    private final Function<String,Enumerator<String>> enumeratorMapper =
+            s -> Enumerator.on(s, s);
+    private final Function<String,Stream<String>> streamMapper =
+            s -> Stream.of(s, s);
 
     @Override
     protected Enumerator<String> enumerator(StringTimingTestArgs args) {
-        return Enumerator.of(getArray(args));
+        return Enumerator.of(buffers.get(args.wideFlatMapCount.get()));
     }
     @Override
     protected Stream<String> stream(StringTimingTestArgs args) {
-        return Arrays.stream(getArray(args));
+        return Arrays.stream(buffers.get(args.wideFlatMapCount.get()));
     }
     @Override
     protected Enumerator<String> transform(StringTimingTestArgs args,
                                            Enumerator<String> enumerator) {
-        return enumerator.map(mapper);
+        return enumerator.flatMap(enumeratorMapper);
     }
     @Override
     protected Stream<String> transform(StringTimingTestArgs args,
                                        Stream<String> stream) {
-        return stream.map(mapper);
+        return stream.flatMap(streamMapper);
     }
     @Override
     protected long sizeOf(StringTimingTestArgs args) {
-        return args.wideMapCount.get();
-    }
-    private String[] getArray(StringTimingTestArgs args) {
-        return Enumerator.repeat(
-                StringTimingTestArgs.ALPHABET,
-                args.wideMapCount.get()).toArray(String.class);
+        return (1+2) * args.wideFlatMapCount.get();
     }
 
     // ---------------------------------------------------------------------- //
@@ -65,21 +79,16 @@ public class EnumeratorWideMapTimigTest
     @Override
     protected double comparisonFactor(StringTimingTestArgs args,
                                       TimingTestKind kind) {
-        return 1000;
+        return Integer.MAX_VALUE;
     }
     @Override
     protected StringTimingTestArgs[] comparisonArgs(TimingTestKind kind) {
-        if (kind == TimingTestKind.CONSTRUCTION)
-        {
-            return new StringTimingTestArgs[0];
+        final StringTimingTestArgs[] args =
+                new StringTimingTestArgs[sizes.length];
+        for(int i=0; i<args.length; ++i) {
+            args[i] = StringTimingTestArgs.ofWideFlatMap(sizes[i]);
         }
-        return args(0, 10, 1)
-                .concat(args(10, 100, 10))
-                .concat(args(100, 1000, 100))
-                .concat(args(1000, 10_000, 1000))
-                .concat(args(10_000, 100_000, 10_000))
-                .concat(args(100_000, 1000_000, 100_000))
-                .toArray(StringTimingTestArgs.class);
+        return args;
     }
 
     // ---------------------------------------------------------------------- //
@@ -87,18 +96,10 @@ public class EnumeratorWideMapTimigTest
     @Override
     protected double scalabilityFactor(StringTimingTestArgs args,
                                        TimingTestKind kind) {
-        return 1;
+        return 0;
     }
     @Override
     protected StringTimingTestArgs[] scalabilityArgs(TimingTestKind kind) {
         return new StringTimingTestArgs[0];
-    }
-
-    // ---------------------------------------------------------------------- //
-
-    private static Enumerator<StringTimingTestArgs> args(long from,
-                                                         long to,
-                                                         long step) {
-        return oneDimArgs(from, to, step, StringTimingTestArgs::ofWideMap);
     }
 }

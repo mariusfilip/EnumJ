@@ -29,7 +29,7 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
         return value;
     }
     @Override
-    protected boolean nextOnNoValue() {
+    protected boolean nextElementOnNoValue() {
         return false;
     }
     @Override

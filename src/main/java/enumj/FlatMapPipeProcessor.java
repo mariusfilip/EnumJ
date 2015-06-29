@@ -26,7 +26,8 @@ package enumj;
 import java.util.Iterator;
 import java.util.function.Function;
 
-final class FlatMapPipeProcessor<In,Out> extends AbstractPipeMultiProcessor<In,Out> {
+final class FlatMapPipeProcessor<In,Out>
+            extends AbstractPipeMultiProcessor<In,Out> {
 
     protected final Function<In,Iterator<Out>> mapper;
     protected final Nullable<Out> value;
@@ -46,7 +47,7 @@ final class FlatMapPipeProcessor<In,Out> extends AbstractPipeMultiProcessor<In,O
     @Override
     protected void process(In value) {
         this.iterator = this.mapper.apply(value);
-        if (this.iterator.hasNext()) {
+        if (this.iterator != null && this.iterator.hasNext()) {
             this.value.set(this.iterator.next());
         } else {
             this.value.clear();
@@ -58,7 +59,7 @@ final class FlatMapPipeProcessor<In,Out> extends AbstractPipeMultiProcessor<In,O
     }
     @Override
     protected Out getValue() {
-        Out result = value.get();
+        final Out result = value.get();
         value.clear();
         if (iterator.hasNext()) {
             value.set(iterator.next());
@@ -66,7 +67,7 @@ final class FlatMapPipeProcessor<In,Out> extends AbstractPipeMultiProcessor<In,O
         return result;
     }
     @Override
-    protected boolean nextOnNoValue() {
+    protected boolean nextElementOnNoValue() {
         return true;
     }
     @Override

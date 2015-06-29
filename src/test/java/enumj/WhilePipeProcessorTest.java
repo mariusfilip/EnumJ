@@ -91,12 +91,12 @@ public class WhilePipeProcessorTest {
     }
 
     /**
-     * Test of nextOnNoValue method, of class WhilePipeProcessor.
+     * Test of nextElementOnNoValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertFalse(processor.nextOnNoValue());
+        assertFalse(processor.nextElementOnNoValue());
     }
 
     /**

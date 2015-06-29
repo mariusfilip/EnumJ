@@ -1,5 +1,3 @@
-package enumj;
-
 /*
  * The MIT License
  *
@@ -23,32 +21,51 @@ package enumj;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package enumj;
 
-import static enumj.EnumeratorStringTimingTestBase.oneDimArgs;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class EnumeratorDeepFlatMapTimingTest
+/**
+ *
+ * @author Marius Filip
+ */
+public class EnumeratorSquareFlatMapTimingTest
              extends EnumeratorStringTimingTestBase {
 
-    public static final long STREAM_DEEP_FLATMAP_COUNT = 1000;
-    public static final long STREAM_DEEP_FLATMAP_STEP = 100;
-    public static final long ENUM_DEEP_FLATMAP_COUNT = 1000_000;
-    public static final long ENUM_DEEP_FLATMAP_STEP = 100_000;
-    public static final long LARGE_DEEP_FLATMAP_COUNT = 10_000_000;
+    public final static long[] powers = {
+        1,
+        3,
+        5,
+        7,
+        11,
+        13
+    };
+    public final static long[] sizes = new long[powers.length];
+
+    static {
+        for(int i=0; i<sizes.length; ++i) {
+            sizes[i] = (long)Math.floor(Math.pow(2, powers[i]));
+        }
+    }
+
+    {
+        buildBuffers(sizes);
+    }
 
     private final Function<String,Enumerator<String>> enumeratorMapper =
-            s -> Enumerator.on(s);
+            s -> Enumerator.on(s, s);
     private final Function<String,Stream<String>> streamMapper =
-            s -> Stream.of(s);
+            s -> Stream.of(s, s);
 
     @Override
     protected Enumerator<String> enumerator(StringTimingTestArgs args) {
-        return Enumerator.on(StringTimingTestArgs.ALPHABET);
+        return Enumerator.of(buffers.get(args.wideFlatMapCount.get()));
     }
     @Override
     protected Stream<String> stream(StringTimingTestArgs args) {
-        return Stream.of(StringTimingTestArgs.ALPHABET);
+        return Arrays.stream(buffers.get(args.wideFlatMapCount.get()));
     }
     @Override
     protected Enumerator<String> transform(StringTimingTestArgs args,
@@ -70,7 +87,12 @@ public class EnumeratorDeepFlatMapTimingTest
     }
     @Override
     protected long sizeOf(StringTimingTestArgs args) {
-        return args.deepFlatMapCount.get();
+        assert args.innerFlatMapCount.get() == 2;
+        final long wide = args.wideFlatMapCount.get();
+        final long inner = 
+                (long)Math.floor(Math.pow(args.innerFlatMapCount.get(),
+                                          args.deepFlatMapCount.get()));
+        return wide * inner;
     }
 
     // ---------------------------------------------------------------------- //
@@ -78,28 +100,18 @@ public class EnumeratorDeepFlatMapTimingTest
     @Override
     protected double comparisonFactor(StringTimingTestArgs args,
                                       TimingTestKind kind) {
-        switch(kind) {
-            case CONSTRUCTION:
-                return 200;
-            case CONSUMPTION:
-                return 200;
-            case BOTH:
-                return comparisonFactor(args, TimingTestKind.CONSTRUCTION)
-                       +
-                       comparisonFactor(args, TimingTestKind.CONSUMPTION);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return Integer.MAX_VALUE;
     }
     @Override
     protected StringTimingTestArgs[] comparisonArgs(TimingTestKind kind) {
-        return args(0, 10, 1)
-                .concat(args(10, 100, 10))
-                .concat(args(100, 1000, 100))
-                .concat(args(1000,
-                             STREAM_DEEP_FLATMAP_COUNT,
-                             STREAM_DEEP_FLATMAP_STEP))
-                .toArray(StringTimingTestArgs.class);
+        final StringTimingTestArgs[] args =
+                new StringTimingTestArgs[sizes.length];
+        for(int i=0; i<args.length; ++i) {
+            args[i] = StringTimingTestArgs.ofCubeFlatMap(powers[i],
+                                                         sizes[i],
+                                                         2);
+        }
+        return args;
     }
 
     // ---------------------------------------------------------------------- //
@@ -107,34 +119,10 @@ public class EnumeratorDeepFlatMapTimingTest
     @Override
     protected double scalabilityFactor(StringTimingTestArgs args,
                                        TimingTestKind kind) {
-        switch(kind) {
-            case CONSTRUCTION:
-                return 100;
-            case CONSUMPTION:
-                return 1.6*16;
-            case BOTH:
-                return scalabilityFactor(args, TimingTestKind.CONSTRUCTION)
-                       +
-                       scalabilityFactor(args, TimingTestKind.CONSUMPTION);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return 0;
     }
     @Override
     protected StringTimingTestArgs[] scalabilityArgs(TimingTestKind kind) {
-        return args(0, ENUM_DEEP_FLATMAP_COUNT, ENUM_DEEP_FLATMAP_STEP)
-                .append(StringTimingTestArgs
-                        .ofDeepFlatMap(LARGE_DEEP_FLATMAP_COUNT/2))
-                .append(StringTimingTestArgs
-                        .ofDeepFlatMap(LARGE_DEEP_FLATMAP_COUNT))
-                .toArray(StringTimingTestArgs.class);
-    }
-
-    // ---------------------------------------------------------------------- //
-
-    private static Enumerator<StringTimingTestArgs> args(long from,
-                                                         long to,
-                                                         long step) {
-        return oneDimArgs(from, to, step, StringTimingTestArgs::ofDeepFlatMap);
+        return new StringTimingTestArgs[0];
     }
 }

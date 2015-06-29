@@ -28,9 +28,13 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.experimental.categories.Category;
 
 public abstract class EnumeratorTimingTestBase<TArgs,E> {
+
+    private boolean doPrint = false; // set this to 'true' to see 
+                                     // test execution progress
 
     public static int percentage(Pair<Long,Long> result) {
         return percentage(result.getLeft(), result.getRight());
@@ -38,6 +42,12 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     public static int percentage(long a, long b) {
         final double ratio = ((double)a) / b;
         return (int)(ratio * 100);
+    }
+
+    protected void print(String msg) {
+        if (doPrint) {
+            System.out.println(msg);
+        }
     }
 
     // ---------------------------------------------------------------------- //
@@ -84,25 +94,32 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
             Function<TArgs[],Pair<Long,Long>[]> test) {
         System.out.println(testName);
 
-        final TArgs[] args = comparisonArgs(testKind);
-        final Pair<Long,Long>[] results = test.apply(args);
-        assertEquals(args.length, results.length);
+        final boolean nanoPrint = NanoTimer.doPrint;
+        NanoTimer.doPrint = doPrint;
+        try {
+            final TArgs[] args = comparisonArgs(testKind);
+            final Pair<Long,Long>[] results = test.apply(args);
+            assertEquals(args.length, results.length);
 
-        System.out.println("Instances," +
-                           "Enumerator(uS),Stream(uS)," +
-                           "Enumerator(ns/inst),Stream(ns/inst)," +
-                           "Enumerator/Stream(%)");
-        for(int i=0; i<args.length; ++i) {
-            final long size = sizeOf(args[i]);
-            System.out.println(size + "," +
-                               (results[i].getLeft()/1000) + "," +
-                               (results[i].getRight()/1000) + "," +
-                               (results[i].getLeft()/size) + "," +
-                               (results[i].getRight()/size) + "," +
-                               percentage(results[i]));
-            assertTrue(results[i].getLeft() <=
-                       comparisonFactor(args[i], testKind) *
-                       results[i].getRight());
+            System.out.println("Instances," +
+                               "Enumerator(uS),Stream(uS)," +
+                               "Enumerator(ns/inst),Stream(ns/inst)," +
+                               "Enumerator/Stream(%)");
+            for(int i=0; i<args.length; ++i) {
+                final long size = sizeOf(args[i]);
+                System.out.println(size + "," +
+                                   (results[i].getLeft()/1000) + "," +
+                                   (results[i].getRight()/1000) + "," +
+                                   (results[i].getLeft()/size) + "," +
+                                   (results[i].getRight()/size) + "," +
+                                   percentage(results[i]));
+                assertTrue(results[i].getLeft() <=
+                           comparisonFactor(args[i], testKind) *
+                           results[i].getRight());
+            }
+        }
+        finally {
+            NanoTimer.doPrint = nanoPrint;
         }
     }
 
@@ -153,32 +170,39 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
             TimingTestKind testKind,
             Function<TArgs[],long[]> test) {
         System.out.println(testName);
-        
-        final TArgs[] args = scalabilityArgs(testKind);
-        final long[] results = test.apply(args);
-        assertEquals(args.length, results.length);
 
-        System.out.println("Instances," +
-                           "Enumerator(uS)," +
-                           "Enumerator(ns/inst)");
-        long sum = 0;
-        long count = 0;
-        for(int i=0; i<args.length; ++i) {
-            final long size = sizeOf(args[i]);
-            final long perInst = results[i]/size;
-            System.out.println(size + "," +
-                               (results[i]/1000) + "," +
-                               perInst);
-            if (i > Math.max(5, args.length/2)) {
-                final double avg = sum / count;
-                assertTrue(perInst <=
-                           scalabilityFactor(args[i], testKind) *
-                           avg);
+        final boolean nanoPrint = NanoTimer.doPrint;
+        NanoTimer.doPrint = doPrint;
+        try {
+            final TArgs[] args = scalabilityArgs(testKind);
+            final long[] results = test.apply(args);
+            assertEquals(args.length, results.length);
+
+            System.out.println("Instances," +
+                               "Enumerator(uS)," +
+                               "Enumerator(ns/inst)");
+            long sum = 0;
+            long count = 0;
+            for(int i=0; i<args.length; ++i) {
+                final long size = sizeOf(args[i]);
+                final long perInst = results[i]/size;
+                System.out.println(size + "," +
+                                   (results[i]/1000) + "," +
+                                   perInst);
+                if (i > Math.max(5, args.length/2)) {
+                    final double avg = sum / count;
+                    assertTrue(perInst <=
+                               scalabilityFactor(args[i], testKind) *
+                               avg);
+                }
+                sum += results[i];
+                count += size;
             }
-            sum += results[i];
-            count += size;
+        } finally {
+            NanoTimer.doPrint = nanoPrint;
         }
     }
+
 
     @Test
     @Category(TimingTests.class)
@@ -187,7 +211,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                 "scalabilityConstructionTest",
                 TimingTestKind.CONSTRUCTION,
                 args -> NanoTimer.nanos(this::testEnumeratorConstruction,
-                                        arg -> "scale construction " + 
+                                        arg -> "scale construction " +
                                                arg +
                                                " ...",
                                         args));
@@ -200,7 +224,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                 TimingTestKind.CONSUMPTION,
                 args -> NanoTimer.buildNanos(this::testEnumeratorConstruction,
                                              this::testEnumeratorConsumption,
-                                             arg -> "scale consumption " + 
+                                             arg -> "scale consumption " +
                                                     arg +
                                                     " ...",
                                              args));

@@ -32,7 +32,7 @@ class ArrayEnumerator<E> extends AbstractEnumerator<E> {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
-    
+
     @Override
     protected boolean internalHasNext() {
         return index < source.length;

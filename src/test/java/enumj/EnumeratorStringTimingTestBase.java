@@ -23,6 +23,8 @@
  */
 package enumj;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class EnumeratorStringTimingTestBase
@@ -40,5 +42,20 @@ public abstract class EnumeratorStringTimingTestBase
                 .rangeClosed(from, to, x -> x+step, Long::compare)
                 .filter(x -> x != from)
                 .map(builder);
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    protected final Map<Long, String[]> buffers = new HashMap<Long, String[]>();
+    
+    protected void buildBuffers(long[] sizes) {
+        buffers.clear();
+        for(long size: sizes) {
+            final String[] buffer = new String[(int)size];
+            for(int i=0; i<size; ++i) {
+                buffer[i] = StringTimingTestArgs.ALPHABET;
+            }
+            buffers.put(size, buffer);
+        }
     }
 }

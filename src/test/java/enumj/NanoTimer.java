@@ -29,8 +29,17 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class NanoTimer {
 
+    public static boolean doPrint = false; // set this to 'true' to see
+                                           // progress
+
+    private static void print(String msg) {
+        if (doPrint) {
+            System.out.println(msg);
+        }
+    }
+
     public static <R> long nanos(Supplier<R> action, Supplier<String> msg) {
-        System.out.println(msg.get());
+        print(msg.get());
         final long t0 = System.nanoTime();
         final R result = action.get();
         return System.nanoTime() - t0;
@@ -39,9 +48,9 @@ public class NanoTimer {
     public static <U,R> long buildNanos(Supplier<U> construction,
                                         Function<U,R> action,
                                         Supplier<String> msg) {
-        System.out.println("Construction: " + msg.get());
+        print("Construction: " + msg.get());
         final U input = construction.get();
-        System.out.println("Action: " + msg.get());
+        print("Action: " + msg.get());
         final long t0 = System.nanoTime();
         final R result = action.apply(input);
         return System.nanoTime() - t0;

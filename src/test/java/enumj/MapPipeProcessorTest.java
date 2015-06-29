@@ -90,12 +90,12 @@ public class MapPipeProcessorTest {
     }
 
     /**
-     * Test of nextOnNoValue method, of class MapPipeProcessor.
+     * Test of nextElementOnNoValue method, of class MapPipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertFalse(processor.nextOnNoValue());
+        assertFalse(processor.nextElementOnNoValue());
     }
 
     /**

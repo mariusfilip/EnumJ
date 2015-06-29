@@ -123,22 +123,25 @@ public class StringTimingTestArgs {
                 Optional.of(wideFlatMapCount),
                 Optional.empty());
     }
-    public static StringTimingTestArgs ofInnerFlatMap(long innerFlatMapCount) {
+    public static StringTimingTestArgs ofInnerFlatMap(long deepFlatMapCount,
+                                                      long innerFlatMapCount) {
         return new StringTimingTestArgs(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.empty(),
+                Optional.of(deepFlatMapCount),
                 Optional.empty(),
                 Optional.of(innerFlatMapCount));
     }
-    public static StringTimingTestArgs ofCubeFlatMap(long cubeFlatMapCount) {
+    public static StringTimingTestArgs ofCubeFlatMap(long deepFlatMapCount,
+                                                     long wideFlatMapCount,
+                                                     long innerFlatMapCount) {
         return new StringTimingTestArgs(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of(cubeFlatMapCount),
-                Optional.of(cubeFlatMapCount),
-                Optional.of(cubeFlatMapCount));
+                Optional.of(deepFlatMapCount),
+                Optional.of(wideFlatMapCount),
+                Optional.of(innerFlatMapCount));
     }
 }

@@ -195,7 +195,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.clear();
 
         if (!multiPipeline.isEmpty()) {
-            Iterator<AbstractPipeMultiProcessor> multiProcessorIterator =
+            final Iterator<AbstractPipeMultiProcessor> multiProcessorIterator =
                     multiPipeline.descendingIterator();
             AbstractPipeMultiProcessor multiProcessor;
             while(multiProcessorIterator.hasNext()) {
@@ -218,12 +218,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.set(pipeline.peekFirst());
         return true;
     }
-    protected boolean tryPipelineOut(Object                in,
-                                     AbstractPipeProcessor processor,
-                                     Nullable<E>           out,
-                                     Nullable<Boolean>     nextOnNoValue) {
+    protected boolean tryPipelineOut(
+            Object                in,
+            AbstractPipeProcessor processor,
+            Nullable<E>           out,
+            Nullable<Boolean>     nextElementOnNoValue) {
         out.clear();
-        nextOnNoValue.clear();
+        nextElementOnNoValue.clear();
 
         while(processor != null) {
             processor.process(in);
@@ -231,7 +232,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 in = processor.getValue();
             }
             else {
-                nextOnNoValue.set(processor.nextOnNoValue());
+                nextElementOnNoValue.set(
+                        processor.nextElementOnNoValue());
                 return false;
             }
             processor = processor.getNext();
@@ -248,10 +250,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (value.isPresent()) {
             return true;
         }
-        if (needValueForHasNext > 0) {
-            return tryGetNext();
-        }
-        return straightHasNext();
+        return needValueForHasNext > 0
+                ? tryGetNext()
+                : straightHasNext();
     }
     @Override
     protected E internalNext() {
@@ -283,7 +284,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected final boolean tryGetNext() {
         final Nullable<Object> in = Nullable.empty();
         final Nullable<AbstractPipeProcessor> processor = Nullable.empty();
-        final Nullable<Boolean> nextOnNoValue = Nullable.empty();
+        final Nullable<Boolean> nextElementOnNoValue = Nullable.empty();
         while(true) {
             if (!tryPipelineIn(in, processor)) {
                 return false;
@@ -291,10 +292,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             if (tryPipelineOut(in.get(),
                                processor.get(),
                                value,
-                               nextOnNoValue)) {
+                               nextElementOnNoValue)) {
                 return true;
             }
-            if (!nextOnNoValue.get()) {
+
+            if (nextElementOnNoValue.get()) {
+                // continue to next element
+            } else {
+                // continue to next source
                 dequeueSourceWithProcessors();
             }
         }

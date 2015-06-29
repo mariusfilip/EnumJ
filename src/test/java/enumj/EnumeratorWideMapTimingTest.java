@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class EnumeratorSquareMapTimingTest
+public class EnumeratorWideMapTimingTest
              extends EnumeratorStringTimingTestBase {
 
     public final static long[] sizes = {
@@ -35,15 +35,11 @@ public class EnumeratorSquareMapTimingTest
         10,
         100,
         1000,
-        2000,
-        3000,
-        4000,
-        5000,
-        6000,
-        7000,
-        8000,
-        9000,
-        10_000
+        10_000,
+        100_000,
+        1000_000,
+        10_000_000,
+        100_000_000
     };
 
     {
@@ -63,24 +59,16 @@ public class EnumeratorSquareMapTimingTest
     @Override
     protected Enumerator<String> transform(StringTimingTestArgs args,
                                            Enumerator<String> enumerator) {
-        final long count = args.deepMapCount.get();
-        for(long i=0; i<count; ++i) {
-            enumerator = enumerator.map(mapper);
-        }
-        return enumerator;
+        return enumerator.map(mapper);
     }
     @Override
     protected Stream<String> transform(StringTimingTestArgs args,
                                        Stream<String> stream) {
-        final long count = args.deepMapCount.get();
-        for(long i=0; i<count; ++i) {
-            stream = stream.map(mapper);
-        }
-        return stream;
+        return stream.map(mapper);
     }
     @Override
     protected long sizeOf(StringTimingTestArgs args) {
-        return args.wideMapCount.get() * args.deepMapCount.get();
+        return args.wideMapCount.get();
     }
 
     // ---------------------------------------------------------------------- //
@@ -88,25 +76,14 @@ public class EnumeratorSquareMapTimingTest
     @Override
     protected double comparisonFactor(StringTimingTestArgs args,
                                       TimingTestKind kind) {
-        switch(kind) {
-            case CONSTRUCTION:
-                return 200;
-            case CONSUMPTION:
-                return 200;
-            case BOTH:
-                return comparisonFactor(args, TimingTestKind.CONSTRUCTION)
-                       +
-                       comparisonFactor(args, TimingTestKind.CONSUMPTION);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return Integer.MAX_VALUE;
     }
     @Override
     protected StringTimingTestArgs[] comparisonArgs(TimingTestKind kind) {
         final StringTimingTestArgs[] args =
                 new StringTimingTestArgs[sizes.length];
         for(int i=0; i<args.length; ++i) {
-            args[i] = StringTimingTestArgs.ofSquareMap(sizes[i]);
+            args[i] = StringTimingTestArgs.ofWideMap(sizes[i]);
         }
         return args;
     }

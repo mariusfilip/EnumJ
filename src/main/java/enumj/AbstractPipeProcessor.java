@@ -46,9 +46,10 @@ abstract class AbstractPipeProcessor<T,R> {
     }
 
     protected AbstractPipeProcessor() {}
+
     abstract void process(T value);
     abstract boolean hasValue();
     abstract R getValue();
-    abstract boolean nextOnNoValue();
+    abstract boolean nextElementOnNoValue();
     abstract boolean hasNextNeedsValue();
 }

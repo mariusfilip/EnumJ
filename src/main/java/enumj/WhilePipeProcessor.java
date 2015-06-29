@@ -46,7 +46,7 @@ class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         return value;
     }
     @Override
-    protected boolean nextOnNoValue() {
+    protected boolean nextElementOnNoValue() {
         return false;
     }
     @Override

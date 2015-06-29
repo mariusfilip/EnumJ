@@ -108,12 +108,12 @@ public class FlatMapPipeProcessorTest {
     }
 
     /**
-     * Test of nextOnNoValue method, of class FlatMapPipeProcessor.
+     * Test of nextElementOnNoValue method, of class FlatMapPipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertTrue(processor.nextOnNoValue());
+        assertTrue(processor.nextElementOnNoValue());
     }
 
     /**

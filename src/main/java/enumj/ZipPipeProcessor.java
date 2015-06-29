@@ -67,7 +67,7 @@ final class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
         return value;
     }
     @Override
-    protected boolean nextOnNoValue() {
+    protected boolean nextElementOnNoValue() {
         return false;
     }
     @Override
