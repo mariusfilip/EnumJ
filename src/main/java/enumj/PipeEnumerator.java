@@ -33,11 +33,11 @@ import java.util.function.Predicate;
 
 class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected LinkedList<AbstractPipeProcessor> pipeline;
+    protected LinkedList<AbstractPipeProcessor>      pipeline;
     protected LinkedList<AbstractPipeMultiProcessor> multiPipeline;
-    protected LinkedList<PipeReference> sources;
-    protected Nullable<E> value;
-    protected long needValueForHasNext;
+    protected LinkedList<PipeReference>              sources;
+    protected Nullable<E>                            value;
+    protected long                                   needValueForHasNext;
 
     PipeEnumerator(Iterator<E> source) {
         this();
@@ -189,8 +189,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return pipeline.peekFirst();
     }
     protected boolean tryPipelineIn(
-            Nullable<Object>                in,
-            Nullable<AbstractPipeProcessor> processor) {
+            Out<Object>                in,
+            Out<AbstractPipeProcessor> processor) {
         in.clear();
         processor.clear();
 
@@ -222,7 +222,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             Object                in,
             AbstractPipeProcessor processor,
             Nullable<E>           out,
-            Nullable<Boolean>     nextElementOnNoValue) {
+            Out<Boolean>          nextElementOnNoValue) {
         out.clear();
         nextElementOnNoValue.clear();
 
@@ -282,9 +282,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return !sources.isEmpty();
     }
     protected final boolean tryGetNext() {
-        final Nullable<Object> in = Nullable.empty();
-        final Nullable<AbstractPipeProcessor> processor = Nullable.empty();
-        final Nullable<Boolean> nextElementOnNoValue = Nullable.empty();
+        final Out<Object> in = Out.empty();
+        final Out<AbstractPipeProcessor> processor = Out.empty();
+        final Out<Boolean> nextElementOnNoValue = Out.empty();
         while(true) {
             if (!tryPipelineIn(in, processor)) {
                 return false;

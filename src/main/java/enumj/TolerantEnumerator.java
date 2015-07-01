@@ -14,10 +14,10 @@ import java.util.function.Consumer;
  */
 final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
-    private Iterator<E> source;
+    private Iterator<E>                 source;
     private Consumer<? super Exception> handler;
 
-    private final int retries;
+    private final int         retries;
     private final Nullable<E> element;
 
     public TolerantEnumerator(Iterator<E> source,

@@ -30,9 +30,8 @@ final class FlatMapPipeProcessor<In,Out>
             extends AbstractPipeMultiProcessor<In,Out> {
 
     protected final Function<In,Iterator<Out>> mapper;
-    protected final Nullable<Out> value;
-    
-    protected Iterator<Out> iterator;
+    protected final Nullable<Out>              value;    
+    protected Iterator<Out>                    iterator;
 
     public FlatMapPipeProcessor(Function<In,Iterator<Out>> mapper) {
         this.mapper = mapper;

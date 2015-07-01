@@ -17,11 +17,11 @@ import java.util.function.IntUnaryOperator;
  */
 class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected IntSupplier indexSupplier;
+    protected IntSupplier      indexSupplier;
     protected IntUnaryOperator nextIndexSupplier;
 
     protected final List<Iterator<E>> sources;
-    protected final Nullable<E> value;
+    protected final Nullable<E>       value;
 
     public ChoiceEnumerator(IntSupplier indexSupplier,
                             IntUnaryOperator nextIndexSupplier,
@@ -45,7 +45,7 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         this.sources.add(first);
         this.sources.add(second);
         this.sources.addAll(rest);
-        
+
         this.value = Nullable.empty();
     }
 
