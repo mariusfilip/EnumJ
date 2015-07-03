@@ -7,39 +7,32 @@ package enumj;
 
 import java.util.function.Predicate;
 
-/**
- *
- * @author Marius Filip
- */
 class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected E value;
     protected Predicate<E> filter;
-    protected boolean keepGoing;
 
     public WhilePipeProcessor(Predicate<E> filter) {
         Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
-        this.keepGoing = true;
     }
 
     @Override
     protected void process(E value) {
-        if (keepGoing) {
+        if (this.filter != null) {
             this.value = value;
         }
     }
     @Override
     protected boolean hasValue() {
-        if (!keepGoing) {
+        if (filter == null) {
             return false;
         }
 
-        keepGoing = filter.test(value);
-        if (!keepGoing) {
+        if (!filter.test(value)) {
             value = null;
             filter = null;
         }
-        return keepGoing;
+        return filter != null;
     }
     @Override
     protected E getValue() {

@@ -112,27 +112,6 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         return source.map(fun);
     }
 
-    public static <E> Enumerator<E> limit(
-            Enumerator<E> source,
-            long          maxSize,
-            boolean       reversed) {
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        final MutableLong size = new MutableLong(0);
-        final Predicate<E> pred = e -> {
-            if (size.longValue() >= maxSize) {
-                return false;
-            }
-            size.setValue(1+size.longValue());
-            return true;
-        };
-        if (reversed) {
-            final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedTakeWhile(pred);
-        }
-        return source.takeWhile(pred);
-    }
-
     public static <E> Enumerator<E> peek(Enumerator<E>       source,
                                          Consumer<? super E> action,
                                          boolean             reversed) {

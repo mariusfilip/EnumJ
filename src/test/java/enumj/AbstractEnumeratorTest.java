@@ -139,19 +139,6 @@ public class AbstractEnumeratorTest {
     }
 
     @Test
-    public void testLimit() {
-        System.out.println("limit");
-        assertTrue(AbstractEnumerator
-                .limit(Enumerator.on(1, 2, 3, 4, 5),
-                       3,
-                       false)
-                .elementsEqual(Enumerator.on(1, 2, 3)));
-        assertTrue(Enumerator.on(1, 2, 3, 4, 5)
-                             .limit(3)
-                             .elementsEqual(Enumerator.on(1, 2, 3)));
-    }
-
-    @Test
     public void testPeek() {
         System.out.println("peek");
         final MutableInt x = new MutableInt(0);

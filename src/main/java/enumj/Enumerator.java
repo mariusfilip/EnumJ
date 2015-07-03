@@ -1210,7 +1210,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @exception IllegalArgumentException <code>maxSize</code> is negative
      */
     public default Enumerator<E> limit(long maxSize) {
-        return AbstractEnumerator.limit(this, maxSize, false);
+        return new PipeEnumerator(this).limit(maxSize);
     }
 
     /**

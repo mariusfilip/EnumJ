@@ -23,4 +23,39 @@
  */
 package enumj;
 
-public interface TimingTests {}
+class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+    protected E    value;
+    protected long size;
+
+    LimitPipeProcessor(long maxSize) {
+        Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        this.size = maxSize;
+    }
+
+    @Override
+    protected void process(E value) {
+        if (size > 0) {
+            this.value = value;
+        }
+    }
+    @Override
+    protected boolean hasValue() {
+        if (size > 0) {
+            --size;
+            return true;
+        }
+        return false;
+    }
+    @Override
+    protected E getValue() {
+        return value;
+    }
+    @Override
+    protected boolean nextElementOnNoValue() {
+        return false;
+    }
+    @Override
+    protected boolean hasNextNeedsValue() {
+        return true;
+    }
+}

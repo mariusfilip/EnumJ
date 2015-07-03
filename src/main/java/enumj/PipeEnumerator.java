@@ -327,6 +327,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return enqueueProcessor(new MapPipeProcessor(mapper));
     }
     @Override
+    public Enumerator<E> limit(long maxSize) {
+        return enqueueProcessor(new LimitPipeProcessor(maxSize));
+    }
+    @Override
     public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
         return enqueueProcessor(new WhilePipeProcessor(predicate));
     }
@@ -370,6 +374,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     public <X> PipeEnumerator<E> reversedMap(
             Function<? super X, ?> mapper) {
         return pushFrontProcessor(new MapPipeProcessor(mapper));
+    }
+    public Enumerator<E> reversedLimit(long maxSize) {
+        return pushFrontProcessor(new LimitPipeProcessor(maxSize));
     }
     public PipeEnumerator<E> reversedTakeWhile(Predicate<?> predicate) {
         return pushFrontProcessor(new WhilePipeProcessor(predicate));

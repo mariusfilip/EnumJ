@@ -124,7 +124,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
     }
 
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void streamComparisonConstructionTest() {
         streamComparisonProc(
                 "streamComparisonConstructionTest",
@@ -135,7 +135,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                         args));
     }
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void streamComparisonConsumptionTest() {
         streamComparisonProc(
                 "streamComparisonConsumptionTest",
@@ -148,7 +148,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                         args));
     }
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void streamComparisonBothTest() {
         streamComparisonProc(
                 "streamComparisonBothTest",
@@ -205,7 +205,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
 
 
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void scalabilityConstructionTest() {
         scalabilityProc(
                 "scalabilityConstructionTest",
@@ -217,7 +217,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                         args));
     }
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void scalabilityConsumptionTest() {
         scalabilityProc(
                 "scalabilityConsumptionTest",
@@ -230,7 +230,7 @@ public abstract class EnumeratorTimingTestBase<TArgs,E> {
                                              args));
     }
     @Test
-    @Category(TimingTests.class)
+    @Category(TimingTestCategory.class)
     public void scalabilityBothTest() {
         scalabilityProc(
                 "scalabilityBothTest",
