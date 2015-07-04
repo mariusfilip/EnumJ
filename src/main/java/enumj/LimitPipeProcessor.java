@@ -28,34 +28,32 @@ class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected long size;
 
     LimitPipeProcessor(long maxSize) {
+        super(false, true);
         Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
         this.size = maxSize;
     }
 
     @Override
-    protected void process(E value) {
+    protected void processInputValue(E value) {
         if (size > 0) {
             this.value = value;
         }
     }
     @Override
-    protected boolean hasValue() {
-        if (size > 0) {
-            --size;
-            return true;
-        }
-        return false;
+    protected boolean hasOutputValue() {
+        return size > 0;
     }
     @Override
-    protected E getValue() {
+    protected E retrieveOutputValue() {
+        --size;
         return value;
     }
     @Override
-    protected boolean nextElementOnNoValue() {
-        return false;
+    protected void clearOutputValue() {
+        value = null;
     }
     @Override
-    protected boolean hasNextNeedsValue() {
-        return true;
+    protected boolean isInactive() {
+        return size == 0;
     }
 }

@@ -60,43 +60,43 @@ public class WhilePipeProcessorTest {
     }
 
     /**
-     * Test of process method, of class WhilePipeProcessor.
+     * Test of processInputValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.process(1);
-        assertTrue(processor.hasValue());
+        processor.processInputValue(1);
+        assertTrue(processor.hasOutputValue());
     }
 
     /**
-     * Test of hasValue method, of class WhilePipeProcessor.
+     * Test of hasOutputValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.process(-1);
-        assertFalse(processor.hasValue());
-        assertFalse(processor.hasValue());
+        processor.processInputValue(-1);
+        assertFalse(processor.hasOutputValue());
+        assertFalse(processor.hasOutputValue());
     }
 
     /**
-     * Test of getValue method, of class WhilePipeProcessor.
+     * Test of getOutputValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.process(1);
-        assertEquals(1, processor.getValue().intValue());
+        processor.processInputValue(1);
+        assertEquals(1, processor.getOutputValue().intValue());
     }
 
     /**
-     * Test of nextElementOnNoValue method, of class WhilePipeProcessor.
+     * Test of sameSourceNextOnNoValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertFalse(processor.nextElementOnNoValue());
+        assertFalse(processor.sameSourceNextOnNoValue);
     }
 
     /**
@@ -105,6 +105,6 @@ public class WhilePipeProcessorTest {
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");
-        assertTrue(processor.hasNextNeedsValue());
+        assertTrue(processor.hasNextNeedsValue);
     }    
 }

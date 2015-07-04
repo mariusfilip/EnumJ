@@ -74,46 +74,46 @@ public class FlatMapPipeProcessorTest {
     }
 
     /**
-     * Test of process method, of class FlatMapPipeProcessor.
+     * Test of processInputValue method, of class FlatMapPipeProcessor.
      */
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor0.process(0);
-        assertFalse(processor0.hasValue());
-        processor.process(1);
-        assertTrue(processor.hasValue());
+        processor0.processInputValue(0);
+        assertFalse(processor0.hasOutputValue());
+        processor.processInputValue(1);
+        assertTrue(processor.hasOutputValue());
     }
 
     /**
-     * Test of hasValue method, of class FlatMapPipeProcessor.
+     * Test of hasOutputValue method, of class FlatMapPipeProcessor.
      */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        assertFalse(processor0.hasValue());
-        assertFalse(processor.hasValue());
+        assertFalse(processor0.hasOutputValue());
+        assertFalse(processor.hasOutputValue());
     }
 
     /**
-     * Test of getValue method, of class FlatMapPipeProcessor.
+     * Test of getOutputValue method, of class FlatMapPipeProcessor.
      */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.process(1);
-        assertEquals(1, processor.getValue().intValue());
-        assertEquals(2, processor.getValue().intValue());
-        assertEquals(3, processor.getValue().intValue());
+        processor.processInputValue(1);
+        assertEquals(1, processor.getOutputValue().intValue());
+        assertEquals(2, processor.getOutputValue().intValue());
+        assertEquals(3, processor.getOutputValue().intValue());
     }
 
     /**
-     * Test of nextElementOnNoValue method, of class FlatMapPipeProcessor.
+     * Test of sameSourceNextOnNoValue method, of class FlatMapPipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertTrue(processor.nextElementOnNoValue());
+        assertTrue(processor.sameSourceNextOnNoValue);
     }
 
     /**
@@ -122,6 +122,6 @@ public class FlatMapPipeProcessorTest {
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");
-        assertTrue(processor.hasNextNeedsValue());
+        assertTrue(processor.hasNextNeedsValue);
     }
 }

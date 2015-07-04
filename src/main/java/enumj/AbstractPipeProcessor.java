@@ -23,33 +23,160 @@
  */
 package enumj;
 
+/**
+ * Processing unit in the highly composable pipeline of {@link PipeEnumerator}.
+ *
+ * @param <T> Type of element being processed.
+ * @param <R> Type of processed result.
+ */
 abstract class AbstractPipeProcessor<T,R> {
+
+    /**
+     * Represents whether the pipeline should proceed to the next element
+     * of the same source when {@link #hasOutputValue()} returns <c>false<c>.
+     */
+    public final boolean sameSourceNextOnNoValue;
+    /**
+     * Represents whether the processor needs a value fed in when participating
+     * to the value of {@link PipeEnumerator#hasNext()}.
+     */
+    public final boolean hasNextNeedsValue;
+
+    /**
+     * Constructs a new instance of {@link AbstractPipeProcessor}.
+     *
+     * @param sameSourceNextOnNoValue Value for
+     *                             {@link #sameSourceNextOnNoValue}.
+     * @param hasNextNeedsValue Value for {@link #hasNextNeedsValue}.
+     */
+    protected AbstractPipeProcessor(boolean sameSourceNextOnNoValue,
+                                    boolean hasNextNeedsValue) {
+        this.sameSourceNextOnNoValue =
+                sameSourceNextOnNoValue;
+        this.hasNextNeedsValue = hasNextNeedsValue;
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    /**
+     * Link to the next processor in the pipeline.
+     */
     private AbstractPipeProcessor<? extends R,?> next;
+    /**
+     * Reference to a {@link PipeReference} instance which represents the
+     * source of data that is being processed starting with the current
+     * processor in the pipeline.
+     */
     private PipeReference reference;
 
+    /**
+     * Returns the value of {@link #next}.
+     * @return Value of {@link #next}.
+     */
     public AbstractPipeProcessor<? extends R,?> getNext() {
         return next;
     }
+    /**
+     * Sets the value of {@link #next}.
+     * <p>
+     * Once {@link next} is set to a non-null value, it cannot change.
+     * </p>
+     * @param next Value for {@link #next}.
+     */
     public void setNext(AbstractPipeProcessor<? extends R,?> next) {
-        assert next != null;
-        assert this.next == null;
-        this.next = next;
+        if (this.next == null) {
+            this.next = next;
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
+    /**
+     * Gets the value of {@link #reference}.
+     * @return Value of {@link #reference}.
+     */
     public PipeReference getReference() {
         return reference;
     }
+    /**
+     * Sets the value of {@link #reference}.
+     * <p>
+     * Once {@link #reference} is set to a non-null value, it cannot change.
+     * </p>
+     * @param reference Value for {@link #reference}.
+     */
     public void setReference(PipeReference reference) {
-        assert reference != null;
-        assert this.reference == null;
-        this.reference = reference;
+        if (this.reference == null) {
+            this.reference = reference;
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
-    protected AbstractPipeProcessor() {}
-
-    abstract void process(T value);
-    abstract boolean hasValue();
-    abstract R getValue();
-    abstract boolean nextElementOnNoValue();
-    abstract boolean hasNextNeedsValue();
+    /**
+     * Processes an input value and returns the result, if any.
+     * <p>
+     * The result of processing must be stored internally.
+     * </p>
+     * @param value Value to process.
+     */
+    abstract void    processInputValue(T value);
+    /**
+     * Gets whether processing was successful and the processor has a value
+     * to yield.
+     * <p>
+     * If {@link #hasOutputValue()} returns <c>false</c> than no internal
+     * storage of input or output should take place.
+     * </p>
+     * @return <c>true</c> if there is an output value to yield, <c>false</c>
+     * otherwise.
+     * @see #processInputValue(java.lang.Object)
+     * @see #getOutputValue()
+     */
+    abstract boolean hasOutputValue();
+    /**
+     * Gets the processed result produced by
+     * {@link #processInputValue(java.lang.Object)} and clears the internal
+     * storage of it.
+     * @return Processed result.
+     * @see #processInputValue(Object)
+     * @see #hasOutputValue()
+     * @see #retrieveOutputValue()
+     * @see #clearOutputValue()
+     */
+    final R getOutputValue() {
+        final R result = retrieveOutputValue();
+        clearOutputValue();
+        return result;
+    }
+    /**
+     * Retrieves the processed result produced by
+     * {@link #processInputValue(Object)}.
+     * @return Processed result.
+     * @see #getOutputValue()
+     * @see #clearOutputValue()
+     */
+    protected abstract R retrieveOutputValue();
+    /**
+     * Clears the processed result after being returned by
+     * {@link #retrieveOutputValue()}.
+     */
+    protected abstract void clearOutputValue();
+    /**
+     * Gets whether the processor does not process any more and the pipeline
+     * up to it should be discarded.
+     * <p>
+     * {@link #isInactive()} returning <c>true</c> is equivalent to the
+     * situation when no matter with what value
+     * {@link #processInputValue(Object)} will be called,
+     * {@link #hasOutputValue()} will always return <c>false</c>.
+     * </p>
+     * <p>
+     * Most processors have this function return <c>false</c> with the
+     * exception of <c>while</c> and <c>limit</c> compositions. These will turn
+     * completely inactive once a certain condition is met.
+     * </p>
+     * @return 
+     */
+    abstract boolean isInactive();
 }

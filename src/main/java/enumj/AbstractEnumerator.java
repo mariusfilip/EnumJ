@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableLong;
 
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
@@ -126,46 +124,5 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
             return pipe.reversedMap(actionMapper);
         }
         return source.map(actionMapper);
-    }
-
-    public static <E> Enumerator<E> skip(Enumerator<E> source,
-                                         long          n,
-                                         boolean       reversed) {
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
-        final MutableLong size = new MutableLong(0);
-        return skipWhile(
-                source,
-                e -> {
-                    if (size.longValue() >= n) {
-                        return false;
-                    }
-                    size.add(1);
-                    return true;
-                },
-                reversed);
-    }
-
-    public static <E> Enumerator<E> skipWhile(
-            Enumerator<E>        source,
-            Predicate<? super E> predicate,
-            boolean              reversed) {
-        Utils.ensureNonEnumerating(source);
-        final MutableBoolean skip = new MutableBoolean(true);
-        final Function<E,Nullable<E>> mapper = e -> {
-            if (skip.isTrue()) {
-                skip.setValue(predicate.test(e));
-            }
-            return skip.isTrue() ? Nullable.empty() : Nullable.of(e);
-        };
-        if (reversed) {
-            final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(e -> ((Nullable<E>)e).get())
-                       .reversedFilter(e -> ((Nullable<E>)e).isPresent())
-                       .reversedMap(mapper);
-        }
-        return source.map(mapper)
-                     .filter(e -> e.isPresent())
-                     .map(e -> e.get());
     }
 }

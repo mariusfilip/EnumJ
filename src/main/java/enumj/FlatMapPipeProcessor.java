@@ -31,9 +31,10 @@ final class FlatMapPipeProcessor<In,Out>
 
     protected final Function<In,Iterator<Out>> mapper;
     protected final Nullable<Out>              value;    
-    protected Iterator<Out>                    iterator;
+    protected       Iterator<Out>              iterator;
 
     public FlatMapPipeProcessor(Function<In,Iterator<Out>> mapper) {
+        super(true, true);
         this.mapper = mapper;
         this.iterator = null;
         this.value = Nullable.empty();
@@ -44,33 +45,35 @@ final class FlatMapPipeProcessor<In,Out>
         return !value.isPresent();
     }
     @Override
-    protected void process(In value) {
+    protected void processInputValue(In value) {
         this.iterator = this.mapper.apply(value);
         if (this.iterator != null && this.iterator.hasNext()) {
             this.value.set(this.iterator.next());
         } else {
+            this.iterator = null;
             this.value.clear();
         }
     }
     @Override
-    protected boolean hasValue() {
+    protected boolean hasOutputValue() {
         return value.isPresent();
     }
     @Override
-    protected Out getValue() {
-        final Out result = value.get();
+    protected Out retrieveOutputValue() {
+        return value.get();
+    }
+    @Override
+    protected void clearOutputValue() {
         value.clear();
         if (iterator.hasNext()) {
-            value.set(iterator.next());
+            value.set(this.iterator.next());
+        } else {
+            iterator = null;
+            value.clear();
         }
-        return result;
     }
     @Override
-    protected boolean nextElementOnNoValue() {
-        return true;
-    }
-    @Override
-    protected boolean hasNextNeedsValue() {
-        return true;
+    protected boolean isInactive() {
+        return false;
     }
 }

@@ -31,13 +31,12 @@ final class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
                                                               Optional<E>[]> {
 
     private final Iterator<E>[] iterators;
-    private final Optional<E>[] value;
-    private boolean hasAny;
+    private       Optional<E>[] value;
+    private       boolean       hasAny;
 
-    public ZipPipeProcessor(Iterator<E> first,
-                            List<Iterator<E>> rest) {
+    public ZipPipeProcessor(Iterator<E> first, List<Iterator<E>> rest) {
+        super(false, true);
         iterators = new Iterator[1+rest.size()];
-        value = new Optional[1+iterators.length];
         iterators[0] = first;
         for(int i=1; i<iterators.length; ++i) {
             iterators[i] = rest.get(i-1);
@@ -45,33 +44,37 @@ final class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
     }
 
     @Override
-    protected void process(Optional<E> value) {
-        this.value[0] = value;
+    protected void processInputValue(Optional<E> value) {
+        final Optional[] tuple = new Optional[1+iterators.length];
+        tuple[0] = value;
         hasAny = value.isPresent();
-        for(int i=0; i<this.iterators.length; ++i) {
-            if (this.iterators[i].hasNext()) {
+        for(int i=0; i<iterators.length; ++i) {
+            if (iterators[i].hasNext()) {
                 hasAny = true;
-                this.value[i+1] = Optional.of(this.iterators[i].next());
+                tuple[i+1] = Optional.of(iterators[i].next());
             }
             else {
-                this.value[i+1] = Optional.empty();
+                tuple[i+1] = Optional.empty();
             }
+        }
+        if (hasAny) {
+            this.value = tuple;
         }
     }
     @Override
-    protected boolean hasValue() {
-        return hasAny;
+    protected boolean hasOutputValue() {
+        return value != null;
     }
     @Override
-    protected Optional<E>[] getValue() {
+    protected Optional<E>[] retrieveOutputValue() {
         return value;
     }
     @Override
-    protected boolean nextElementOnNoValue() {
-        return false;
+    protected void clearOutputValue() {
+        value = null;
     }
     @Override
-    protected boolean hasNextNeedsValue() {
-        return true;
+    protected boolean isInactive() {
+        return false;
     }
 }

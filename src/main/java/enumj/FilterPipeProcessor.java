@@ -7,37 +7,38 @@ package enumj;
 
 import java.util.function.Predicate;
 
-/**
- *
- * @author Marius Filip
- */
 class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
-    protected E value;
+    protected E            value;
     protected Predicate<E> filter;
     
     public FilterPipeProcessor(Predicate<E> filter) {
+        super(true, true);
         Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
 
     @Override
-    protected void process(E value) {
+    protected void processInputValue(E value) {
         this.value = value;
     }
     @Override
-    protected boolean hasValue() {
-        return filter.test(value);
+    protected boolean hasOutputValue() {
+        if (filter.test(value)) {
+            return true;
+        }
+        value = null;
+        return false;
     }
     @Override
-    protected E getValue() {
+    protected E retrieveOutputValue() {
         return value;
     }
     @Override
-    protected boolean nextElementOnNoValue() {
-        return true;
+    protected void clearOutputValue() {
+        value = null;
     }
     @Override
-    protected boolean hasNextNeedsValue() {
-        return true;
+    protected boolean isInactive() {
+        return false;
     }
 }

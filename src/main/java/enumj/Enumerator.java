@@ -1736,7 +1736,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the truncated enumerator
      */
     public default Enumerator<E> skip(long n) {
-        return AbstractEnumerator.skip(this, n, false);
+        return new PipeEnumerator(this).skip(n);
     }
 
     /**
@@ -1750,7 +1750,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the enumerator with front elements dropped
      */
     public default Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        return AbstractEnumerator.skipWhile(this, predicate, false);
+        return new PipeEnumerator(this).skipWhile(predicate);
     }
 
     /**

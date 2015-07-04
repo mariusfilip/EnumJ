@@ -10,30 +10,31 @@ import java.util.function.Function;
 final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
 
     protected Function<In,Out> mapper;
-    protected Out value;
+    protected Out              value;
 
     public MapPipeProcessor(Function<In,Out> functor) {
+        super(false, false);
         this.mapper = functor;
     }
 
     @Override
-    protected void process(In value) {
+    protected void processInputValue(In value) {
         this.value = mapper.apply(value);
     }
     @Override
-    protected boolean hasValue() {
+    protected boolean hasOutputValue() {
         return true;
     }
     @Override
-    protected Out getValue() {
+    protected Out retrieveOutputValue() {
         return value;
     }
     @Override
-    protected boolean nextElementOnNoValue() {
-        return false;
+    protected void clearOutputValue() {
+        value = null;
     }
     @Override
-    protected boolean hasNextNeedsValue() {
+    protected boolean isInactive() {
         return false;
     }
 }

@@ -153,30 +153,4 @@ public class AbstractEnumeratorTest {
                   .forEach(y -> {});
         assertEquals(2*(1+2+3+4+5), x.intValue());        
     }
-
-    @Test
-    public void testSkip() {
-        System.out.println("skip");
-        assertTrue(AbstractEnumerator
-                .skip(Enumerator.on(1, 2, 3, 4, 5),
-                      2,
-                      false)
-                .elementsEqual(Enumerator.on(3, 4, 5)));
-        assertTrue(Enumerable.on(1, 2, 3, 4, 5)
-                             .skip(2)
-                             .elementsEqual(Enumerable.on(3, 4, 5)));
-    }
-
-    @Test
-    public void testSkipWhile() {
-        System.out.println("skipWhile");
-        assertTrue(AbstractEnumerator
-                .skipWhile(Enumerator.on(1, 2, 3, 4, 5),
-                           x -> x < 4,
-                           false)
-                .elementsEqual(Enumerator.on(4, 5)));
-        assertTrue(Enumerable.on(1, 2, 3, 4, 5)
-                             .skipWhile(x -> x < 4)
-                             .elementsEqual(Enumerable.on(4, 5)));
-    }
 }

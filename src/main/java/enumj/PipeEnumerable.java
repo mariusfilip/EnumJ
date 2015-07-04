@@ -187,7 +187,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
 
     static <E> Enumerable<E> skip(Enumerable<E> enumerable, long n) {
         return of(enumerable,
-                  in -> AbstractEnumerator.skip(in, n, true),
+                  in -> ((PipeEnumerator)in).reversedSkip(n),
                   () -> false);
     }
 
@@ -195,7 +195,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             Predicate<? super E> predicate) {
         return of(enumerable,
-                  in -> AbstractEnumerator.skipWhile(in, predicate, true),
+                  in -> ((PipeEnumerator)in).reversedSkipWhile(predicate),
                   () -> false);
     }
 

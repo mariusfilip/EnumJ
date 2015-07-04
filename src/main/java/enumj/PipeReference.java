@@ -27,20 +27,20 @@ import java.util.Iterator;
 
 class PipeReference<E> extends IteratorEnumerator<E> {
 
-    private AbstractPipeProcessor<?,?> reference;
+    private AbstractPipeProcessor<?,?> firstProcessor;
 
     protected PipeReference(Iterator<E> source) {
         super(source);
     }
 
-    AbstractPipeProcessor<?,?> getReference() {
-        return this.reference;
+    AbstractPipeProcessor<?,?> getFirstProcessor() {
+        return this.firstProcessor;
     }
-    void setReferenceIfNull(AbstractPipeProcessor<?,?> reference) {
-        if (this.reference == null) {
-            reference.setReference(this);
-            this.reference = reference;
+    void setFirstProcessorIfNone(AbstractPipeProcessor<?,?> processor) {
+        if (this.firstProcessor == null) {
+            this.firstProcessor = processor;
         }
+        processor.setReference(this);
     }
 
     static <T> PipeReference<T> of(Iterator<T> source) {

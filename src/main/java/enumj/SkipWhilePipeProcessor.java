@@ -23,11 +23,42 @@
  */
 package enumj;
 
-abstract class AbstractPipeMultiProcessor<T,R>
-               extends AbstractPipeProcessor<T,R> {    
-    protected AbstractPipeMultiProcessor(boolean nextElementOnNoValue,
-                                         boolean hasNextNeedsValue) {
-        super(nextElementOnNoValue, hasNextNeedsValue);
+import java.util.function.Predicate;
+
+class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+    protected E            value;
+    protected Predicate<E> filter;
+    
+    public SkipWhilePipeProcessor(Predicate<E> filter) {
+        super(true, true);
+        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
+        this.filter = filter;
     }
-    abstract boolean needsValue();
+
+    @Override
+    protected void processInputValue(E value) {
+        if (this.filter == null) {
+            this.value = value;
+        }
+        else if(!this.filter.test(value)) {
+            this.value = value;
+            this.filter = null;
+        }
+    }
+    @Override
+    protected boolean hasOutputValue() {
+        return filter == null;
+    }
+    @Override
+    protected E retrieveOutputValue() {
+        return value;
+    }
+    @Override
+    protected void clearOutputValue() {
+        value = null;
+    }
+    @Override
+    protected boolean isInactive() {
+        return false;
+    }
 }

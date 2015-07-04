@@ -60,42 +60,42 @@ public class MapPipeProcessorTest {
     }
 
     /**
-     * Test of process method, of class MapPipeProcessor.
+     * Test of processInputValue method, of class MapPipeProcessor.
      */
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.process(1);
-        assertTrue(processor.hasValue());
+        processor.processInputValue(1);
+        assertTrue(processor.hasOutputValue());
     }
 
     /**
-     * Test of hasValue method, of class MapPipeProcessor.
+     * Test of hasOutputValue method, of class MapPipeProcessor.
      */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.process(1);
-        assertTrue(processor.hasValue());
+        processor.processInputValue(1);
+        assertTrue(processor.hasOutputValue());
     }
 
     /**
-     * Test of getValue method, of class MapPipeProcessor.
+     * Test of getOutputValue method, of class MapPipeProcessor.
      */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.process(1);
-        assertEquals(2, processor.getValue().intValue());
+        processor.processInputValue(1);
+        assertEquals(2, processor.getOutputValue().intValue());
     }
 
     /**
-     * Test of nextElementOnNoValue method, of class MapPipeProcessor.
+     * Test of sameSourceNextOnNoValue method, of class MapPipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertFalse(processor.nextElementOnNoValue());
+        assertFalse(processor.sameSourceNextOnNoValue);
     }
 
     /**
@@ -104,6 +104,6 @@ public class MapPipeProcessorTest {
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");
-        assertFalse(processor.hasNextNeedsValue());
+        assertFalse(processor.hasNextNeedsValue);
     }
 }

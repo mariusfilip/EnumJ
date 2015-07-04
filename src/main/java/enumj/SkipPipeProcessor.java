@@ -23,11 +23,40 @@
  */
 package enumj;
 
-abstract class AbstractPipeMultiProcessor<T,R>
-               extends AbstractPipeProcessor<T,R> {    
-    protected AbstractPipeMultiProcessor(boolean nextElementOnNoValue,
-                                         boolean hasNextNeedsValue) {
-        super(nextElementOnNoValue, hasNextNeedsValue);
+class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+    protected E    value;
+    protected long n;
+    
+    public SkipPipeProcessor(long n) {
+        super(true, true);
+        Utils.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        this.n = n;
     }
-    abstract boolean needsValue();
+
+    @Override
+    protected void processInputValue(E value) {
+        if (n == 0) {
+            this.value = value;
+        }
+    }
+    @Override
+    protected boolean hasOutputValue() {
+        if (n == 0) {
+            return true;
+        }
+        --n;
+        return false;
+    }
+    @Override
+    protected E retrieveOutputValue() {
+        return value;
+    }
+    @Override
+    protected void clearOutputValue() {
+        value = null;
+    }
+    @Override
+    protected boolean isInactive() {
+        return false;
+    }
 }
