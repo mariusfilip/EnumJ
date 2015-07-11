@@ -75,9 +75,9 @@ public class EnumeratorDeepMapTimingTest
                                       TimingTestKind kind) {
         switch(kind) {
             case CONSTRUCTION:
-                return 200;
+                return 400;
             case CONSUMPTION:
-                return 200;
+                return 400;
             case BOTH:
                 return comparisonFactor(args, TimingTestKind.CONSTRUCTION)
                        +

@@ -1,5 +1,3 @@
-package enumj;
-
 /*
  * The MIT License
  *
@@ -23,12 +21,12 @@ package enumj;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package enumj;
 
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class EnumeratorSquareLimitTimingTest
+public class EnumeratorWideFilterTimingLanguage
              extends EnumeratorStringTimingTestBase {
 
     public final static long[] sizes = {
@@ -36,15 +34,11 @@ public class EnumeratorSquareLimitTimingTest
         10,
         100,
         1000,
-        2000,
-        3000,
-        4000,
-        5000,
-        6000,
-        7000,
-        8000,
-        9000,
-        10_000
+        10_000,
+        100_000,
+        1000_000,
+        10_000_000,
+        100_000_000
     };
 
     {
@@ -53,33 +47,25 @@ public class EnumeratorSquareLimitTimingTest
 
     @Override
     protected Enumerator<String> enumerator(StringTimingTestArgs args) {
-        return Enumerator.of(buffers.get(args.wideLimitCount.get()));
+        return Enumerator.of(buffers.get(args.wideFilterCount.get()));
     }
     @Override
     protected Stream<String> stream(StringTimingTestArgs args) {
-        return Arrays.stream(buffers.get(args.wideLimitCount.get()));
+        return Arrays.stream(buffers.get(args.wideFilterCount.get()));
     }
     @Override
     protected Enumerator<String> transform(StringTimingTestArgs args,
                                            Enumerator<String> enumerator) {
-        final long count = args.deepLimitCount.get();
-        for(long i=0; i<count; ++i) {
-            enumerator = enumerator.limit(Long.MAX_VALUE);
-        }
-        return enumerator;
+        return enumerator.limit(Long.MAX_VALUE);
     }
     @Override
     protected Stream<String> transform(StringTimingTestArgs args,
                                        Stream<String> stream) {
-        final long count = args.deepLimitCount.get();
-        for(long i=0; i<count; ++i) {
-            stream = stream.limit(Long.MAX_VALUE);
-        }
-        return stream;
+        return stream.limit(Long.MAX_VALUE);
     }
     @Override
     protected long sizeOf(StringTimingTestArgs args) {
-        return args.wideLimitCount.get() * args.deepLimitCount.get();
+        return args.wideFilterCount.get();
     }
 
     // ---------------------------------------------------------------------- //
@@ -87,25 +73,14 @@ public class EnumeratorSquareLimitTimingTest
     @Override
     protected double comparisonFactor(StringTimingTestArgs args,
                                       TimingTestKind kind) {
-        switch(kind) {
-            case CONSTRUCTION:
-                return 200;
-            case CONSUMPTION:
-                return 200;
-            case BOTH:
-                return comparisonFactor(args, TimingTestKind.CONSTRUCTION)
-                       +
-                       comparisonFactor(args, TimingTestKind.CONSUMPTION);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return Integer.MAX_VALUE;
     }
     @Override
     protected StringTimingTestArgs[] comparisonArgs(TimingTestKind kind) {
         final StringTimingTestArgs[] args =
                 new StringTimingTestArgs[sizes.length];
         for(int i=0; i<args.length; ++i) {
-            args[i] = StringTimingTestArgs.ofSquareLimit(sizes[i]);
+            args[i] = StringTimingTestArgs.ofWideFilter(sizes[i]);
         }
         return args;
     }

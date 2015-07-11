@@ -406,7 +406,7 @@ public interface Enumerable<E> extends Iterable<E> {
 
     public default <T>
                    Enumerable<Pair<E, T>>
-                   zipBoth(Enumerable<E> elements) {
+                   zipBoth(Enumerable<T> elements) {
         return zipAll((Iterable<E>)elements)
                .takeWhile(arr -> arr[0].isPresent() && arr[1].isPresent())
                .map(arr -> Pair.of(arr[0].get(), ((Optional<T>)arr[1]).get()));

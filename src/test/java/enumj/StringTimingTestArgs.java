@@ -54,8 +54,12 @@ public class StringTimingTestArgs {
     public final Optional<Long> deepFlatMapCount;
     public final Optional<Long> wideFlatMapCount;
     public final Optional<Long> innerFlatMapCount;
+    public final Optional<Long> deepFilterCount;
+    public final Optional<Long> wideFilterCount;
     public final Optional<Long> deepLimitCount;
     public final Optional<Long> wideLimitCount;
+    public final Optional<Long> deepPeekCount;
+    public final Optional<Long> widePeekCount;
 
     private StringTimingTestArgs(Optional<Long> concatCount,
                                  Optional<Long> deepMapCount,
@@ -63,21 +67,33 @@ public class StringTimingTestArgs {
                                  Optional<Long> deepFlatMapCount,
                                  Optional<Long> wideFlatMapCount,
                                  Optional<Long> innerFlatMapCount,
+                                 Optional<Long> deepFilterCount,
+                                 Optional<Long> wideFilterCount,
                                  Optional<Long> deepLimitCount,
-                                 Optional<Long> wideLimitCount) {
+                                 Optional<Long> wideLimitCount,
+                                 Optional<Long> deepPeekCount,
+                                 Optional<Long> widePeekCount) {
         this.concatCount = concatCount;
         this.deepMapCount = deepMapCount;
         this.wideMapCount = wideMapCount;
         this.deepFlatMapCount = deepFlatMapCount;
         this.wideFlatMapCount = wideFlatMapCount;
         this.innerFlatMapCount = innerFlatMapCount;
+        this.deepFilterCount = deepFilterCount;
+        this.wideFilterCount = wideFilterCount;
         this.deepLimitCount = deepLimitCount;
         this.wideLimitCount = wideLimitCount;
+        this.deepPeekCount = deepPeekCount;
+        this.widePeekCount = widePeekCount;
     }
 
     public static StringTimingTestArgs ofConcat(long concatCount) {
         return new StringTimingTestArgs(
                 Optional.of(concatCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
@@ -95,6 +111,10 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofWideMap(long wideMapCount) {
@@ -102,6 +122,10 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(wideMapCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
@@ -117,6 +141,10 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofDeepFlatMap(long deepFlatMapCount) {
@@ -125,6 +153,10 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(deepFlatMapCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
@@ -139,6 +171,10 @@ public class StringTimingTestArgs {
                 Optional.of(wideFlatMapCount),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofInnerFlatMap(long deepFlatMapCount,
@@ -150,6 +186,10 @@ public class StringTimingTestArgs {
                 Optional.of(deepFlatMapCount),
                 Optional.empty(),
                 Optional.of(innerFlatMapCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty());
     }
@@ -164,6 +204,55 @@ public class StringTimingTestArgs {
                 Optional.of(wideFlatMapCount),
                 Optional.of(innerFlatMapCount),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofDeepFilter(long deepFilterCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(deepFilterCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofWideFilter(long wideFilterCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(wideFilterCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofSquareFilter(long squareFilterCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(squareFilterCount),
+                Optional.of(squareFilterCount),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofDeepLimit(long deepLimitCount) {
@@ -174,7 +263,11 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.of(deepLimitCount),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
     }
     public static StringTimingTestArgs ofWideLimit(long wideLimitCount) {
@@ -186,7 +279,11 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of(wideLimitCount));
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(wideLimitCount),
+                Optional.empty(),
+                Optional.empty());
     }
     public static StringTimingTestArgs ofSquareLimit(long squareLimitCount) {
         return new StringTimingTestArgs(
@@ -196,7 +293,56 @@ public class StringTimingTestArgs {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.of(squareLimitCount),
-                Optional.of(squareLimitCount));
+                Optional.of(squareLimitCount),
+                Optional.empty(),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofDeepPeek(long deepPeekCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(deepPeekCount),
+                Optional.empty());
+    }
+    public static StringTimingTestArgs ofWidePeek(long widePeekCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(widePeekCount));
+    }
+    public static StringTimingTestArgs ofSquarePeek(long squarePeekCount) {
+        return new StringTimingTestArgs(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(squarePeekCount),
+                Optional.of(squarePeekCount));
     }
 }

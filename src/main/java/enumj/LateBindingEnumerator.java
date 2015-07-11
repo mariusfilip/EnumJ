@@ -30,8 +30,6 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
 
-    LateBindingEnumerator() {}
-
     @Override
     protected boolean internalHasNext() {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
