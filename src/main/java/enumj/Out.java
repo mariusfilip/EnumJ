@@ -23,6 +23,8 @@
  */
 package enumj;
 
+import java.util.NoSuchElementException;
+
 /**
  * Encapsulates output method parameters.
  *
@@ -42,14 +44,14 @@ public final class Out<T> {
      */
     public T get() {
         if (!this.hasValue) {
-            throw new UnsupportedOperationException();
+            throw new NoSuchElementException();
         }
         return this.value;
     }
-    
+
     /**
      * Sets the value of the output parameter.
-     * 
+     *
      * @param value Value of the output parameter.
      */
     public void set(T value) {
@@ -59,13 +61,13 @@ public final class Out<T> {
 
     /**
      * Gets whether an output value has been set.
-     * 
+     *
      * @return <code>true</code>
      */
     public boolean hasValue() {
         return this.hasValue;
     }
-    
+
     /**
      * Empties the output parameter.
      */
