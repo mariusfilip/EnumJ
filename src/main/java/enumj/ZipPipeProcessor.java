@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-final class ZipPipeProcessor<E> extends AbstractPipeProcessor<Optional<E>,
-                                                              Optional<E>[]> {
+final class ZipPipeProcessor<E>
+            extends AbstractPipeProcessor<Optional<E>,Optional<E>[]> {
 
     private final Iterator<E>[] iterators;
     private       Optional<E>[] value;
