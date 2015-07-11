@@ -20,10 +20,11 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     private final int         retries;
     private final Nullable<E> element;
 
-    public TolerantEnumerator(Iterator<E> source,
+    public TolerantEnumerator(Enumerator<E> source,
                               Consumer<? super Exception> handler,
                               int retries) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNonEnumerating(source);
         Utils.ensureNotNull(handler, Messages.NULL_ENUMERATOR_HANDLER);
         Utils.ensureNonNegative(retries, Messages.NEGATIVE_RETRIES);
 

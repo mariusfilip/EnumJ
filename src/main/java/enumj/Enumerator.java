@@ -516,7 +516,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the infinite enumerator of {@link Optional} instances
      */
     public default Enumerator<Optional<E>> asOptional() {
-        Utils.ensureNonEnumerating(this);
         return map(e -> Optional.of(e))
                 .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
     }
@@ -604,7 +603,6 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default Enumerator<E> asTolerant(
             Consumer<? super Exception> handler) {
-        Utils.ensureNonEnumerating(this);
         return new TolerantEnumerator(this, handler, 0);
     }
 
@@ -635,7 +633,6 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<E> asTolerant(
             Consumer<? super Exception> handler,
             int retries) {
-        Utils.ensureNonEnumerating(this);
         return new TolerantEnumerator(this, handler, retries);
     }
 
@@ -1076,7 +1073,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the filtered enumerator
      */
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         return new PipeEnumerator(this).filter(predicate);
     }
@@ -1116,7 +1112,6 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
         return new PipeEnumerator(this).flatMap(mapper);
     }
@@ -1248,7 +1243,6 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default <R> Enumerator<R> map(
             Function<? super E, ? extends R> mapper) {
-        Utils.ensureNonEnumerating(this);
         return new PipeEnumerator(this).map(mapper);
     }
 
@@ -1349,7 +1343,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Iterator<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
         return PipeEnumerator.of((Iterator<E>)elements).concat(this);
     }
 
@@ -1365,7 +1358,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Iterable<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
         return prepend(of(elements));
     }
 
@@ -1382,7 +1374,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Enumeration<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
         return prepend(of(elements));
     }
 
@@ -1399,7 +1390,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Stream<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
         return prepend(of(elements));
     }
 
@@ -1416,7 +1406,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Spliterator<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
         return prepend(of(elements));
     }
 
@@ -1438,8 +1427,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Supplier<Optional<E>> elements) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(elements, Messages.NULL_ENUMERATOR_SOURCE);
         return prepend(of(elements));
     }
 
@@ -1458,7 +1445,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the prepended enumerator
      */
     public default Enumerator<E> prependOn(E... elements) {
-        Utils.ensureNonEnumerating(this);
         return prepend(on(elements));
     }
 
@@ -1522,10 +1508,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param endExclusive the exclusive upper bound of the range
      * @return the enumerator covering the range
      */
-    public static Enumerator<Integer> rangeInt(int startInclusive,
-                                               int endExclusive) {
-        return range(startInclusive, endExclusive,
-                     i -> i+1, Comparator.comparingInt(n -> n));
+    public static IntRangeEnumerator rangeInt(int startInclusive,
+                                              int endExclusive) {
+        return new IntRangeEnumerator(startInclusive, endExclusive, false);
     }
 
     /**
@@ -1536,10 +1521,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param endInclusive the inclusive upper bound of the range
      * @return the enumerator covering the range
      */
-    public static Enumerator<Integer> rangeIntClosed(int startInclusive,
-                                                     int endInclusive) {
-        return rangeClosed(startInclusive, endInclusive,
-                           i -> i+1, Comparator.comparingInt(i -> i));
+    public static IntRangeEnumerator rangeIntClosed(int startInclusive,
+                                                    int endInclusive) {
+        return new IntRangeEnumerator(startInclusive, endInclusive, true);
     }
 
     /**
@@ -1550,10 +1534,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param endExclusive the exclusive upper bound of the range
      * @return the enumerator covering the range
      */
-    public static Enumerator<Long> rangeLong(long startInclusive,
-                                             long endExclusive) {
-        return range(startInclusive, endExclusive,
-                     i -> i+1, Comparator.comparingLong(i -> i));
+    public static LongRangeEnumerator rangeLong(long startInclusive,
+                                                long endExclusive) {
+        return new LongRangeEnumerator(startInclusive, endExclusive, false);
     }
 
     /**
@@ -1564,10 +1547,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param endInclusive the inclusive upper bound of the range
      * @return the enumerator covering the range
      */
-    public static Enumerator<Long> rangeLongClosed(long startInclusive,
-                                                   long endInclusive) {
-        return rangeClosed(startInclusive, endInclusive,
-                           i -> i+1, Comparator.comparingLong(i -> i));
+    public static LongRangeEnumerator rangeLongClosed(long startInclusive,
+                                                      long endInclusive) {
+        return new LongRangeEnumerator(startInclusive, endInclusive, true);
     }
 
     /**
@@ -1711,14 +1693,14 @@ public interface Enumerator<E> extends Iterator<E> {
      *
      * @return the single element
      * @exception InputMismatchException the current enumerator has
-     * <code>0</code> or more than <code>1</code> element
+     * <code>0</code> or more than <code>1</code> elements
      */
     public default E single() {
         if (!hasNext()) {
             throw new InputMismatchException(
                     Messages.NO_SINGLE_ENUMERATOR_ELEMENT);
         }
-        E result = next();
+        final E result = next();
         if (hasNext()) {
             throw new InputMismatchException(
                     Messages.NO_SINGLE_ENUMERATOR_ELEMENT);
@@ -1810,7 +1792,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> takeWhile(Predicate<? super E> predicate) {
-        Utils.ensureNonEnumerating(this);
         return new PipeEnumerator(this).takeWhile(predicate);
     }
 
@@ -2082,7 +2063,6 @@ public interface Enumerator<E> extends Iterator<E> {
     public default <T>
                    Enumerator<Pair<Optional<E>, T>>
                    zipRight(Iterator<T> elements) {
-        Utils.ensureNonEnumerating(this);
         return zipAll((Iterator<E>)elements)
                .takeWhile(arr -> arr[1].isPresent())
                .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));
@@ -2102,7 +2082,6 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<Optional<E>[]>
                    zipAll(Iterator<? extends E> first,
                           Iterator<? extends E>... rest) {
-        Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(first, Messages.NULL_ITERATOR);
         for(Iterator<?> it: rest) {
             Utils.ensureNotNull(it, Messages.NULL_ITERATOR);

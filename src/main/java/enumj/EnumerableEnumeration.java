@@ -8,10 +8,6 @@ package enumj;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-/**
- *
- * @author Marius Filip
- */
 final class EnumerableEnumeration<E> implements Enumeration<E> {
 
     private Iterator<E> source;

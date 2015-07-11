@@ -117,7 +117,7 @@ public class PipeEnumeratorTest {
     }
 
     class ThrowingMultiLastPipeEnumerator<E> extends PipeEnumerator<E> {
-        public ThrowingMultiLastPipeEnumerator(Iterator<E> source) {
+        public ThrowingMultiLastPipeEnumerator(Enumerator<E> source) {
             super(source);
         }
         @Override
@@ -128,7 +128,7 @@ public class PipeEnumeratorTest {
     }
 
     class ThrowingFirstPipeEnumerator<E> extends PipeEnumerator<E> {
-        public ThrowingFirstPipeEnumerator(Iterator<E> source) {
+        public ThrowingFirstPipeEnumerator(Enumerator<E> source) {
             super(source);
         }
         @Override
@@ -139,7 +139,7 @@ public class PipeEnumeratorTest {
     }
 
     class ThrowingMultiFirstPipeEnumerator<E> extends PipeEnumerator<E> {
-        public ThrowingMultiFirstPipeEnumerator(Iterator<E> source) {
+        public ThrowingMultiFirstPipeEnumerator(Enumerator<E> source) {
             super(source);
         }
         @Override

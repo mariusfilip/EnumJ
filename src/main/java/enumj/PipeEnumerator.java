@@ -39,9 +39,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected Nullable<E>                            value;
     protected long                                   needValueForHasNext;
 
-    PipeEnumerator(Iterator<E> source) {
+    PipeEnumerator(Enumerator<E> source) {
         this();
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNonEnumerating(source);
         PipeReference<?> ref = PipeReference.of(source);
         this.sources.add(ref);
     }
@@ -56,7 +57,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return (source instanceof PipeEnumerator)
                ? (PipeEnumerator<T>)source
-               : new PipeEnumerator(source);
+               : new PipeEnumerator(Enumerator.of(source));
     }
 
     // ---------------------------------------------------------------------- //
