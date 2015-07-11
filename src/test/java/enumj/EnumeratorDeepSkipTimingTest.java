@@ -1,5 +1,3 @@
-package enumj;
-
 /*
  * The MIT License
  *
@@ -23,62 +21,51 @@ package enumj;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package enumj;
 
-import java.util.Arrays;
+import static enumj.EnumeratorStringTimingTestBase.oneDimArgs;
 import java.util.stream.Stream;
 
-public class EnumeratorSquareLimitTimingTest
+public class EnumeratorDeepSkipTimingTest
              extends EnumeratorStringTimingTestBase {
 
-    public final static long[] sizes = {
-        1,
-        10,
-        100,
-        1000,
-        2000,
-        3000,
-        4000,
-        5000,
-        6000,
-        7000,
-        8000,
-        9000,
-        10_000
-    };
-
-    {
-        buildBuffers(sizes);
-    }
+    public static final long STREAM_DEEP_SKIP_COUNT = 10_000;
+    public static final long STREAM_DEEP_SKIP_STEP = 1000;
+    public static final long ENUM_DEEP_SKIP_COUNT = 1000_000;
+    public static final long ENUM_DEEP_SKIP_STEP = 100_000;
+    public static final long LARGE_DEEP_SKIP_COUNT = 10_000_000;
 
     @Override
     protected Enumerator<String> enumerator(StringTimingTestArgs args) {
-        return Enumerator.of(buffers.get(args.wideLimitCount.get()));
+        return Enumerator.on(StringTimingTestArgs.ALPHABET);
     }
     @Override
     protected Stream<String> stream(StringTimingTestArgs args) {
-        return Arrays.stream(buffers.get(args.wideLimitCount.get()));
+        return Stream.of(StringTimingTestArgs.ALPHABET);
     }
     @Override
     protected Enumerator<String> transform(StringTimingTestArgs args,
                                            Enumerator<String> enumerator) {
-        final long count = args.deepLimitCount.get();
+        final long count = args.deepSkipCount.get();
         for(long i=0; i<count; ++i) {
-            enumerator = enumerator.limit(Long.MAX_VALUE);
+            enumerator = enumerator.skip(1); // need to use '1' instead of '0'
+                                             // to avoid short-cutting
         }
         return enumerator;
     }
     @Override
     protected Stream<String> transform(StringTimingTestArgs args,
                                        Stream<String> stream) {
-        final long count = args.deepLimitCount.get();
+        final long count = args.deepSkipCount.get();
         for(long i=0; i<count; ++i) {
-            stream = stream.limit(Long.MAX_VALUE);
+            stream = stream.skip(1); // need to use '1' instead of '0'
+                                     // to avoid short-cutting
         }
         return stream;
     }
     @Override
     protected long sizeOf(StringTimingTestArgs args) {
-        return args.wideLimitCount.get() * args.deepLimitCount.get();
+        return args.deepSkipCount.get();
     }
 
     // ---------------------------------------------------------------------- //
@@ -88,9 +75,9 @@ public class EnumeratorSquareLimitTimingTest
                                       TimingTestKind kind) {
         switch(kind) {
             case CONSTRUCTION:
-                return 200;
+                return 1000;
             case CONSUMPTION:
-                return 200;
+                return 1000;
             case BOTH:
                 return comparisonFactor(args, TimingTestKind.CONSTRUCTION)
                        +
@@ -101,12 +88,13 @@ public class EnumeratorSquareLimitTimingTest
     }
     @Override
     protected StringTimingTestArgs[] comparisonArgs(TimingTestKind kind) {
-        final StringTimingTestArgs[] args =
-                new StringTimingTestArgs[sizes.length];
-        for(int i=0; i<args.length; ++i) {
-            args[i] = StringTimingTestArgs.ofSquareLimit(sizes[i]);
-        }
-        return args;
+        return args(0, 10, 1)
+                .concat(args(10, 100, 10))
+                .concat(args(100, 1000, 100))
+                .concat(args(1000,
+                             STREAM_DEEP_SKIP_COUNT,
+                             STREAM_DEEP_SKIP_STEP))
+                .toArray(StringTimingTestArgs.class);
     }
 
     // ---------------------------------------------------------------------- //
@@ -114,10 +102,32 @@ public class EnumeratorSquareLimitTimingTest
     @Override
     protected double scalabilityFactor(StringTimingTestArgs args,
                                        TimingTestKind kind) {
-        return 0;
+        switch(kind) {
+            case CONSTRUCTION:
+                return 200;
+            case CONSUMPTION:
+                return 1.6;
+            case BOTH:
+                return scalabilityFactor(args, TimingTestKind.CONSTRUCTION)
+                       +
+                       scalabilityFactor(args, TimingTestKind.CONSUMPTION);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
     @Override
     protected StringTimingTestArgs[] scalabilityArgs(TimingTestKind kind) {
-        return new StringTimingTestArgs[0];
+        return args(0, ENUM_DEEP_SKIP_COUNT, ENUM_DEEP_SKIP_STEP)
+                .append(StringTimingTestArgs.ofDeepSkip(LARGE_DEEP_SKIP_COUNT/2))
+                .append(StringTimingTestArgs.ofDeepSkip(LARGE_DEEP_SKIP_COUNT))
+                .toArray(StringTimingTestArgs.class);
+    }
+
+    // ---------------------------------------------------------------------- //
+
+    private static Enumerator<StringTimingTestArgs> args(long from,
+                                                         long to,
+                                                         long step) {
+        return oneDimArgs(from, to, step, StringTimingTestArgs::ofDeepSkip);
     }
 }

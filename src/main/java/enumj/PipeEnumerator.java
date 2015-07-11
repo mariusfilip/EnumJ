@@ -347,6 +347,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     public Enumerator<E> skip(long n) {
+        if (n == 0) {
+            return this;
+        }
         return enqueueProcessor(new SkipPipeProcessor(n));
     }
     @Override
@@ -408,6 +411,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return pushFrontProcessor(new LimitPipeProcessor(maxSize));
     }
     public Enumerator<E> reversedSkip(long n) {
+        if (n == 0) {
+            return this;
+        }
         return pushFrontProcessor(new SkipPipeProcessor(n));
     }
     public PipeEnumerator<E> reversedTakeWhile(Predicate<?> predicate) {
