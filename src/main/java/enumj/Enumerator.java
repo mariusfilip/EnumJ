@@ -1343,7 +1343,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> prepend(Iterator<? extends E> elements) {
-        return PipeEnumerator.of((Iterator<E>)elements).concat(this);
+        return new PipeEnumerator(this).reversedConcat(elements);
     }
 
     /**

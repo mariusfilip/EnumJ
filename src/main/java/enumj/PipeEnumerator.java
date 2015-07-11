@@ -342,6 +342,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return enqueueProcessor(new LimitPipeProcessor(maxSize));
     }
     @Override
+    public Enumerator<E> prepend(Iterator<? extends E> elements) {
+        return reversedConcat(elements);
+    }
+    @Override
     public Enumerator<E> skip(long n) {
         return enqueueProcessor(new SkipPipeProcessor(n));
     }
