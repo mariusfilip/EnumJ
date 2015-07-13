@@ -25,6 +25,10 @@ package enumj;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Basis for all the {@link Enumerable} implementations of {@code EnumJ}.
+ * @param <E> Type of elements being enumerated.
+ */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
     private final AtomicBoolean enumerating = new AtomicBoolean(false);
@@ -33,12 +37,10 @@ abstract class AbstractEnumerable<E> implements Enumerable<E> {
     public final boolean enumerating() {
         return enumerating.get();
     }
-
     @Override
     public final boolean onceOnly() {
         return internalOnceOnly();
     }
-
     @Override
     public final Enumerator<E> enumerator() {
         return onceOnly() ? onceEnumerator() : multipleEnumerator();
@@ -53,12 +55,22 @@ abstract class AbstractEnumerable<E> implements Enumerable<E> {
         }
         return internalEnumerator();
     }
-
     private final Enumerator<E> multipleEnumerator() {
         enumerating.set(true);
         return internalEnumerator();
     }
 
+    /**
+     * Gets whether the current instance may yield an {@link Enumerator}
+     * only once.
+     * @return {@code true} if {@link #enumerator()} may be called
+     * only once, {@code false} otherwise.
+     */
     protected abstract boolean internalOnceOnly();
+    /**
+     * Gets a new {@link Enumerator} enumerating over the enumeration
+     * represented by the current {@link Enumerable}.
+     * @return {@link Enumerator} instance.
+     */
     protected abstract Enumerator<E> internalEnumerator();
 }

@@ -124,7 +124,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
 
     static <E> Enumerable<E> distinct(Enumerable<E> enumerable) {
         return of(enumerable,
-                  in -> AbstractEnumerator.distinct(in, true),
+                  in -> Reversible.distinct(in, true),
                   () -> false);                          
     }
 
@@ -149,9 +149,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             BiFunction<? super E, ? super Long, ? extends R> mapper) {
         return of(enumerable,
-                  in -> AbstractEnumerator.indexedMap((Enumerator)in,
-                                                      mapper,
-                                                      true),
+                  in -> Reversible.indexedMap((Enumerator)in, mapper, true),
                   () -> false);
     }
 
@@ -181,7 +179,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             Consumer<? super E> action) {
         return of(enumerable,
-                  in -> AbstractEnumerator.peek(in, action, true),
+                  in -> Reversible.peek(in, action, true),
                   () -> false);
     }
 

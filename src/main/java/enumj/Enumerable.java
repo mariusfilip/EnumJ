@@ -88,17 +88,17 @@ public interface Enumerable<E> extends Iterable<E> {
      * Returns whether {@link #enumerating()} has been called at least once.
      * <p>
      * Most non-static methods of {@link Enumerable} require that this method
-     * returns <c>false</c>.
+     * returns {@code false}.
      * </p>
-     * @return <c>True</c> if {@link #enumerating()} has been called,
-     * <c>false</c> otherwise.
+     * @return {@code true} if {@link #enumerating()} has been called,
+     * {@code false} otherwise.
      */
     public boolean enumerating();
 
     /**
      * Returns whether the enumerable may generate only one iterator or not.
-     * @return <c>True</c> if the enumerable may generate only one iterator,
-     * <c>false</c> otherwise.
+     * @return {@code true} if the enumerable may generate only one iterator,
+     * {@code false} otherwise.
      */
     public boolean onceOnly();
 

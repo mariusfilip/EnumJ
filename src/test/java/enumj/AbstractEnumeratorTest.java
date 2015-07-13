@@ -118,7 +118,7 @@ public class AbstractEnumeratorTest {
     @Test
     public void testDistinct() {
         System.out.println("distinct");
-        assertTrue(AbstractEnumerator.distinct(Enumerator.on(1, 1), false)
+        assertTrue(Reversible.distinct(Enumerator.on(1, 1), false)
                                      .elementsEqual(Enumerator.on(1)));
         assertTrue(Enumerable.on(1, 1)
                              .distinct()
@@ -128,7 +128,7 @@ public class AbstractEnumeratorTest {
     @Test
     public void testIndexedMap() {
         System.out.println("indexedMap");
-        assertTrue(AbstractEnumerator
+        assertTrue(Reversible
                 .indexedMap(Enumerator.on(1, 2, 3),
                             (x,i) -> x.intValue()+i.intValue(),
                             false)
@@ -142,7 +142,7 @@ public class AbstractEnumeratorTest {
     public void testPeek() {
         System.out.println("peek");
         final MutableInt x = new MutableInt(0);
-        AbstractEnumerator
+        Reversible
                 .peek(Enumerator.on(1, 2, 3, 4, 5),
                       e -> x.add(e),
                       false)

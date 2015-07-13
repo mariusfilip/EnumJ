@@ -33,7 +33,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12.4</version>
                 <configuration>
-                    <excludedGroups>enumj.TimingTestCategory</excludedGroups>
+                    <!-- excludedGroups>enumj.TimingTestCategory</excludedGroups -->
                 </configuration>
             </plugin>
             <plugin>
@@ -43,7 +43,7 @@
                 <configuration>
                     <author>Marius Filip</author>
                     <detectLinks>true</detectLinks>
-                    <show>public</show>
+                    <show>package</show>
                     <validateLinks>true</validateLinks>
                     <windowtitle>EnumJ</windowtitle>
                 </configuration>

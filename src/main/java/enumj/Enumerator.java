@@ -988,7 +988,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see Stream
      */
     public default Enumerator<E> distinct() {
-        return AbstractEnumerator.distinct(this, false);
+        return Reversible.distinct(this, false);
     }
 
     /**
@@ -1108,7 +1108,6 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the flattened enumerator
      * @exception IllegalArgumentException <code>mapper</code> is
      * <code>null</code>
-     * @see #quickFlatMap(java.util.function.Function)
      */
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
@@ -1148,7 +1147,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default <R> Enumerator<R> indexedMap(
             BiFunction<? super E, ? super Long, ? extends R> mapper) {
-        return AbstractEnumerator.indexedMap(this, mapper, false);
+        return Reversible.indexedMap(this, mapper, false);
     }
 
     /**
@@ -1327,7 +1326,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> peek(Consumer<? super E> action) {
-        return AbstractEnumerator.peek(this, action, false);
+        return Reversible.peek(this, action, false);
     }
 
     /**

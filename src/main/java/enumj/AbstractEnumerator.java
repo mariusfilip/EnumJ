@@ -23,14 +23,12 @@
  */
 package enumj;
 
-import java.util.HashSet;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import org.apache.commons.lang3.mutable.MutableLong;
 
+/**
+ * Basis for all the {@link Enumerator} implementations of {@code EnumJ}.
+ * @param <E> Type of elements being enumerated.
+ */
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
     private boolean started;
@@ -42,7 +40,6 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     public final boolean enumerating() {
         return started;
     }
-
     @Override
     public final boolean hasNext() {
         if (done) {
@@ -58,6 +55,20 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         hasNextHasThrown = false;
         hasNextHasBeenCalled = true;
         return !done;
+    }
+    @Override
+    public final E next() {
+        if (!hasNextHasBeenCalled) {
+            hasNext();
+        }
+        if (done || hasNextHasThrown) {
+            throw new NoSuchElementException();
+        }
+        try {
+            return internalNext();
+        } finally {
+            hasNextHasBeenCalled = false;
+        }
     }
 
     private boolean safeHasNext() {
@@ -79,68 +90,23 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         }
     }
 
-    @Override
-    public final E next() {
-        if (!hasNextHasBeenCalled) {
-            hasNext();
-        }
-        if (done || hasNextHasThrown) {
-            throw new NoSuchElementException();
-        }
-        try {
-            return internalNext();
-        } finally {
-            hasNextHasBeenCalled = false;
-        }
-    }
-
+    /**
+     * Returns whether the enumerator has more elements.
+     * @return {@code true} if the enumerator has more elements, {@code false}
+     * otherwise.
+     */
     protected abstract boolean internalHasNext();
+    /**
+     * Returns the next enumerated element.
+     * @return Next enumerated element.
+     */
     protected abstract E internalNext();
+    /**
+     * Cleans up the internals of the current enumerator after enumeration
+     * has ended.
+     * <p>
+     * By default this method does nothing.
+     * </p>
+     */
     protected void cleanup() {}
-
-    // ---------------------------------------------------------------------- //
-
-    public static <E> Enumerator<E> distinct(Enumerator<E> source,
-                                             boolean       reversed) {
-        final Set<E> existing = new HashSet<E>(256);
-        if (reversed) {
-            final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedFilter(e -> existing.add((E)e));
-        }
-        return source.filter(existing::add);
-    }
-
-    public static <E,R> Enumerator<R> indexedMap(
-            Enumerator<E> source,
-            BiFunction<? super E, ? super Long, ? extends R> mapper,
-            boolean reversed) {
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
-        final MutableLong index = new MutableLong(0);
-        final Function<E,R> fun = e -> {
-            final R result = mapper.apply(e, index.toLong());
-            index.increment();
-            return result;
-        };
-        if (reversed) {
-            final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(fun);
-        }
-        return source.map(fun);
-    }
-
-    public static <E> Enumerator<E> peek(Enumerator<E>       source,
-                                         Consumer<? super E> action,
-                                         boolean             reversed) {
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNotNull(action, Messages.NULL_ENUMERATOR_CONSUMER);
-        final Function<E,E> actionMapper = e -> {
-            action.accept(e);
-            return e;
-        };
-        if (reversed) {
-            final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(actionMapper);
-        }
-        return source.map(actionMapper);
-    }
 }

@@ -33,7 +33,7 @@ abstract class AbstractPipeProcessor<T,R> {
 
     /**
      * Represents whether the pipeline should proceed to the next element
-     * of the same source when {@link #hasOutputValue()} returns <c>false<c>.
+     * of the same source when {@link #hasOutputValue()} returns {@code false}.
      */
     public final boolean sameSourceNextOnNoValue;
     /**
@@ -125,10 +125,10 @@ abstract class AbstractPipeProcessor<T,R> {
      * Gets whether processing was successful and the processor has a value
      * to yield.
      * <p>
-     * If {@link #hasOutputValue()} returns <c>false</c> than no internal
+     * If {@link #hasOutputValue()} returns {@code false} than no internal
      * storage of input or output should take place.
      * </p>
-     * @return <c>true</c> if there is an output value to yield, <c>false</c>
+     * @return {@code true} if there is an output value to yield, {@code false}
      * otherwise.
      * @see #processInputValue(java.lang.Object)
      * @see #getOutputValue()
@@ -166,17 +166,17 @@ abstract class AbstractPipeProcessor<T,R> {
      * Gets whether the processor does not process any more and the pipeline
      * up to it should be discarded.
      * <p>
-     * {@link #isInactive()} returning <c>true</c> is equivalent to the
+     * {@link #isInactive()} returning {@code true} is equivalent to the
      * situation when no matter with what value
      * {@link #processInputValue(Object)} will be called,
-     * {@link #hasOutputValue()} will always return <c>false</c>.
+     * {@link #hasOutputValue()} will always return {@code false}.
      * </p>
      * <p>
-     * Most processors have this function return <c>false</c> with the
-     * exception of <c>while</c> and <c>limit</c> compositions. These will turn
-     * completely inactive once a certain condition is met.
+     * Most processors have this function return {@code false} with the
+     * exception of {@code while} and {@code limit} compositions. These will
+     * turn completely inactive once a certain condition is met.
      * </p>
-     * @return 
+     * @return {@code true} if processing must stop, {@code false} otherwise.
      */
     abstract boolean isInactive();
 }

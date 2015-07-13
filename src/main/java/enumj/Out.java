@@ -40,7 +40,7 @@ public final class Out<T> {
      * Gets the value of the output parameter.
      *
      * @return Value of the output parameter, if any.
-     * @throws {NoSuchElementException} An output value has not been set.
+     * @throws NoSuchElementException An output value has not been set.
      */
     public T get() {
         if (!this.hasValue) {

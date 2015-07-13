@@ -23,11 +23,33 @@
  */
 package enumj;
 
+/**
+ * Specialised type of {@link AbstractPipeProcessor} that may produce multiple
+ * elements for a single input element.
+ * @param <T> Type of input element.
+ * @param <R> Type of resulted elements.
+ */
 abstract class AbstractPipeMultiProcessor<T,R>
-               extends AbstractPipeProcessor<T,R> {    
-    protected AbstractPipeMultiProcessor(boolean nextElementOnNoValue,
+               extends AbstractPipeProcessor<T,R> {
+    /**
+     * Constructs a new {@link AbstractPipeMultiProcessor} instance.
+     * @param sameSourceNextOnNoValue {@code true} if the processor demands
+     * continuing to the next element of the same piped source when
+     * {@link #hasOutputValue()} does not return {@code true}, {@code false}
+     * otherwise.
+     * @param hasNextNeedsValue {@code true} if the processor requires a value
+     * for the decision on return of {@link Enumerator#hasNext()}.
+     */
+    protected AbstractPipeMultiProcessor(boolean sameSourceNextOnNoValue,
                                          boolean hasNextNeedsValue) {
-        super(nextElementOnNoValue, hasNextNeedsValue);
+        super(sameSourceNextOnNoValue, hasNextNeedsValue);
     }
+
+    /**
+     * Gets whether the processor needs a fresh input value to produce output
+     * values.
+     * @return {@code true} if the processor needs a new input to produce
+     * output, {@code false} otherwise.
+     */
     abstract boolean needsValue();
 }
