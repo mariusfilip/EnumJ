@@ -26,12 +26,19 @@ package enumj;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Basis for all the {@link Enumerable} implementations of {@code EnumJ}.
+ * Basis for all the {@link Enumerable} implementations of {@literal EnumJ}.
  * @param <E> Type of elements being enumerated.
  */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
-    private final AtomicBoolean enumerating = new AtomicBoolean(false);
+    private final AtomicBoolean enumerating;
+
+    /**
+     * Constructs a new {@link AbstractEnumerable} instance.
+     */
+    protected AbstractEnumerable() {
+        enumerating = new AtomicBoolean(false);
+    }
 
     @Override
     public final boolean enumerating() {

@@ -38,16 +38,16 @@ abstract class AbstractPipeProcessor<T,R> {
     public final boolean sameSourceNextOnNoValue;
     /**
      * Represents whether the processor needs a value fed in when participating
-     * to the value of {@link PipeEnumerator#hasNext()}.
+     * to the outcome of {@link PipeEnumerator#hasNext()}.
      */
     public final boolean hasNextNeedsValue;
 
     /**
      * Constructs a new instance of {@link AbstractPipeProcessor}.
      *
-     * @param sameSourceNextOnNoValue Value for
+     * @param sameSourceNextOnNoValue value for
      *                             {@link #sameSourceNextOnNoValue}.
-     * @param hasNextNeedsValue Value for {@link #hasNextNeedsValue}.
+     * @param hasNextNeedsValue value for {@link #hasNextNeedsValue}.
      */
     protected AbstractPipeProcessor(boolean sameSourceNextOnNoValue,
                                     boolean hasNextNeedsValue) {

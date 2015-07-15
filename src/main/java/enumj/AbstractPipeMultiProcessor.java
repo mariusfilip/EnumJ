@@ -35,10 +35,8 @@ abstract class AbstractPipeMultiProcessor<T,R>
      * Constructs a new {@link AbstractPipeMultiProcessor} instance.
      * @param sameSourceNextOnNoValue {@code true} if the processor demands
      * continuing to the next element of the same piped source when
-     * {@link #hasOutputValue()} does not return {@code true}, {@code false}
-     * otherwise.
-     * @param hasNextNeedsValue {@code true} if the processor requires a value
-     * for the decision on return of {@link Enumerator#hasNext()}.
+     * {@link #hasOutputValue()} value for {@link #sameSourceNextOnNoValue}.
+     * @param hasNextNeedsValue value for {@link #hasNextNeedsValue}.
      */
     protected AbstractPipeMultiProcessor(boolean sameSourceNextOnNoValue,
                                          boolean hasNextNeedsValue) {

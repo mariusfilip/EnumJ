@@ -35,6 +35,13 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     private boolean hasNextHasBeenCalled;
     private boolean hasNextHasThrown;
     private boolean done;
+    
+    /**
+     * Constructs a new {@link AbstractEnumerator} instance.
+     */
+    protected AbstractEnumerator() {
+        // do nothing
+    }
 
     @Override
     public final boolean enumerating() {

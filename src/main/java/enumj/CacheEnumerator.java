@@ -25,11 +25,21 @@ package enumj;
 
 import java.util.Optional;
 
+/**
+ * Enumerates over instances of {@link CachedElementWrapper}.
+ * @param <E> Type of enumerated elements.
+ */
 final class CacheEnumerator<E> extends AbstractEnumerator<E> {
 
-    Optional<CachedElementWrapper<E>> cached;
+    private Optional<CachedElementWrapper<E>> cached;
     
-    CacheEnumerator(Optional<CachedElementWrapper<E>> cached) {
+    /**
+     * Constructs a {@link CacheEnumerator} encapsulating an optional
+     * reference to a {@link CachedElementWrapper}.
+     * @param cached Optional {@link CachedElementWrapper} representing
+     * the head of the list to enumerate.
+     */
+    public CacheEnumerator(Optional<CachedElementWrapper<E>> cached) {
         this.cached = cached;
     }
 
@@ -37,14 +47,12 @@ final class CacheEnumerator<E> extends AbstractEnumerator<E> {
     protected boolean internalHasNext() {
         return cached.isPresent();
     }
-
     @Override
     protected E internalNext() {
         final E result = cached.get().getElement();
         cached = cached.get().getNextWrapper();
         return result;
     }
-
     @Override
     protected void cleanup() {
         cached = null;

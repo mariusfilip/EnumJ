@@ -85,7 +85,7 @@ public interface Enumerable<E> extends Iterable<E> {
     public Enumerator<E> enumerator();
 
     /**
-     * Returns whether {@link #enumerating()} has been called at least once.
+     * Returns whether {@link #enumerator()} has been called at least once.
      * <p>
      * Most non-static methods of {@link Enumerable} require that this method
      * returns {@code false}.

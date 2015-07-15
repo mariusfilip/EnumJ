@@ -26,16 +26,31 @@ package enumj;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Wraps enumerated elements into a single-linked list that grows dynamically.
+ * @param <E> Type of enumerated elements.
+ */
 final class CachedElementWrapper<E> {
 
     private final E elem;
     private final Lazy<Optional<CachedElementWrapper<E>>> next;
 
-    CachedElementWrapper(E elem,
-                         Supplier<Nullable<E>> nextSupplier,
-                         long limit,
-                         long ordinal,
-                         Runnable disableProc) {
+    /**
+     * Constructs a {@link CachedElementWrapper} instance that wraps the given
+     * element while allowing the generation of the next element up to the
+     * given limit.
+     * @param elem Wrapped element.
+     * @param nextSupplier Supplier of the next element in the cached list.
+     * @param limit Maximum number of elements in the cached list.
+     * @param ordinal Position of the current element in the cached list. The
+     * first element in the list has an {@code ordinal} of {@code 1}.
+     * @param disableProc Procedure to call when the cached list reaches limit.
+     */
+    public CachedElementWrapper(E elem,
+                                Supplier<Nullable<E>> nextSupplier,
+                                long limit,
+                                long ordinal,
+                                Runnable disableProc) {
         this.elem = elem;
         this.next = new Lazy(() -> {
             final long count = ordinal;
@@ -54,10 +69,18 @@ final class CachedElementWrapper<E> {
         });
     }
 
+    /**
+     * Gets the wrapped element.
+     * @return Wrapped element.
+     */
     public E getElement() {
         return elem;
     }
 
+    /**
+     * Gets the wrapper of the next element in the cached list, if any.
+     * @return Optional wrapper for the next element.
+     */
     public Optional<CachedElementWrapper<E>> getNextWrapper() {
         return next.get();
     }

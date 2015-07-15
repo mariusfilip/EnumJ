@@ -23,11 +23,23 @@
  */
 package enumj;
 
+/**
+ * {@link Enumerator} implementation for arrays.
+ * @param <E> Type of enumerated elements.
+ */
 class ArrayEnumerator<E> extends AbstractEnumerator<E> {
 
+    /**
+     * Array to enumerate over.
+     */
     protected E[] source;
     private int index;
 
+    /**
+     * Constructs a {@link ArrayEnumerator} that enumerates over the given
+     * array.
+     * @param source Array to enumerate.
+     */
     public ArrayEnumerator(E[] source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
@@ -39,9 +51,7 @@ class ArrayEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     protected E internalNext() {
-        final E result = source[index];
-        ++index;
-        return result;
+        return source[index++];
     }
     @Override
     protected void cleanup() {
