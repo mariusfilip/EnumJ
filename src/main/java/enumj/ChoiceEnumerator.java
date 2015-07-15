@@ -12,17 +12,29 @@ import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 
 /**
- *
- * @author Marius Filip
+ * {@link Enumerator} implementation that enumerates by choosing among the
+ * elements of given source {@link Iterator} instances.
+ * @param <E> Type of enumerated elements.
  */
-class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
+final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected IntSupplier      indexSupplier;
-    protected IntUnaryOperator nextIndexSupplier;
+    private IntSupplier             indexSupplier;
+    private IntUnaryOperator        nextIndexSupplier;
+    private final List<Iterator<E>> sources;
+    private final Nullable<E>       value;
 
-    protected final List<Iterator<E>> sources;
-    protected final Nullable<E>       value;
-
+    /**
+     * Constructs a {@link ChoiceEnumerator} instance.
+     * @param indexSupplier {@link IntSupplier} instance that yields the index
+     * of the source {@link Iterator} instance to get the next element from.
+     * @param nextIndexSupplier {@link IntSupplier} instance that yields the
+     * subsequent indexes of the source {@link Iterator} instance to get the
+     * next element from, if the source indicated by {@code indexSupplier} runs
+     * out of elements.
+     * @param first first {@link Iterator} source to choose elements from.
+     * @param second second {@link Iterator} source to choose elements from.
+     * @param rest rest of {@link Iterator} sources to choose elements from.
+     */
     public ChoiceEnumerator(IntSupplier indexSupplier,
                             IntUnaryOperator nextIndexSupplier,
                             Iterator<E> first,
@@ -81,7 +93,6 @@ class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
     protected void cleanup() {
         indexSupplier = null;
         nextIndexSupplier = null;
-
         sources.clear();
         value.clear();
     }

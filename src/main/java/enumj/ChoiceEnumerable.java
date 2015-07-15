@@ -28,6 +28,11 @@ import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
+/**
+ * {@link Enumerable} implementation that enumerates by choosing among the
+ * elements of given source {@link Iterable} instances.
+ * @param <E> Type of enumerated elements.
+ */
 final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
 
     private final Supplier<IntSupplier> indexSupplier;
@@ -37,11 +42,24 @@ final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
     private final List<Iterable<E>> rest;
     private final Lazy<Boolean> onceOnly;
 
-    ChoiceEnumerable(Supplier<IntSupplier> indexSupplier,
-                     Supplier<IntUnaryOperator> nextIndexSupplier,
-                     Iterable<E> first,
-                     Iterable<? extends E> second,
-                     List<Iterable<E>> rest) {
+    /**
+     * Constructs a {@link ChoiceEnumerable} instance.
+     * @param indexSupplier lazily provided {@link IntSupplier} instance that
+     * yields the index of the source {@link Iterable} instance to get the next
+     * element from.
+     * @param nextIndexSupplier lazily provided {@link IntSupplier} instance
+     * that yields the subsequent indexes of the source {@link Iterable}
+     * instance to get the next element from, if the source indicated by
+     * {@code indexSupplier} runs out of elements.
+     * @param first first {@link Iterable} source to choose elements from.
+     * @param second second {@link Iterable} source to choose elements from.
+     * @param rest  rest of {@link Iterable} sources to choose elements from.
+     */
+    public ChoiceEnumerable(Supplier<IntSupplier> indexSupplier,
+                            Supplier<IntUnaryOperator> nextIndexSupplier,
+                            Iterable<E> first,
+                            Iterable<? extends E> second,
+                            List<Iterable<E>> rest) {
         Utils.ensureNotNull(indexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
         Utils.ensureNotNull(nextIndexSupplier,
@@ -68,7 +86,6 @@ final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
     protected boolean internalOnceOnly() {
         return onceOnly.get();
     }
-
     @Override
     protected Enumerator<E> internalEnumerator() {
         return new ChoiceEnumerator(indexSupplier.get(),

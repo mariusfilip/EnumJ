@@ -27,7 +27,7 @@ package enumj;
  * {@link Enumerator} implementation for arrays.
  * @param <E> Type of enumerated elements.
  */
-class ArrayEnumerator<E> extends AbstractEnumerator<E> {
+final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Array to enumerate over.

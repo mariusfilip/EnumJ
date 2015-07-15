@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Atomic composite state of {@link CachedEnumerable}.
  * @param <E> Type of enumerated elements.
  */
-final class CachedEnumerableState<E> {
+public final class CachedEnumerableState<E> {
 
     /**
      * {@link Enumerable} instance providing the elements to cache.

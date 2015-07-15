@@ -66,7 +66,7 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
      * of the current {@link CachedEnumerable}.
      * @return {@link CachedEnumerableState} instance
      */
-    CachedEnumerableState<E> state() {
+    public CachedEnumerableState<E> state() {
         return this.state;
     }
 
