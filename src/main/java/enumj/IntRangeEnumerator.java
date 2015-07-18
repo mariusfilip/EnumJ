@@ -26,6 +26,10 @@ package enumj;
 import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 
+/**
+ * Type of {@link Enumerator} and {@link PrimitiveIterator.OfInt} enumerating
+ * over a range of integers.
+ */
 public final class IntRangeEnumerator implements PrimitiveIterator.OfInt,
                                                  Enumerator<Integer> {
     private int     start;
@@ -35,6 +39,13 @@ public final class IntRangeEnumerator implements PrimitiveIterator.OfInt,
     private boolean overflow;
     private boolean enumerating;
 
+    /**
+     * Constructs an {@link IntRangeEnumerator} instance.
+     * @param start lower limit of integer range.
+     * @param end upper limit of integer range.
+     * @param isInclusive {@code true} if {@code end} is an inclusive upper
+     * limit, {@code otherwise}.
+     */
     public IntRangeEnumerator(int start,
                               int end,
                               boolean isInclusive) {

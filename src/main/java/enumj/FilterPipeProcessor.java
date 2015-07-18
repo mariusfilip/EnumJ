@@ -25,10 +25,20 @@ package enumj;
 
 import java.util.function.Predicate;
 
-class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+/**
+ * Type of {@link AbstractPipeProcessor} that knows how to filter elements in
+ * the pipeline.
+ * @param <E> type of enumerated elements.
+ */
+final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+
     protected E            value;
     protected Predicate<E> filter;
-    
+
+    /**
+     * Constructs a {@link FilterPipeProcessor} instance.
+     * @param filter predicate to apply on enumerated elements.
+     */
     public FilterPipeProcessor(Predicate<E> filter) {
         super(true, true);
         Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
