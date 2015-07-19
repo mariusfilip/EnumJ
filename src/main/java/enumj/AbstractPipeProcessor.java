@@ -63,11 +63,10 @@ abstract class AbstractPipeProcessor<T,R> {
      */
     private AbstractPipeProcessor<? extends R,?> next;
     /**
-     * Reference to a {@link PipeReference} instance which represents the
-     * source of data that is being processed starting with the current
-     * processor in the pipeline.
+     * {@link PipeSource} instance which represents the source of data that is
+     * being processed starting with the current processor in the pipeline.
      */
-    private PipeReference reference;
+    private PipeSource source;
 
     /**
      * Returns the value of {@link #next}.
@@ -92,22 +91,22 @@ abstract class AbstractPipeProcessor<T,R> {
     }
 
     /**
-     * Gets the value of {@link #reference}.
-     * @return Value of {@link #reference}.
+     * Gets the value of {@link #source}.
+     * @return Value of {@link #source}.
      */
-    public PipeReference getReference() {
-        return reference;
+    public PipeSource getSource() {
+        return source;
     }
     /**
-     * Sets the value of {@link #reference}.
+     * Sets the value of {@link #source}.
      * <p>
-     * Once {@link #reference} is set to a non-null value, it cannot change.
+     * Once {@link #source} is set to a non-null value, it cannot change.
      * </p>
-     * @param reference Value for {@link #reference}.
+     * @param reference Value for {@link #source}.
      */
-    public void setReference(PipeReference reference) {
-        if (this.reference == null) {
-            this.reference = reference;
+    public void setSource(PipeSource reference) {
+        if (this.source == null) {
+            this.source = reference;
         } else {
             throw new UnsupportedOperationException();
         }

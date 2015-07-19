@@ -26,6 +26,11 @@ package enumj;
 import java.util.Iterator;
 import java.util.Optional;
 
+/**
+ * Type of {@link Enumerator} whose source of elements can be defined after
+ * construction.
+ * @param <E> type of enumerated elements.
+ */
 public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
@@ -48,12 +53,9 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Binds the current enumerator to the given source iterator.
-     *
-     * @param source iterator to bind to
-     * @exception IllegalStateException the current enumerator is enumerating
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>.
+     * Binds the current {@link LateBindingEnumerator} to the given
+     * {@code source}.
+     * @param source {@link Iterator} to get the elements from.
      */
     public void bind(Iterator<? extends E> source) {
         Utils.ensureNonEnumerating(this);
@@ -62,10 +64,8 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Gets the binding of the current enumerator, if any.
-     *
-     * @return {@link Optional} containing the iterator that the current
-     * enumerator is bound to, if any.
+     * Gets the bound {@link Iterable} source, if any.
+     * @return optional source {@link Iterable}.
      */
     public Optional<Iterator<E>> binding() {
         return Optional.ofNullable(source);

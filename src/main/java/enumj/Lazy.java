@@ -27,10 +27,20 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 
+/**
+ * Type of {@link LazyInitializer} that gets a {@link Supplier} to initialise
+ * with.
+ * @param <T> type of lazily enumerated entity.
+ */
 public final class Lazy<T> extends LazyInitializer<T> {
 
     private Supplier<T> supplier;
 
+    /**
+     * Constructs a {@link Lazy} instance.
+     * @param supplier {@link Supplier} instance providing the lazily
+     * initialised element.
+     */
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;
     }
@@ -43,7 +53,6 @@ public final class Lazy<T> extends LazyInitializer<T> {
             throw new UnsupportedOperationException(ex.getCause());
         }
     }
-
     @Override
     protected T initialize() throws ConcurrentException {
         try {

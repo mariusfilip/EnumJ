@@ -23,13 +23,28 @@
  */
 package enumj;
 
+/**
+ * Type of {@link RuntimeException} for the use of {@link Lazy} instances.
+ */
 public class LazyException extends RuntimeException {
+    /**
+     * Creates an empty {@link LazyException} instance.
+     */
     public LazyException() {
         super();
     }
+    /**
+     * Creates a {@link LazyException} instance with message.
+     * @param msg message to associate with {@link LazyException}.
+     */
     public LazyException(String msg) {
         super(msg);
     }
+    /**
+     * Creates a {@link LazyException} instance with message and cause.
+     * @param msg message to associate with {@link LazyException}.
+     * @param cause cause for exception.
+     */
     public LazyException(String msg, Throwable cause) {
         super(msg, cause);
     }

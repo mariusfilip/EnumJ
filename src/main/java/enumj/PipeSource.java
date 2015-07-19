@@ -25,11 +25,11 @@ package enumj;
 
 import java.util.Iterator;
 
-class PipeReference<E> extends IteratorEnumerator<E> {
+class PipeSource<E> extends IteratorEnumerator<E> {
 
     private AbstractPipeProcessor<?,?> firstProcessor;
 
-    protected PipeReference(Iterator<E> source) {
+    protected PipeSource(Iterator<E> source) {
         super(source);
     }
 
@@ -40,10 +40,10 @@ class PipeReference<E> extends IteratorEnumerator<E> {
         if (this.firstProcessor == null) {
             this.firstProcessor = processor;
         }
-        processor.setReference(this);
+        processor.setSource(this);
     }
 
-    static <T> PipeReference<T> of(Iterator<T> source) {
-        return new PipeReference(source);
+    static <T> PipeSource<T> of(Iterator<T> source) {
+        return new PipeSource(source);
     }
 }

@@ -25,6 +25,10 @@ package enumj;
 
 import java.util.Iterator;
 
+/**
+ * Type of {@link Enumerator} encapsulating an {@link Iterator}.
+ * @param <E> type of enumerated elements.
+ */
 class IteratorEnumerator<E> extends AbstractEnumerator<E> {
 
     protected Iterator<E> source;
@@ -50,6 +54,16 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
         source = null;
     }
 
+    // ---------------------------------------------------------------------- //
+
+    /**
+     * Constructs an {@link Enumerator} from an {@link Iterator}. If the
+     * iterator is already an enumerator, it returns is unchanged, otherwise
+     * it returns an {@link IteratorEnumerator} encapsulating it.
+     * @param <T> type of enumerated elements.
+     * @param source {@link Iterator} to get elements from.
+     * @return {@link Enumerator} instance.
+     */
     static <T> Enumerator<T> of(Iterator<T> source) {
         Enumerator<T> result = (source != null && source instanceof Enumerator)
                                ? (Enumerator<T>)source

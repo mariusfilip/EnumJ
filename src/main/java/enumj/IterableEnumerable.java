@@ -31,11 +31,7 @@ final class IterableEnumerable<E> extends AbstractEnumerable<E> {
 
     protected Iterable<E> source;
 
-    /**
-     * Constructs an {@link IterableEnumerable} instance.
-     * @param source {@link Iterable} to get elements from.
-     */
-    protected IterableEnumerable(Iterable<E> source) {
+    private IterableEnumerable(Iterable<E> source) {
         this.source = source;
     }
 

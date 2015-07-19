@@ -26,6 +26,11 @@ package enumj;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * Type of {@link Enumerable} whose source of elements can be defined after
+ * construction.
+ * @param <E> type of enumerated elements.
+ */
 public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
     private volatile Iterable<E> source;
@@ -35,7 +40,6 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
         final Iterable<E> source = this.source;
         return Enumerable.onceOnly(source);
     }
-
     @Override
     protected Enumerator<E> internalEnumerator() {
         final Iterable<E> source = this.source;
@@ -47,11 +51,21 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
     // ---------------------------------------------------------------------- //
 
+    /**
+     * Binds the current {@link LateBindingEnumerable} to the given
+     * {@code source}.
+     * @param source {@link Iterable} to get the elements from.
+     */
     public void bind(Iterable<? extends E> source) {
+        Utils.ensureNonEnumerating(this);
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = (Iterable<E>)source;
     }
 
+    /**
+     * Gets the bound {@link Iterable} source, if any.
+     * @return optional source {@link Iterable}.
+     */
     public Optional<Iterable<E>> binding() {
         return Optional.ofNullable(source);
     }
