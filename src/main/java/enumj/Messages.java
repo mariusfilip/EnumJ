@@ -23,49 +23,103 @@
  */
 package enumj;
 
+/**
+ * Utility class containing error messages.
+ */
 public final class Messages {
-    
+
     private Messages() {}
 
+    /**
+     * Enumerator source is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_SOURCE =
             "Null enumerator source";
+    /**
+     * Predicate that works upon the enumerator is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_PREDICATE =
             "Null enumerator predicate";
+    /**
+     * Procedure handling enumeration errors is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_HANDLER =
             "Null enumerator handler";
+    /**
+     * Function mapping enumerated elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_MAPPER =
             "Null enumerator mapper";
+    /**
+     * The function generating enumerator elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_GENERATOR =
             "Null enumerator generator";
+    /**
+     * Procedure processing enumerator elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_CONSUMER =
             "Null enumerator consumer";
+    /**
+     * Function comparing enumerator elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_COMPARATOR =
             "Null enumerator comparator";
+    /**
+     * Class casting enumerator elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_CLASS =
             "Null enumerator class";
+    /**
+     * Function accumulating enumerator elements is {@code null}.
+     */
     public static final String NULL_ENUMERATOR_ACCUMULATOR =
             "Null enumerator accumulator";
+    /**
+     * Iterator is {@code null}.
+     */
     public static final String NULL_ITERATOR =
             "Null iterator";
-    public static final String NULL_PIPE_PROCESSOR_REFERENCE =
+    /**
+     * Processor operator is {@code null}.
+     */
+    public static final String NULL_PIPE_PROCESSOR_OPERATOR =
             "Null pipe processor reference";
 
+    /**
+     * Size of enumerator is negative.
+     */
     public static final String NEGATIVE_ENUMERATOR_SIZE =
             "Negative enumerator size";
+    /**
+     * Index of enumerator is negative.
+     */
     public static final String NEGATIVE_ENUMERATOR_INDEX =
             "Negative enumerator index";
+    /**
+     * Expected enumerator count is negative.
+     */
     public static final String NEGATIVE_ENUMERATOR_EXPECTED_COUNT =
             "Negative enumerator expected count";
+    /**
+     * Negative number of error recovery retries.
+     */
     public static final String NEGATIVE_RETRIES =
             "Negative enumerator retries";
 
+    /**
+     * State of enumerator is invalid.
+     */
     public static final String ILLEGAL_ENUMERATOR_STATE =
             "Illegal enumerator state";
+    /**
+     * Multiple enumerations have been attempted.
+     */
     public static final String ILLEGAL_MULTIPLE_ENUMERATIONS =
             "Illegal multiple enumerations";
-
+    /**
+     * Enumerator should have exactly one element.
+     */
     public static final String NO_SINGLE_ENUMERATOR_ELEMENT =
             "No single enumerator element";
-    public static final String OVERFLOWED_ENUMERATOR_INDEX =
-            "Overflowed enumerator index";
 }

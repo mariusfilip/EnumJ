@@ -23,11 +23,21 @@
  */
 package enumj;
 
-class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+/**
+ * Type of {@link AbstractPipeProcessor} that stops enumeration once a limit
+ * is reached.
+ * @param <E> type of enumerated elements.
+ */
+final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+    
     protected E    value;
     protected long size;
 
-    LimitPipeProcessor(long maxSize) {
+    /**
+     * Constructs {@link LimitPipeProcessor} instance.
+     * @param maxSize enumeration limit.
+     */
+    public LimitPipeProcessor(long maxSize) {
         super(false, true);
         Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
         this.size = maxSize;

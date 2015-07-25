@@ -25,6 +25,10 @@ package enumj;
 
 import java.util.Iterator;
 
+/**
+ * Type of {@link AbstractEnumerable} that yields one enumerator only.
+ * @param <E> type of enumerated elements.
+ */
 public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
 
     private Enumerator<E> source;
@@ -38,11 +42,10 @@ public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     protected boolean internalOnceOnly() {
         return true;
     }
-
     @Override
     protected Enumerator<E> internalEnumerator() {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Enumerator<E> result = source;
+        final Enumerator<E> result = source;
         source = null;
         return result;
     }
