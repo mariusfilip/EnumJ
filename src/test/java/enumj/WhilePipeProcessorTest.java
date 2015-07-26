@@ -91,12 +91,12 @@ public class WhilePipeProcessorTest {
     }
 
     /**
-     * Test of sameSourceNextOnNoValue method, of class WhilePipeProcessor.
+     * Test of nextOnSameSourceOnNoValue method, of class WhilePipeProcessor.
      */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
-        assertFalse(processor.sameSourceNextOnNoValue);
+        assertFalse(processor.nextOnSameSourceOnNoValue);
     }
 
     /**

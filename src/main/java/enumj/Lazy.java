@@ -35,20 +35,32 @@ import org.apache.commons.lang3.concurrent.LazyInitializer;
 public final class Lazy<T> extends LazyInitializer<T> {
 
     private Supplier<T> supplier;
+    private volatile boolean initialized;
 
     /**
      * Constructs a {@link Lazy} instance.
      * @param supplier {@link Supplier} instance providing the lazily
-     * initialised element.
+     * initialised non-null element.
      */
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
+    /**
+     * Gets whether this lazy instance has been initialised.
+     * @return {@code True} if the value has been initialised, {@code false}
+     * otherwise.
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     @Override
     public T get() {
         try {
-            return super.get();
+            final T result = super.get();
+            initialized = true;
+            return result;
         } catch(ConcurrentException ex) {
             throw new UnsupportedOperationException(ex.getCause());
         }

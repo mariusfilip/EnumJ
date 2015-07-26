@@ -44,7 +44,7 @@ class Reversible {
         return source.filter(existing::add);
     }
 
-    static <E,R> Enumerator<R> indexedMap(
+    static <E,R> Enumerator<R> map(
             Enumerator<E> source,
             BiFunction<? super E, ? super Long, ? extends R> mapper,
             boolean reversed) {

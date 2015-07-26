@@ -33,14 +33,14 @@ abstract class AbstractPipeMultiProcessor<T,R>
                extends AbstractPipeProcessor<T,R> {
     /**
      * Constructs a new {@link AbstractPipeMultiProcessor} instance.
-     * @param sameSourceNextOnNoValue {@code true} if the processor demands
+     * @param nextOnSameSourceOnNoValue {@code true} if the processor demands
      * continuing to the next element of the same piped source when
-     * {@link #hasOutputValue()} value for {@link #sameSourceNextOnNoValue}.
+     * {@link #hasOutputValue()} value for {@link #nextOnSameSourceOnNoValue}.
      * @param hasNextNeedsValue value for {@link #hasNextNeedsValue}.
      */
-    protected AbstractPipeMultiProcessor(boolean sameSourceNextOnNoValue,
+    protected AbstractPipeMultiProcessor(boolean nextOnSameSourceOnNoValue,
                                          boolean hasNextNeedsValue) {
-        super(sameSourceNextOnNoValue, hasNextNeedsValue);
+        super(nextOnSameSourceOnNoValue, hasNextNeedsValue);
     }
 
     /**

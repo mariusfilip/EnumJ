@@ -35,7 +35,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * Represents whether the pipeline should proceed to the next element
      * of the same source when {@link #hasOutputValue()} returns {@code false}.
      */
-    public final boolean sameSourceNextOnNoValue;
+    public final boolean nextOnSameSourceOnNoValue;
     /**
      * Represents whether the processor needs a value fed in when participating
      * to the outcome of {@link PipeEnumerator#hasNext()}.
@@ -45,14 +45,14 @@ abstract class AbstractPipeProcessor<T,R> {
     /**
      * Constructs a new instance of {@link AbstractPipeProcessor}.
      *
-     * @param sameSourceNextOnNoValue value for
-     *                             {@link #sameSourceNextOnNoValue}.
+     * @param nextOnSameSourceOnNoValue value for
+     * {@link #nextOnSameSourceOnNoValue}.
      * @param hasNextNeedsValue value for {@link #hasNextNeedsValue}.
      */
-    protected AbstractPipeProcessor(boolean sameSourceNextOnNoValue,
+    protected AbstractPipeProcessor(boolean nextOnSameSourceOnNoValue,
                                     boolean hasNextNeedsValue) {
-        this.sameSourceNextOnNoValue =
-                sameSourceNextOnNoValue;
+        this.nextOnSameSourceOnNoValue =
+                nextOnSameSourceOnNoValue;
         this.hasNextNeedsValue = hasNextNeedsValue;
     }
 

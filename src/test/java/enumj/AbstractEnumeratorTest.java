@@ -129,12 +129,12 @@ public class AbstractEnumeratorTest {
     public void testIndexedMap() {
         System.out.println("indexedMap");
         assertTrue(Reversible
-                .indexedMap(Enumerator.on(1, 2, 3),
+                .map(Enumerator.on(1, 2, 3),
                             (x,i) -> x.intValue()+i.intValue(),
                             false)
                 .elementsEqual(Enumerator.on(1, 3, 5)));
         assertTrue(Enumerable.on(1, 2, 3)
-                             .indexedMap((x,i) -> x.intValue()+i.intValue())
+                             .map((x,i) -> x.intValue()+i.intValue())
                              .elementsEqual(Enumerable.on(1, 3, 5)));
     }
 

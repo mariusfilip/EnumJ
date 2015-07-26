@@ -633,7 +633,7 @@ public class EnumerableTest {
     }
 
     /**
-     * Test of indexedMap method, of class Enumerable.
+     * Test of map method, of class Enumerable.
      */
     @Test
     public void testIndexedMap() {
@@ -642,7 +642,7 @@ public class EnumerableTest {
                 .generators()
                 .limit(100)
                 .map(gen -> gen.repeatable())
-                .map(en -> en.indexedMap((x,i) -> Pair.of(1+i.intValue(), x)))
+                .map(en -> en.map((x,i) -> Pair.of(1+i.intValue(), x)))
                 .map(en -> Pair.of(en.map(q -> q.getLeft())
                                      .enumerator()
                                      .reduce((x,y) -> x+y),

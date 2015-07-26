@@ -774,7 +774,7 @@ public class EnumeratorTest {
     public void testIndexedMap() {
         System.out.println("indexedMap");
         assertTrue(Enumerator.rangeInt(0, 100)
-                             .indexedMap((x,i) -> x - i)
+                             .map((x,i) -> x - i)
                              .allMatch(x -> x == 0));
     }
 

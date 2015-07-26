@@ -31,29 +31,77 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Implementation of highly composable enumerators.
+ * <p>
+ * This class is not {@code final} for testing purposes.
+ * </p>
+ * @param <E> type of enumerated elements.
+ */
 class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
-    protected LinkedList<AbstractPipeProcessor>      pipeline;
+    /**
+     * {@link LinkedList} of {@link AbstractPipeProcessor} instances
+     * holding the transformers operating upon the enumerated elements.
+     */
+    protected LinkedList<AbstractPipeProcessor> pipeline;
+    /**
+     * {@link LinkedList} of {@link AbstractPipeMultiProcessor} instances
+     * holding the transformers operating upon the enumerated elements that
+     * produce more then one output per single input.
+     */
     protected LinkedList<AbstractPipeMultiProcessor> multiPipeline;
-    protected LinkedList<PipeSource>              sources;
-    protected Nullable<E>                            value;
-    protected long                                   needValueForHasNext;
+    /**
+     * {@link LinkedList} of {@link PipeSource} instance that provide the
+     * elements that the processors in {@link #pipeline} work upon.
+     */
+    protected LinkedList<PipeSource> sources;
+    /**
+     * Value to return during enumeration, if any.
+     */
+    protected Nullable<E> value;
+    /**
+     * Number of elements in {@link #pipeline} that need a value in order to
+     * participate to the calculation of {@link #hasNext()}.
+     */
+    protected long needValueForHasNext;
 
-    PipeEnumerator(Enumerator<E> source) {
+    /**
+     * Creates a new {@link PipeEnumerator} instance based on the given
+     * {@code source} {@link Enumerator}.
+     * @param source {@link Enumerator} providing the elements that the pipeline
+     * works upon.
+     */
+    public PipeEnumerator(Enumerator<E> source) {
         this();
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Utils.ensureNonEnumerating(source);
         PipeSource<?> src = PipeSource.of(source);
         this.sources.add(src);
     }
-    PipeEnumerator() {
+    /**
+     * Creates a new {@link PipeEnumerator} instance with an empty internal
+     * pipeline.
+     */
+    public PipeEnumerator() {
         this.pipeline = new LinkedList<>();
         this.multiPipeline = new LinkedList<>();
         this.sources = new LinkedList<>();
         this.value = Nullable.empty();
     }
 
-    static <T> PipeEnumerator<T> of(Iterator<T> source) {
+    /**
+     * Creates a {@link PipeEnumerable} based on the given {@code source}
+     * {@link Iterator}.
+     * <p>
+     * If {@code source} is already a {@link PipeEnumerator} then this function
+     * returns it unchanged.
+     * </p>
+     * @param <T> type of enumerated elements.
+     * @param source {@link Iterator} to get elements from.
+     * @return created {@link PipeEnumerable}.
+     */
+    public static <T> PipeEnumerator<T> of(Iterator<T> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return (source instanceof PipeEnumerator)
                ? (PipeEnumerator<T>)source
@@ -62,6 +110,19 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // ---------------------------------------------------------------------- //
 
+    /**
+     * Adds the given {@code processor} to the back of the pipeline.
+     * <p>
+     * This method also maintains the consistency of
+     * {@link #needValueForHasNext}, {@link AbstractPipeProcessor#next} of
+     * the last element in {@link #pipeline} as well as
+     * {@link PipeSource#firstProcessor} of the last element in
+     * {@link #sources}.
+     * </p>
+     * @param <X> type of processed enumerated elements.
+     * @param processor {@link AbstractPipeProcessor} to add.
+     * @return the current {@link PipeEnumerator}.
+     */
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last = pipeline.peekLast();
@@ -77,6 +138,18 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return (Enumerator<X>)this;
     }
+
+    /**
+     * Adds the given {@code processor} to the front of the pipeline.
+     * <p>
+     * This method also maintains the consistency of
+     * {@link #needValueForHasNext} as well as
+     * {@link AbstractPipeProcessor#next} of {@code processor}.
+     * </p>
+     * @param <X> type of elements produced by {@code processor}.
+     * @param processor {@link AbstractPipeProcessor} to add.
+     * @return the current {@link PipeEnumerator}.
+     */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeProcessor<? super X, ?> processor) {
         final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
@@ -89,10 +162,23 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return this;
     }
+
+    /**
+     * Adds the given {@code processor} to the back of the multi-pipeline.
+     * <p>
+     * This method also maintains the consistency of
+     * {@link #needValueForHasNext}, {@link AbstractPipeProcessor#next} of
+     * the last element in {@link pipeline} as well as
+     * {@link PipeSource#firstProcessor} of the last element in
+     * {@link #sources}.
+     * </p>
+     * @param <X> type of processed enumerated elements.
+     * @param processor {@link AbstractPipeMultiProcessor} to add.
+     * @return the current {@link PipeEnumerator}.
+     */
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last = pipeline.peekLast();
-        safePipelineAddLast(processor);
         safeMultiPipelineAddLast(processor);
         if (processor.hasNextNeedsValue) {
             ++needValueForHasNext;
@@ -105,10 +191,21 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return (Enumerator<X>)this;
     }
+
+    /**
+     * Adds the given {@code processor} to the front of the multi-pipeline.
+     * <p>
+     * This method also maintains the consistency of
+     * {@link #needValueForHasNext} as well as
+     * {@link AbstractPipeProcessor#next} of {@code processor}.
+     * </p>
+     * @param <X> type of elements produced by {@code processor}.
+     * @param processor {@link AbstractPipeMultiProcessor} to add.
+     * @return the current {@link PipeEnumerator}.
+     */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
         final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
-        safePipelineAddFirst(processor);
         safeMultiPipelineAddFirst(processor);
         if (processor.hasNextNeedsValue) {
             ++needValueForHasNext;
@@ -121,12 +218,32 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
+    /**
+     * Adds the given {@code processor} to the end of {@link #pipeline}.
+     * <p>
+     * This method allows fault-injection for testing purposes.
+     * </p>
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeProcessor} to add.
+     */
     protected <X> void safePipelineAddLast(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
         pipeline.addLast(processor);
     }
+
+    /**
+     * Adds the given {@code processor} to the end of {@link #multiPipeline}.
+     * <p>
+     * This method calls
+     * {@link #safePipelineAddLast(enumj.AbstractPipeProcessor)}
+     * first.
+     * </p>
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeMultiProcessor} to add.
+     */
     protected <X> void safeMultiPipelineAddLast(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
+        safePipelineAddLast(processor);
         try {
             multiPipeline.addLast(processor);
         } catch(Throwable err) {
@@ -134,12 +251,30 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             throw err;
         }
     }
+
+    /**
+     * Adds the given {@code processor} at the front of {@link #pipeline}.
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeProcessor} to add.
+     */
     protected <X> void safePipelineAddFirst(
             AbstractPipeProcessor<? super X, ?> processor) {
         pipeline.addFirst(processor);
     }
+
+    /**
+     * Adds the given {@code processor} at the front of {@link #multiPipeline}.
+     * <p>
+     * This method calls
+     * {@link #safePipelineAddFirst(enumj.AbstractPipeProcessor)}
+     * first.
+     * </p>
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeMultiProcessor} to add.
+     */
     protected <X> void safeMultiPipelineAddFirst(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
+        safePipelineAddFirst(processor);
         try {
             multiPipeline.addFirst(processor);
         } catch(Throwable err) {
@@ -150,10 +285,33 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // ---------------------------------------------------------------------- //
 
+    /**
+     * Removes the first source in {@link #sources}.
+     * <p>
+     * This happens because the first source in {@link #sources} has no more
+     * elements. Removing the first source also involves removing the
+     * {@link AbstractPipeProcessor} instances that were processing specifically
+     * the elements of that source.
+     * </p>
+     * <p>
+     * This method clears {@link #value}.
+     * </p>
+     */
     protected void dequeueSourceWithProcessors() {
         dequeueSourceProcessors(sources.remove());
         value.clear();
     }
+
+    /**
+     * Removes the front elements of {@link #sources} until the given
+     * {@link AbstractPipeProcessor} becomes first in {@link #pipeline}.
+     * <p>
+     * This method keeps calling {@link #dequeueSourceWithProcessors()}
+     * until the condition is met.
+     * </p>
+     * @param processor {@link AbstractPipeProcessor} to bring to the front
+     * of {@link #sources}.
+     */
     protected void dequeueSourcesUpToProcessor(
             AbstractPipeProcessor processor) {
         final PipeSource processorSource = processor.getSource();
@@ -161,6 +319,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             dequeueSourceWithProcessors();
         }
     }
+
+    /**
+     * Removes the processors of the given {@link PipeSource} from
+     * the {@link #pipeline}.
+     * @param removed {@link PipeSource} that has just been removed and need
+     * its processors to be removed as well.
+     */
     protected void dequeueSourceProcessors(PipeSource removed) {
         if (sources.isEmpty()) {
             pipeline.clear();
@@ -185,6 +350,21 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             firstInPipeline = dequeueProcessor();
         }
     }
+
+    /**
+     * Removes the element in front of {@link #pipeline} and returns the new
+     * head of {@link #pipeline}.
+     * <p>
+     * This method removes the same element from the front of
+     * {@link #multiPipeline} if the removed element matches the head of
+     * {@link #multiPipeline}.
+     * </p>
+     * <p>
+     * The method also maintains the consistency of
+     * {@link #needValueForHasNext}.
+     * </p>
+     * @return the new head of {@link #pipeline}, if any.
+     */
     protected AbstractPipeProcessor dequeueProcessor() {
         final AbstractPipeProcessor head = pipeline.remove();
         if (!multiPipeline.isEmpty()
@@ -196,6 +376,15 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         return pipeline.peekFirst();
     }
+
+    /**
+     * Tries to obtain obtain an input value for the pipeline.
+     * @param in {@link Out} value serving as input for the pipeline.
+     * @param processor head of {@link #pipeline} if {@code in} gets
+     * extracted successfully.
+     * @return {@code true} if the input value for {@link #pipeline} has been
+     * extracted successfully, {@code false} otherwise.
+     */
     protected boolean tryPipelineIn(
             Out<Object>                in,
             Out<AbstractPipeProcessor> processor) {
@@ -227,18 +416,30 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         processor.set(pipeline.peekFirst());
         return true;
     }
+
+    /**
+     * Tries to process the given {@code in} value through the {@link #pipeline}
+     * and produce an output in {@link #value}.
+     * @param in input for the {@link #pipeline}.
+     * @param processor {@link AbstractPipeProcessor} instance in
+     * {@link #pipeline} to start processing from.
+     * @param nextOnSameSourceOnNoValue {@link Out} boolean telling whether
+     * to keep the same source on a failure to process the input or not.
+     * @return {@code true} if the {@code in} value has been processed to the
+     * end, {@code false} otherwise.
+     */
     protected boolean tryPipelineOut(
             Object                in,
             AbstractPipeProcessor processor,
-            Out<Boolean>          sameSourceNextOnNoValue) {
+            Out<Boolean>          nextOnSameSourceOnNoValue) {
         value.clear();
-        sameSourceNextOnNoValue.clear();
+        nextOnSameSourceOnNoValue.clear();
 
         Object val = in;
         while(processor != null) {
             if (processor.isInactive()) {
                 this.dequeueSourcesUpToProcessor(processor);
-                sameSourceNextOnNoValue.set(false);
+                nextOnSameSourceOnNoValue.set(false);
                 return false;
             }
             processor.processInputValue(val);
@@ -246,7 +447,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 val = processor.getOutputValue();
             }
             else {
-                sameSourceNextOnNoValue.set(processor.sameSourceNextOnNoValue);
+                nextOnSameSourceOnNoValue.set(
+                        processor.nextOnSameSourceOnNoValue);
                 return false;
             }
             processor = processor.getNext();
@@ -273,7 +475,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             return retrieveValue();
         }
         throw new UnsupportedOperationException("Should never be here");
-    }
+    }    
     private E retrieveValue() {
         final E result = value.get();
         value.clear();
@@ -287,27 +489,39 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         value = null;
     }
 
+    /**
+     * Gets whether there are elements in one of the {@link #sources}.
+     * <p>
+     * This method also discards the items in {@link #sources} with no elements.
+     * </p>
+     * @return {@code true} if there are more elements, {@code false} otherwise.
+     */
     protected final boolean straightHasNext() {
         while(!sources.isEmpty() && !sources.peekFirst().hasNext()) {
             dequeueSourceWithProcessors();
         }
         return !sources.isEmpty();
     }
+
+    /**
+     * Tries to get the next value.
+     * @return the next value.
+     */
     protected final boolean tryGetNext() {
         final Out<Object> in = Out.empty();
         final Out<AbstractPipeProcessor> processor = Out.empty();
-        final Out<Boolean> sameSourceNextOnNoValue = Out.empty();
+        final Out<Boolean> nextOnSameSourceOnNoValue = Out.empty();
         while(true) {
             if (!tryPipelineIn(in, processor)) {
                 return false;
             }
             if (tryPipelineOut(in.get(),
                                processor.get(),
-                               sameSourceNextOnNoValue)) {
+                               nextOnSameSourceOnNoValue)) {
                 return true;
             }
 
-            if (sameSourceNextOnNoValue.get()) {
+            if (nextOnSameSourceOnNoValue.get()) {
                 // continue to next element of same source
             } else {
                 // continue to next source
@@ -369,8 +583,15 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -//
 
-    Enumerator<Optional<E>[]> zipAll(Iterator<E> first,
-                                     List<Iterator<E>> rest) {
+    /**
+     * Zips the elements of the {@code first} {@link Iterator} with the
+     * elements of the {@code rest} of iterators.
+     * @param first first {@link Iterator} to zip.
+     * @param rest rest of the {@link Iterator} instances to zip.
+     * @return {@link Enumerator} of zipped elements.
+     */
+    public Enumerator<Optional<E>[]> zipAll(Iterator<E> first,
+                                            List<Iterator<E>> rest) {
         PipeEnumerator<Optional<E>> optionalPipe =
                 (PipeEnumerator<Optional<E>>)map(e -> Optional.of(e))
                 .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
@@ -379,9 +600,19 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     // ---------------------------------------------------------------------- //
 
+    /**
+     * Sets the source of enumeration.
+     * <p>
+     * This method gets called when the {@link PipeEnumerator} gets constructed
+     * in reverse order, during enumerator extraction from a
+     * {@link PipeEnumerable}.
+     * </p>
+     * @param elements {@link Iterator} to set as source.
+     * @return the current {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> setSource(Iterator<?> elements) {
-        final PipeSource<?> reference = PipeSource.of(elements);
-        sources.addFirst(reference);
+        final PipeSource<?> source = PipeSource.of(elements);
+        sources.addFirst(source);
         final Iterator<AbstractPipeProcessor> pipelineIterator =
                 pipeline.iterator();
         while(pipelineIterator.hasNext()) {
@@ -389,39 +620,95 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             if (processor.getSource() != null) {
                 break;
             }
-            reference.setFirstProcessorIfNone(processor);
+            source.setFirstProcessorIfNone(processor);
         }
         return this;
     }
+    
+    /**
+     * Prepends the given {@code elements} at the front {@link #sources}.
+     * @param elements {@link Iterator} to prepend.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedConcat(Iterator<?> elements) {
         return setSource(elements);
     }
+
+    /**
+     * Adds a filter processor at the front of the {@link #pipeline}.
+     * @param predicate condition to filter elements upon.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedFilter(Predicate<?> predicate) {
         return pushFrontProcessor(new FilterPipeProcessor(predicate));
     }
+
+    /**
+     * Adds a flat-map processor at the front of {@link #pipeline}.
+     * @param mapper {@link Function} mapping enumerated elements.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedFlatMap(
         Function<?, ? extends Iterator<?>> mapper) {
         return pushFrontProcessor(new FlatMapPipeProcessor(mapper));
     }
+
+    /**
+     * Adds a map processor at the front of {@link #pipeline}.
+     * @param <X> type of mapped elements. 
+     * @param mapper {@link Function} mapping enumerated elements.
+     * @return this {@link PipeEnumerator}.
+     */
     public <X> PipeEnumerator<E> reversedMap(
             Function<? super X, ?> mapper) {
         return pushFrontProcessor(new MapPipeProcessor(mapper));
     }
+
+    /**
+     * Adds a limit processor at the front of {@link #pipeline}.
+     * @param maxSize enumeration limit.
+     * @return this {@link PipeEnumerator}.
+     */
     public Enumerator<E> reversedLimit(long maxSize) {
         return pushFrontProcessor(new LimitPipeProcessor(maxSize));
     }
+
+    /**
+     * Adds a skip processor at the front of {@link #pipeline}.
+     * @param n number of elements to skip.
+     * @return this {@link PipeEnumerator}.
+     */
     public Enumerator<E> reversedSkip(long n) {
         if (n == 0) {
             return this;
         }
         return pushFrontProcessor(new SkipPipeProcessor(n));
     }
+
+    /**
+     * Adds a take-while processor at the front of {@link #pipeline}.
+     * @param predicate condition to continue taking elements.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedTakeWhile(Predicate<?> predicate) {
         return pushFrontProcessor(new WhilePipeProcessor(predicate));
     }
+
+    /**
+     * Adds a skip-while processor at the front of {@link #pipeline}.
+     * @param predicate condition to continue skipping elements.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedSkipWhile(Predicate<?> predicate) {
         return pushFrontProcessor(new SkipWhilePipeProcessor(predicate));
     }
+
+    /**
+     * Adds a zip-all processor at the front of {@link #pipeline}.
+     * @param first {@link Iterator} to zip.
+     * @param rest rest of {@link Iterator} instances to zip with.
+     * @return this {@link PipeEnumerator}.
+     */
     public PipeEnumerator<E> reversedZipAll(Iterator<?> first,
                                             List<Iterator<?>> rest) {
         pushFrontProcessor(new ZipPipeProcessor(first, rest));

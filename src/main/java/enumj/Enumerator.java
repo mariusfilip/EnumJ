@@ -100,7 +100,7 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #concat(java.util.function.Supplier)}</li>
  *   <li>{@link #filter(java.util.function.Predicate)}</li>
  *   <li>{@link #flatMap(java.util.function.Function)}</li>
- *   <li>{@link #indexedMap(java.util.function.BiFunction)}</li>
+ *   <li>{@link #map(java.util.function.BiFunction)}</li>
  *   <li>{@link #limit(long)}</li>
  *   <li>{@link #limitWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #map(java.util.function.Function)}</li>
@@ -516,7 +516,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the infinite enumerator of {@link Optional} instances
      */
     public default Enumerator<Optional<E>> asOptional() {
-        return map(e -> Optional.of(e))
+        return Enumerator.this.map(e -> Optional.of(e))
                 .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
     }
 
@@ -1130,27 +1130,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator consisting of the results of applying the
-     * provided function on the enumerated elements.
-     * <p>
-     * This method works like {@link #map(java.util.function.Function) } with
-     * the distinction that each enumerated element is accompanied by its
-     * <code>0</code>-based index.
-     * </p>
-     * @param <R> the element type of the resulted enumerator
-     * @param mapper state-less {@link  BiFunction} to apply on each enumerated
-     * element
-     * @return the mapped enumerator
-     * @exception IllegalArgumentException <code>mapper</code> is
-     * <code>null</code>
-     * @see #map(java.util.function.Function)
-     */
-    public default <R> Enumerator<R> indexedMap(
-            BiFunction<? super E, ? super Long, ? extends R> mapper) {
-        return Reversible.indexedMap(this, mapper, false);
-    }
-
-    /**
      * Returns an infinite enumerator obtained by applying repeatedly the
      * provided unary operator.
      * <p>
@@ -1238,11 +1217,32 @@ public interface Enumerator<E> extends Iterator<E> {
      * @param mapper state-less {@link Function} to apply on each enumerated
      * element
      * @return the mapped enumerator
-     * @see #indexedMap(java.util.function.BiFunction)
+     * @see #map(java.util.function.BiFunction)
      */
     public default <R> Enumerator<R> map(
             Function<? super E, ? extends R> mapper) {
         return new PipeEnumerator(this).map(mapper);
+    }
+
+    /**
+     * Returns an enumerator consisting of the results of applying the
+     * provided function on the enumerated elements.
+     * <p>
+     * This method works like {@link #map(java.util.function.Function) } with
+     * the distinction that each enumerated element is accompanied by its
+     * <code>0</code>-based index.
+     * </p>
+     * @param <R> the element type of the resulted enumerator
+     * @param mapper state-less {@link  BiFunction} to apply on each enumerated
+     * element
+     * @return the mapped enumerator
+     * @exception IllegalArgumentException <code>mapper</code> is
+     * <code>null</code>
+     * @see #map(java.util.function.Function)
+     */
+    public default <R> Enumerator<R> map(
+            BiFunction<? super E, ? super Long, ? extends R> mapper) {
+        return Reversible.map(this, mapper, false);
     }
 
     /**
