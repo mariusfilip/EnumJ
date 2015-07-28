@@ -25,24 +25,51 @@ package enumj;
 
 import java.util.Iterator;
 
+/**
+ * Type of {@link IteratorEnumerator} that acts as a source of enumerated
+ * elements for {@link AbstractPipeProcessor} instances within
+ * {@link PipeEnumerator#pipeline}.
+ * @param <E> type of enumerated elements.
+ */
 class PipeSource<E> extends IteratorEnumerator<E> {
 
     private AbstractPipeProcessor<?,?> firstProcessor;
 
+    /**
+     * Constructs a new {@link PipeSource} instances based on the given
+     * {@code source}.
+     * @param source {@link Iterator} supplying enumerated elements.
+     */
     protected PipeSource(Iterator<E> source) {
         super(source);
     }
 
-    AbstractPipeProcessor<?,?> getFirstProcessor() {
+    /**
+     * Gets the first {@link AbstractPipeProcessor} instance that processes the
+     * elements of this {@link PipeSource}
+     * @return {@link AbstractPipeProcessor} instance.
+     */
+    public AbstractPipeProcessor<?,?> getFirstProcessor() {
         return this.firstProcessor;
     }
-    void setFirstProcessorIfNone(AbstractPipeProcessor<?,?> processor) {
+    /**
+     * Sets {@link #firstProcessor} to the given {@link AbstractPipeProcessor}
+     * if there is none.
+     * @param processor value for {@link #firstProcessor} is none.
+     */
+    public void setFirstProcessorIfNone(AbstractPipeProcessor<?,?> processor) {
         if (this.firstProcessor == null) {
             this.firstProcessor = processor;
         }
-        processor.setSource(this);
     }
 
+    /**
+     * Creates a new instance of {@link PipeSource} with the given
+     * {@code source}.
+     * @param <T> type of enumerated elements.
+     * @param source {@link Iterator} instance acting as a source of elements.
+     * @return {@link PipeSource} instance.
+     */
     static <T> PipeSource<T> of(Iterator<T> source) {
         return new PipeSource(source);
     }

@@ -146,14 +146,11 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         isEnumerating = true;
         return source.hasNext();
     }
-
     @Override
     protected E internalNext() {
-        assert !isSharing && !isSharedEnumerating;
         isEnumerating = true;
         return source.next();
     }
-
     @Override
     protected void cleanup() {
         source = null;
@@ -162,13 +159,11 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     boolean hasNext(ShareableElement<E> consumedPtr) {
-        assert !isEnumerating;
         isSharedEnumerating = true;
         return consumedPtr != null && consumedPtr.next != null
                || consumedPtr == null && !buffer.isEmpty()
                || source.hasNext();
     }
-
     ShareableElement<E> next(SharingEnumerator<E> enumerator,
                              ShareableElement<E> consumedPtr) {
         assert !isEnumerating;
@@ -258,7 +253,6 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     protected SharingEnumerator<E> newSharingEnumerator() {
         return new SharingEnumerator(this);
     }
-
     protected ShareableElement<E> newShareableElement(
             E value,
             WeakHashMap<SharingEnumerator<E>,

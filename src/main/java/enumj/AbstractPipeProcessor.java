@@ -23,6 +23,9 @@
  */
 package enumj;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 /**
  * Processing unit in the highly composable pipeline of {@link PipeEnumerator}.
  *
@@ -111,6 +114,33 @@ abstract class AbstractPipeProcessor<T,R> {
             throw new UnsupportedOperationException();
         }
     }
+
+    // ---------------------------------------------------------------------- //    
+
+    /**
+     * Returns {@code true} and aggregates the given {@code mapper} to the
+     * top of the existing mappers, otherwise it returns {@code false}.
+     * @param <U> type of mapped enumerated elements.
+     * @param mapper mapping {@link Function}.
+     * @return {@code true} on successful aggregation of mappers, {@code false}
+     * otherwise.
+     */
+    public <U> boolean pushFrontMap(Function<R,U> mapper) {
+        return false;
+    }
+    /**
+     * Returns {@code true} and aggregates the given {@code mapper} to the
+     * existing mappers, otherwise it returns {@code false}.
+     * @param <U> type of mapped enumerated elements.
+     * @param mapper mapping {@link Function}.
+     * @return {@code true} on successful aggregation of mappers, {@code false}
+     * otherwise.
+     */
+    public <U> boolean enqueueMap(Function<R,U> mapper) {
+        return false;
+    }
+    
+    // ---------------------------------------------------------------------- //
 
     /**
      * Processes an input value and returns the result, if any.

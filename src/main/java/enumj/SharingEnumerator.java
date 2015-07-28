@@ -42,22 +42,15 @@ public final class SharingEnumerator<E> extends AbstractEnumerator<E> {
     protected boolean internalHasNext() {
         return source.hasNext(consumedPtr);
     }
-
     @Override
     protected E internalNext() {
         consumedPtr = source.next(this, consumedPtr);
-
-        assert consumedPtr != null;
-        assert !consumedPtr.isFree();
-
         return consumedPtr.getValue();
     }
-
     @Override
     protected void cleanup() {
         source = null;
         if (consumedPtr != null) {
-            assert !consumedPtr.isFree();
             consumedPtr.release(this);
             consumedPtr = null;
         }

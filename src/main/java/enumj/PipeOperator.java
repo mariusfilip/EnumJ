@@ -26,13 +26,30 @@ package enumj;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * Type of {@link Function} that a {@link PipeEnumerable} applies in order
+ * to constructs its {@link Enumerator} instances.
+ * @param <T> type of input enumerated elements.
+ * @param <E> type of output enumerated elements.
+ */
 final class PipeOperator<T,E> implements Function<Enumerator<T>,
                                                   Enumerator<E>> {
+    /**
+     * {@link Lazy} value indicating whether the operator can be applied
+     * only once or not.
+     */
     public final Lazy<Boolean> onceOnly;
     private final Function<Enumerator<T>, Enumerator<E>> operator;
 
-    public PipeOperator(Function<Enumerator<T>, Enumerator<E>> operator,
-                         Supplier<Boolean> onceOnly) {
+    /**
+     * Creates a {@link PipeOperator} instance with the given {@code operator}
+     * and {@code onceOnly} flag.
+     * @param operator value for the internal {@code operator}.
+     * @param onceOnly value for {@link #onceOnly}.
+     */
+    public PipeOperator(Function<Enumerator<T>,
+                                 Enumerator<E>> operator,
+                        Supplier<Boolean> onceOnly) {
         this.onceOnly = new Lazy(onceOnly);
         this.operator = operator;
     }

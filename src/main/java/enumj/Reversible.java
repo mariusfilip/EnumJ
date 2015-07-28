@@ -30,11 +30,23 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.mutable.MutableLong;
 
-class Reversible {
+/**
+ * Utility class containing methods for {@link Enumerable}.
+ */
+final class Reversible {
 
     private Reversible() {}
 
-    static <E> Enumerator<E> distinct(Enumerator<E> source,
+    /**
+     * Applies a {@link Enumerator#distinct()} operation upon {@code source},
+     * in reverse if necessary.
+     * @param <E> type of enumerated elements.
+     * @param source {@link Enumerator} to apply the operation on.
+     * @param reversed {@code true} if the operation is applied in reverse,
+     * {@code false} otherwise.
+     * @return distinct {@link Enumerator}.
+     */
+    public static <E> Enumerator<E> distinct(Enumerator<E> source,
                                              boolean       reversed) {
         final Set<E> existing = new HashSet<E>(256);
         if (reversed) {
@@ -44,6 +56,17 @@ class Reversible {
         return source.filter(existing::add);
     }
 
+    /**
+     * Applies a {@link Enumerator#map(java.util.function.BiFunction)} operation
+     * upon {@code source}, in reverse if necessary.
+     * @param <E> type of unmapped enumerated elements.
+     * @param <R> type of mapped enumerated elements.
+     * @param source {@link Enumerator} to apply the operation on.
+     * @param mapper operation to apply.
+     * @param reversed {@code true} if the operation is applied in reverse,
+     * {@code false} otherwise.
+     * @return mapped {@link Enumerator}.
+     */
     static <E,R> Enumerator<R> map(
             Enumerator<E> source,
             BiFunction<? super E, ? super Long, ? extends R> mapper,
@@ -62,9 +85,19 @@ class Reversible {
         return source.map(fun);
     }
 
-    static <E> Enumerator<E> peek(Enumerator<E>       source,
-                                  Consumer<? super E> action,
-                                  boolean             reversed) {
+    /**
+     * Applies a {@link Enumerator#peek(java.util.function.Consumer)} operation
+     * upon {@code source}, in reverse if necessary.
+     * @param <E> type of enumerated elements.
+     * @param source {@link Enumerator} to apply the operation on.
+     * @param action operation to apply.
+     * @param reversed {@code true} if the operation is applied in reverse,
+     * {@code false} otherwise.
+     * @return picked {@link Enumerator}.
+     */
+    public static <E> Enumerator<E> peek(Enumerator<E>       source,
+                                         Consumer<? super E> action,
+                                         boolean             reversed) {
         Utils.ensureNonEnumerating(source);
         Utils.ensureNotNull(action, Messages.NULL_ENUMERATOR_CONSUMER);
         final Function<E,E> actionMapper = e -> {

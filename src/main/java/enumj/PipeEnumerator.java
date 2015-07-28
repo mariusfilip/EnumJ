@@ -134,7 +134,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             last.setNext((AbstractPipeProcessor)processor);
         }
         if (!sources.isEmpty()) {
-            sources.getLast().setFirstProcessorIfNone(processor);
+            final PipeSource source = sources.getLast();
+            source.setFirstProcessorIfNone(processor);
+            processor.setSource(source);
         }
         return (Enumerator<X>)this;
     }
@@ -187,7 +189,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             last.setNext((AbstractPipeProcessor)processor);
         }
         if (!sources.isEmpty()) {
-            sources.peekLast().setFirstProcessorIfNone(processor);
+            final PipeSource source = sources.getLast();
+            source.setFirstProcessorIfNone(processor);
+            processor.setSource(source);
         }
         return (Enumerator<X>)this;
     }
@@ -212,6 +216,37 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         }
         if (first != null) {
             processor.setNext((AbstractPipeProcessor)first);
+        }
+        return this;
+    }
+
+    /**
+     * Enqueues the given mapper by aggregating it with the last mappers,
+     * if possible.
+     * @param <X> type of mapped enumerated elements.
+     * @param processor mapping {@link Function}.
+     * @return mapped {@link Enumerator}.
+     */
+    protected <X> Enumerator<X> enqueueMapProcessor(
+            Function<? super E, ? extends X> processor) {
+        if (pipeline.isEmpty() || !pipeline.getLast().enqueueMap(processor)) {
+            return enqueueProcessor(new MapPipeProcessor(processor));
+        }
+        return (Enumerator<X>)this;
+    }
+
+    /**
+     * Prepends the given mapper to the existing pipeline by aggregating it with
+     * the first mappers, if possible.
+     * @param <X> type of enumerated elements to map.
+     * @param processor mapping {@link Function}.
+     * @return mapped {@link Enumerator}.
+     */
+    protected <X> PipeEnumerator<E> pushFrontMapProcessor(
+            Function<? super X, ?> processor) {
+        if (pipeline.isEmpty()
+            || !pipeline.getFirst().pushFrontMap(processor)) {
+            return pushFrontProcessor(new MapPipeProcessor(processor));
         }
         return this;
     }
@@ -549,7 +584,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     public <X> Enumerator<X> map(
             Function<? super E, ? extends X> mapper) {
-        return enqueueProcessor(new MapPipeProcessor(mapper));
+        return enqueueMapProcessor(mapper);
     }
     @Override
     public Enumerator<E> limit(long maxSize) {
@@ -621,6 +656,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
                 break;
             }
             source.setFirstProcessorIfNone(processor);
+            processor.setSource(source);
         }
         return this;
     }
@@ -661,7 +697,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public <X> PipeEnumerator<E> reversedMap(
             Function<? super X, ?> mapper) {
-        return pushFrontProcessor(new MapPipeProcessor(mapper));
+        return pushFrontMapProcessor(mapper);
     }
 
     /**
