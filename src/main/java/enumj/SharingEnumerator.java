@@ -44,8 +44,8 @@ final class SharingEnumerator<E> extends AbstractEnumerator<E> {
      */
     public SharingEnumerator(ShareableEnumerator<E> sharedSource,
                              Enumerator<E>          cachedSource) {
-        Utils.ensureNotNull(sharedSource, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNotNull(cachedSource, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(sharedSource, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(cachedSource, Messages.NULL_ENUMERATOR_SOURCE);
         this.sharedSource = sharedSource;
         this.cachedSource = cachedSource;
         this.value = cachedSource.hasNext()

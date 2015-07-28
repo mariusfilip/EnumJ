@@ -71,7 +71,7 @@ final class Reversible {
             Enumerator<E> source,
             BiFunction<? super E, ? super Long, ? extends R> mapper,
             boolean reversed) {
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
+        Checks.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
         final MutableLong index = new MutableLong(0);
         final Function<E,R> fun = e -> {
             final R result = mapper.apply(e, index.toLong());
@@ -98,8 +98,8 @@ final class Reversible {
     public static <E> Enumerator<E> peek(Enumerator<E>       source,
                                          Consumer<? super E> action,
                                          boolean             reversed) {
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNotNull(action, Messages.NULL_ENUMERATOR_CONSUMER);
+        Checks.ensureNonEnumerating(source);
+        Checks.ensureNotNull(action, Messages.NULL_ENUMERATOR_CONSUMER);
         final Function<E,E> actionMapper = e -> {
             action.accept(e);
             return e;

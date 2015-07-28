@@ -81,7 +81,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @param source {@link Iterator} to share.
      */
     public ShareableEnumerator(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = Enumerator.of(source)
                                 .asEnumerable()
                                 .cached();
@@ -135,7 +135,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @exception IllegalStateException enumeration has started
      */
     public Enumerator<E>[] share(int count) {
-        Utils.ensureNonNegative(count,
+        Checks.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         startSharing();
 

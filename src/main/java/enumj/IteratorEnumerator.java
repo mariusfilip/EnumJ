@@ -34,9 +34,9 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
     protected Iterator<E> source;
 
     protected IteratorEnumerator(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         if (source instanceof Enumerator) {
-            Utils.ensureNonEnumerating((Enumerator<E>)source);
+            Checks.ensureNonEnumerating((Enumerator<E>)source);
         }
         this.source = source;
     }
@@ -69,7 +69,7 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
                                ? (Enumerator<T>)source
                                : new IteratorEnumerator<>(source);
         if (result == source) {
-            Utils.ensureNonEnumerating(result);
+            Checks.ensureNonEnumerating(result);
         }
         return result;
     }

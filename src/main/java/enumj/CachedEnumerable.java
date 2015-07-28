@@ -57,9 +57,9 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     CachedEnumerable(Enumerable<E> source,
                      long limit,
                      Consumer<CachedEnumerable<E>> onLimitCallback) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureLessThan(0, limit, Messages.ILLEGAL_ENUMERATOR_STATE);
-        Utils.ensureNotNull(onLimitCallback, Messages.NULL_ENUMERATOR_HANDLER);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureLessThan(0, limit, Messages.ILLEGAL_ENUMERATOR_STATE);
+        Checks.ensureNotNull(onLimitCallback, Messages.NULL_ENUMERATOR_HANDLER);
 
         this.state = new CachedEnumerableState(source,
                                                this,

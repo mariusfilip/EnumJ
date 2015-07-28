@@ -53,56 +53,56 @@ public class UtilsTest {
     }
 
     /**
-     * Test of ensureNotNull method, of class Utils.
+     * Test of ensureNotNull method, of class Checks.
      */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNotNull() {
         System.out.println("ensureNotNull");
-        Utils.ensureNotNull("not null", "");
-        Utils.ensureNotNull(null, "");
+        Checks.ensureNotNull("not null", "");
+        Checks.ensureNotNull(null, "");
     }
 
     /**
-     * Test of ensureNonNegative method, of class Utils.
+     * Test of ensureNonNegative method, of class Checks.
      */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNonNegative() {
         System.out.println("ensureNonNegative");
-        Utils.ensureNonNegative(1, "");
-        Utils.ensureNonNegative(-1, "");
+        Checks.ensureNonNegative(1, "");
+        Checks.ensureNonNegative(-1, "");
     }
 
     /**
-     * Test of ensureLessThan method, of class Utils.
+     * Test of ensureLessThan method, of class Checks.
      */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureLessThan() {
         System.out.println("ensureLessThan");
-        Utils.ensureLessThan(1, 2, "");
-        Utils.ensureLessThan(1, 1, "");
+        Checks.ensureLessThan(1, 2, "");
+        Checks.ensureLessThan(1, 1, "");
     }
 
     /**
-     * Test of ensureNonEnumerating method, of class Utils.
+     * Test of ensureNonEnumerating method, of class Checks.
      */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerator() {
         System.out.println("ensureNonEnumerating");
         final Enumerator<Integer> e = Enumerator.on(1, 2, 3);
         e.next();
-        Utils.ensureNonEnumerating(e);
+        Checks.ensureNonEnumerating(e);
     }
 
     /**
-     * Test of ensureNonEnumerating method, of class Utils.
+     * Test of ensureNonEnumerating method, of class Checks.
      */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerable() {
         System.out.println("ensureNonEnumerating");
         final Enumerable<Integer> e = Enumerable.on(1, 2, 3);
-        Utils.ensureNonEnumerating(e);
+        Checks.ensureNonEnumerating(e);
         final Iterator<Integer> it = e.iterator();
-        Utils.ensureNonEnumerating(e);
+        Checks.ensureNonEnumerating(e);
     }
     
 }

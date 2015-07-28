@@ -41,7 +41,7 @@ final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
      * @param source Array to enumerate.
      */
     public ArrayEnumerator(E[] source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

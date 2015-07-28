@@ -39,7 +39,7 @@ final class EnumerableEnumeration<E> implements Enumeration<E> {
      * @param source {@link Iterator} instance to get elements from.
      */
     public EnumerableEnumeration(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

@@ -23,13 +23,30 @@
  */
 package enumj;
 
+/**
+ * Type of of {@link AbstractPipeProcessor} that skips over a number of
+ * elements.
+ * @param <E> type of enumerated elements.
+ */
 class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+
+    /**
+     * Enumerated value.
+     */
     protected E    value;
+    /**
+     * Number of values to skip.
+     */
     protected long n;
-    
+
+    /**
+     * Constructs a {@link SkipPipeProcessor} that skips over {@code n}
+     * elements.
+     * @param n number of elements to skip.
+     */
     public SkipPipeProcessor(long n) {
         super(true, true);
-        Utils.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        Checks.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
         this.n = n;
     }
 

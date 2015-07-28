@@ -41,7 +41,7 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
      */
     public FilterPipeProcessor(Predicate<E> filter) {
         super(true, true);
-        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
 

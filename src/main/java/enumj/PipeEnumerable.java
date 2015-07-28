@@ -57,8 +57,8 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     protected PipeEnumerable(Iterable<T> source,
                              Function<Enumerator<E>, Enumerator<T>> operator,
                              Supplier<Boolean> onceOnly) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_OPERATOR);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_OPERATOR);
         this.source = source;
         this.pipeSource = Optional.empty();
         this.reversedOperator = new PipeOperator(operator, onceOnly);
@@ -75,9 +75,9 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     protected PipeEnumerable(PipeEnumerable<?,T> source,
                              Function<Enumerator<E>, Enumerator<T>> operator,
                              Supplier<Boolean> onceOnly) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_OPERATOR);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonEnumerating(source);
+        Checks.ensureNotNull(operator, Messages.NULL_PIPE_PROCESSOR_OPERATOR);
         this.source = source;
         this.pipeSource = Optional.of(source);
         this.reversedOperator = new PipeOperator(operator, onceOnly);
@@ -364,10 +364,10 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             Iterable<? extends E> first,
             Iterable<? extends E>... rest) {
-        Utils.ensureNonEnumerating(enumerable);
-        Utils.ensureNotNull(first, Messages.NULL_ITERATOR);
+        Checks.ensureNonEnumerating(enumerable);
+        Checks.ensureNotNull(first, Messages.NULL_ITERATOR);
         for(Iterable<?> it: rest) {
-            Utils.ensureNotNull(it, Messages.NULL_ITERATOR);
+            Checks.ensureNotNull(it, Messages.NULL_ITERATOR);
         }
         return of(enumerable,
                 in -> {

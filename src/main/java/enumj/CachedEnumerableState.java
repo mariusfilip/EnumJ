@@ -79,11 +79,11 @@ public final class CachedEnumerableState<E> {
                                   long                          limit,
                                   Consumer<CachedEnumerable<E>> callback,
                                   boolean                       disabled) {
-        this.source = (limit < Long.MAX_VALUE
-                       && callback != CachedEnumerable.noAction)
-                      ? source
-                      : null;
-        this.cachedSource = cachedSource;
+        this.source = source;
+        this.cachedSource = (limit < Long.MAX_VALUE
+                             && callback != CachedEnumerable.noAction)
+                            ? cachedSource
+                            : null;
         this.limit = limit;
         this.callback = callback;
 
@@ -168,7 +168,7 @@ public final class CachedEnumerableState<E> {
      * the current limit.
      */
     public CachedEnumerableState<E> resize(long newLimit) {
-        Utils.ensureLessThan(limit,
+        Checks.ensureLessThan(limit,
                              newLimit,
                              Messages.ILLEGAL_ENUMERATOR_STATE);
         return new CachedEnumerableState(source,

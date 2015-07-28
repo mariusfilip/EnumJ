@@ -23,21 +23,46 @@
  */
 package enumj;
 
-public final class Utils {
-    
-    private Utils() {}
-    
+/**
+ * Utility class containing check methods.
+ */
+final class Checks {
+
+    private Checks() {}
+
+    /**
+     * Checks whether {@code something} is not {@code null}.
+     * @param <T> type of {@code something}.
+     * @param something object to check for {@code null}.
+     * @param message error message.
+     * @throws IllegalArgumentException {@code something} is {@code null}.
+     */
     public static <T> void ensureNotNull(T something, String message) {
         if (something == null) {
             throw new IllegalArgumentException(message);
         }
     }
+    /**
+     * Checks whether {@code something} is not negative.
+     * @param something {@code long} value to check.
+     * @param message error message.
+     * @throws IllegalArgumentException {@code something} is negative.
+     */
     public static void ensureNonNegative(long something, String message) {
         if (something < 0) {
             throw new IllegalArgumentException(message);
         }
     }
-    public static void ensureLessThan(long something, long limit,
+    /**
+     * Checks whether {@code something} is less than a {@code limit}.
+     * @param something {@code long} value to check.
+     * @param limit {@code long} limit to check against.
+     * @param message error message.
+     * @throws IllegalArgumentException {@code something} is not less than
+     * the given {@code limit}.
+     */
+    public static void ensureLessThan(long something,
+                                      long limit,
                                       String message) {
         if (something >= limit) {
             throw new IllegalArgumentException(
@@ -45,12 +70,24 @@ public final class Utils {
                     something + " is not less than " + limit);
         }
     }
+    /**
+     * Checks that an {@code enumerator} is not enumerating.
+     * @param enumerator {@link Enumerator} to check.
+     * @throws IllegalStateException {@code enumerator} is enumerating.
+     * @see Enumerator#enumerating()
+     */
     public static void ensureNonEnumerating(Enumerator<?> enumerator) {
         if (enumerator.enumerating()) {
             throw new IllegalStateException(
                     Messages.ILLEGAL_MULTIPLE_ENUMERATIONS);
         }
     }
+    /**
+     * Checks that an {@code enumerable} is not enumerating.
+     * @param enumerable {@link Enumerable} to check.
+     * @throws IllegalStateException {@code enumerable} is enumerating.
+     * @see Enumerable#enumerating()
+     */
     public static void ensureNonEnumerating(Enumerable<?> enumerable) {
         if (enumerable.enumerating()) {
             throw new IllegalStateException(

@@ -40,15 +40,15 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
                             Iterator<E> first,
                             Iterator<E> second,
                             List<Iterator<E>> rest) {
-        Utils.ensureNotNull(indexSupplier,
+        Checks.ensureNotNull(indexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(nextIndexSupplier,
+        Checks.ensureNotNull(nextIndexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(first, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNotNull(second, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNotNull(rest, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(first, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(second, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(rest, Messages.NULL_ENUMERATOR_SOURCE);
         for(Iterator<E> source : rest) {
-            Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+            Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         }
         this.indexSupplier = indexSupplier;
         this.nextIndexSupplier = nextIndexSupplier;

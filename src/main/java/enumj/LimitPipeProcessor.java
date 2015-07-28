@@ -39,7 +39,7 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
      */
     public LimitPipeProcessor(long maxSize) {
         super(false, true);
-        Utils.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        Checks.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
         this.size = maxSize;
     }
 

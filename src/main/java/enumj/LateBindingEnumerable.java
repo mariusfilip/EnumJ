@@ -57,8 +57,8 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
      * @param source {@link Iterable} to get the elements from.
      */
     public void bind(Iterable<? extends E> source) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonEnumerating(this);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = (Iterable<E>)source;
     }
 

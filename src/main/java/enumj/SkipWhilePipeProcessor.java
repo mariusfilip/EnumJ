@@ -25,13 +25,30 @@ package enumj;
 
 import java.util.function.Predicate;
 
+/**
+ * Type of {@link AbstractPipeProcessor} that skips over enumerated elements
+ * as long as a condition holds {@code true}.
+ * @param <E> type of enumerated elements.
+ */
 class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+
+    /**
+     * Enumerated value.
+     */
     protected E            value;
+    /**
+     * {@link Predicate} that filters skipped elements.
+     */
     protected Predicate<E> filter;
-    
+
+    /**
+     * Constructs a {@link SkipWhilePipeProcessor} that skips enumerated
+     * elements as long as the given {@code filter} holds {@code true}.
+     * @param filter {@link Predicate} filtering skipped elements.
+     */
     public SkipWhilePipeProcessor(Predicate<E> filter) {
         super(true, true);
-        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
 

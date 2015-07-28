@@ -74,8 +74,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public PipeEnumerator(Enumerator<E> source) {
         this();
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonEnumerating(source);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonEnumerating(source);
         PipeSource<?> src = PipeSource.of(source);
         this.sources.add(src);
     }
@@ -102,7 +102,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return created {@link PipeEnumerable}.
      */
     public static <T> PipeEnumerator<T> of(Iterator<T> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return (source instanceof PipeEnumerator)
                ? (PipeEnumerator<T>)source
                : new PipeEnumerator(Enumerator.of(source));

@@ -276,7 +276,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Stream<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return of(source.iterator());
     }
 
@@ -291,7 +291,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public static <E> Enumerator<E> of(Spliterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return of(Spliterators.iterator(source));
     }
 
@@ -355,7 +355,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> ofLazyIterable(
             Supplier<? extends Iterable<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return LazyEnumerator.of(() -> of(source.get()));
     }
 
@@ -378,7 +378,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> ofLazyEnumeration(
             Supplier<? extends Enumeration<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return LazyEnumerator.of(() -> of(source.get()));
     }
 
@@ -400,7 +400,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> ofLazyStream(
             Supplier<? extends Stream<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return LazyEnumerator.of(() -> of(source.get()));
     }
 
@@ -423,7 +423,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> ofLazySpliterator(
             Supplier<? extends Spliterator<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return LazyEnumerator.of(() -> of(source.get()));
     }
 
@@ -456,7 +456,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #asFiltered(java.lang.Class)
      */
     public default <T> Enumerator<T> as(Class<T> clazz) {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return (Enumerator<T>)this;
     }
 
@@ -474,7 +474,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #filter(java.util.function.Predicate)
      */
     public default <T> Enumerator<T> asFiltered(Class<T> clazz) {
-        Utils.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
+        Checks.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
         return filter(clazz::isInstance).as(clazz);
     }
 
@@ -489,7 +489,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the new {@link OnceEnumerable}
      */
     public default OnceEnumerable<E> asEnumerable() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return new OnceEnumerable<E>(this);
     }
 
@@ -499,7 +499,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #asEnumerable()
      */
     public default Enumeration<E> asEnumeration() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return new EnumerableEnumeration(this);
     }
 
@@ -528,7 +528,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #asStream()
      */
     public default Spliterator<E> asSpliterator() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED);
     }
 
@@ -541,7 +541,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #asSupplier()
      */
     public default Stream<E> asStream() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return StreamSupport.stream(asSpliterator(), false);
     }
 
@@ -558,7 +558,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #asStream()
      */
     public default Supplier<Optional<E>> asSupplier() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return () -> hasNext() ? Optional.of(next()) : Optional.empty();
     }
 
@@ -575,7 +575,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the new {@link ShareableEnumerator}
      */
     public default ShareableEnumerator<E> asShareable() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return new ShareableEnumerator<E>(this);
     }
 
@@ -651,7 +651,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default boolean allMatch(Predicate<? super E> predicate) {
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         while(hasNext()) {
             if (!predicate.test(next())) {
                 return false;
@@ -673,7 +673,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default boolean anyMatch(Predicate<? super E> predicate) {
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         while(hasNext()) {
             if (predicate.test(next())) {
                 return true;
@@ -829,7 +829,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default <R, A> R collect(Collector<? super E, A, R> collector) {
-        Utils.ensureNotNull(collector, Messages.NULL_ENUMERATOR_HANDLER);
+        Checks.ensureNotNull(collector, Messages.NULL_ENUMERATOR_HANDLER);
         return asStream().collect(collector);
     }
 
@@ -1005,7 +1005,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @exception IllegalArgumentException <code>index</code> is negative
      */
     public default Optional<E> elementAt(long index) {
-        Utils.ensureNonNegative(index, Messages.NEGATIVE_ENUMERATOR_INDEX);
+        Checks.ensureNonNegative(index, Messages.NEGATIVE_ENUMERATOR_INDEX);
         Enumerator<E> skipped = skip(index);
         return Optional.ofNullable(skipped.hasNext()
                                    ? skipped.next()
@@ -1035,7 +1035,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default <T> boolean elementsEqual(Iterator<T> elements) {
-        Utils.ensureNotNull(elements, Messages.NULL_ITERATOR);
+        Checks.ensureNotNull(elements, Messages.NULL_ITERATOR);
         boolean thisHasNext;
         boolean elementsHasNext;
         while (true) {
@@ -1073,7 +1073,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the filtered enumerator
      */
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         return new PipeEnumerator(this).filter(predicate);
     }
 
@@ -1111,7 +1111,7 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        Utils.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
+        Checks.ensureNotNull(mapper, Messages.NULL_ENUMERATOR_MAPPER);
         return new PipeEnumerator(this).flatMap(mapper);
     }
 
@@ -1123,7 +1123,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default void forEach(Consumer<? super E> consumer) {
-        Utils.ensureNotNull(consumer, Messages.NULL_ENUMERATOR_CONSUMER);
+        Checks.ensureNotNull(consumer, Messages.NULL_ENUMERATOR_CONSUMER);
         while (hasNext()) {
             consumer.accept(next());
         }
@@ -1144,7 +1144,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @exception IllegalArgumentException <code>f</code> is <code>null</code>
      */
     public static <E> Enumerator<E> iterate(E seed, UnaryOperator<E> f) {
-        Utils.ensureNotNull(f, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(f, Messages.NULL_ENUMERATOR_GENERATOR);
         final Mutable<E> result = new MutableObject(seed);
         final MutableBoolean first = new MutableBoolean(true);
         return of(() -> {
@@ -1259,7 +1259,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see Comparator
      */
     public default Optional<E> max(Comparator<? super E> comparator) {
-        Utils.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
         E m = null;
         while (hasNext()) {
             E e = next();
@@ -1303,7 +1303,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #anyMatch(java.util.function.Predicate)
      */
     public default boolean noneMatch(Predicate<? super E> predicate) {
-        Utils.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
         while (hasNext()) {
             if (predicate.test(next())) {
                 return false;
@@ -1465,8 +1465,8 @@ public interface Enumerator<E> extends Iterator<E> {
                                           E endExclusive,
                                           UnaryOperator<E> succ,
                                           Comparator<? super E> cmp) {
-        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
         return cmp.compare(startInclusive, endExclusive) >= 0
                ? Enumerator.empty()
                : iterate(startInclusive, succ)
@@ -1491,8 +1491,8 @@ public interface Enumerator<E> extends Iterator<E> {
                                                 E endInclusive,
                                                 UnaryOperator<E> succ,
                                                 Comparator<? super E> cmp) {
-        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
         return cmp.compare(startInclusive, endInclusive) > 0
                ? Enumerator.empty()
                : iterate(startInclusive, succ)
@@ -1562,7 +1562,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Optional<E> reduce(BinaryOperator<E> accumulator) {
-        Utils.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
+        Checks.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
         if (!hasNext()) {
             return Optional.empty();
         }
@@ -1582,7 +1582,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default E reduce(E identity, BinaryOperator<E> accumulator) {
-        Utils.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
+        Checks.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
         E result = identity;
         while (hasNext()) {
             result = accumulator.apply(result, next());
@@ -1604,7 +1604,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #repeatEach(int)
      */
     public static <E> Enumerator<E> repeat(E element, long count) {
-        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        Checks.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
         return rangeLong(0, count).map(l -> element);
     }
 
@@ -1624,8 +1624,8 @@ public interface Enumerator<E> extends Iterator<E> {
      */
     public static <E> Enumerator<E> repeatAll(Supplier<Iterator<E>> source,
                                               long count) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonNegative(count,
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         return rangeLong(0, count).flatMap(l -> source.get());
     }
@@ -1646,7 +1646,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #repeatEach(int)
      */
     public default Enumerator<E> repeatAll(int count) {
-        Utils.ensureNonNegative(count,
+        Checks.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         final Enumerator<E>[] sharing = asShareable().share(count);
         return Enumerator.rangeInt(0, sharing.length)
@@ -1669,7 +1669,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #repeatAll(int)
      */
     public default Enumerator<E> repeatEach(int count) {
-        Utils.ensureNonNegative(count,
+        Checks.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         return flatMap(e -> repeat(e, count));
     }
@@ -1754,7 +1754,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default Enumerator<E> sorted(Comparator<? super E> comparator) {
-        Utils.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
         return of(asStream().sorted(comparator));
     }
 
@@ -1804,7 +1804,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * <code>null</code>
      */
     public default E[] toArray(Class<E> clazz) {
-        Utils.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
+        Checks.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
         return toList().toArray((E[])Array.newInstance(clazz, 0));
     }
 
@@ -2081,9 +2081,9 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<Optional<E>[]>
                    zipAll(Iterator<? extends E> first,
                           Iterator<? extends E>... rest) {
-        Utils.ensureNotNull(first, Messages.NULL_ITERATOR);
+        Checks.ensureNotNull(first, Messages.NULL_ITERATOR);
         for(Iterator<?> it: rest) {
-            Utils.ensureNotNull(it, Messages.NULL_ITERATOR);
+            Checks.ensureNotNull(it, Messages.NULL_ITERATOR);
         }
         return new PipeEnumerator(this).zipAll(first, rest);
     }

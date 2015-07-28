@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 class SuppliedEnumerable<E> extends AbstractEnumerable<E> {
 
-    Supplier<Enumerator<E>> supplier;
+    private final Supplier<Enumerator<E>> supplier;
 
     /**
      * Constructs a {@link SuppliedEnumerable} instance.
@@ -40,7 +40,7 @@ class SuppliedEnumerable<E> extends AbstractEnumerable<E> {
      * {@link Enumerator} instance to return.
      */
     public SuppliedEnumerable(Supplier<Enumerator<E>> supplier) {
-        Utils.ensureNotNull(supplier, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(supplier, Messages.NULL_ENUMERATOR_GENERATOR);
         this.supplier = supplier;
     }
 

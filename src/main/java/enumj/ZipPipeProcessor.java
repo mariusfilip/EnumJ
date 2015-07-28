@@ -27,6 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Type of {@link AbstractPipeProcessor} that zips enumerated values together.
+ * @param <E> type of enumerated elements to zip together.
+ */
 final class ZipPipeProcessor<E>
             extends AbstractPipeProcessor<Optional<E>,Optional<E>[]> {
 
@@ -34,6 +38,12 @@ final class ZipPipeProcessor<E>
     private       Optional<E>[] value;
     private       boolean       hasAny;
 
+    /**
+     * Constructs a {@link ZipPipeProcessor} that zips together the processed
+     * element with elements from other {@link Iterator} instances.
+     * @param first first {@link Iterator} to use in zipping.
+     * @param rest rest of {@link Iterator} instances to use in zipping.
+     */
     public ZipPipeProcessor(Iterator<E> first, List<Iterator<E>> rest) {
         super(false, true);
         iterators = new Iterator[1+rest.size()];

@@ -26,13 +26,24 @@ package enumj;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Type of {@link Enumerator} enumerating over optional elements supplied
+ * by a {@link Supplier}.
+ * @param <E> type of enumerated elements.
+ */
 final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Optional<E>> source;
     private Optional<E> value;
 
+    /**
+     * Creates a {@link SuppliedEnumerator} that enumerated over the optional
+     * elements supplied by {@code source}.
+     * @param source {@link Supplier} of {@link Optional} instances representing
+     * enumerated elements.
+     */
     public SuppliedEnumerator(Supplier<Optional<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

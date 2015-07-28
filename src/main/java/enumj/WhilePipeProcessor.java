@@ -25,13 +25,24 @@ package enumj;
 
 import java.util.function.Predicate;
 
+/**
+ * Type of {@link AbstractPipeProcessor} that lets enumeration through as long
+ * as a predicate holds {@code true}.
+ * @param <E> type of enumerated elements.
+ */
 class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+
     protected E            value;
     protected Predicate<E> filter;
 
+    /**
+     * Creates a {@link WhilePipeProcessor} that enumerates elements while
+     * {@code filter} holds {@code true}.
+     * @param filter {@link Predicate} to filter enumerated elements.
+     */
     public WhilePipeProcessor(Predicate<E> filter) {
         super(false, true);
-        Utils.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
+        Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
 

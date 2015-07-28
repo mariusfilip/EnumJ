@@ -456,7 +456,7 @@ public interface Enumerable<E> extends Iterable<E> {
      * @return distinct {@link Enumerable}.
      */
     public default Enumerable<E> distinct() {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return PipeEnumerable.distinct(this);
     }
 
@@ -577,7 +577,7 @@ public interface Enumerable<E> extends Iterable<E> {
      * @return prepended {@link Enumerable}.
      */
     public default Enumerable<E> prepend(Iterable<? extends E> elements) {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return of((Iterable<E>)elements).concat(this);
     }
 
@@ -603,8 +603,8 @@ public interface Enumerable<E> extends Iterable<E> {
                                           E endExclusive,
                                           UnaryOperator<E> succ,
                                           Comparator<? super E> cmp) {
-        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
         return new SuppliedEnumerable(() ->
                 Enumerator.range(startInclusive,
                                  endExclusive,
@@ -625,8 +625,8 @@ public interface Enumerable<E> extends Iterable<E> {
                                                 E endInclusive,
                                                 UnaryOperator<E> succ,
                                                 Comparator<? super E> cmp) {
-        Utils.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
-        Utils.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
+        Checks.ensureNotNull(succ, Messages.NULL_ENUMERATOR_GENERATOR);
+        Checks.ensureNotNull(cmp, Messages.NULL_ENUMERATOR_COMPARATOR);
         return new SuppliedEnumerable(() ->
                 Enumerator.rangeClosed(startInclusive,
                                        endInclusive,
@@ -713,7 +713,7 @@ public interface Enumerable<E> extends Iterable<E> {
      * @return repeated {@link Enumerable}.
      */
     public default Enumerable<E> repeatEach(long count) {
-        Utils.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        Checks.ensureNonNegative(count, Messages.NEGATIVE_ENUMERATOR_SIZE);
         return flatMap(e -> repeat(e, count));
     }
 
@@ -884,7 +884,7 @@ public interface Enumerable<E> extends Iterable<E> {
     public default <T>
                    Enumerable<Pair<Optional<E>, T>>
                    zipRight(Iterable<T> elements) {
-        Utils.ensureNonEnumerating(this);
+        Checks.ensureNonEnumerating(this);
         return zipAll((Iterable<E>)elements)
                .takeWhile(arr -> arr[1].isPresent())
                .map(arr -> Pair.of(arr[0], ((Optional<T>)arr[1]).get()));

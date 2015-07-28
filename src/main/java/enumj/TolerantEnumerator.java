@@ -26,6 +26,11 @@ package enumj;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+/**
+ * Type of {@link AbstractEnumerator} that continues enumeration on errors by
+ * passing errors to an error handler.
+ * @param <E> type of enumerated elements.
+ */
 final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E>                 source;
@@ -34,13 +39,21 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     private final int         retries;
     private final Nullable<E> element;
 
-    public TolerantEnumerator(Enumerator<E> source,
+    /**
+     * Creates a {@link TolerantEnumerator} that enumerates over the given
+     * {@code source} and handles errors by calling the given error
+     * {@code handler} a given number of times.
+     * @param source {@link Enumerator} to enumerate upon.
+     * @param handler error handler.
+     * @param retries number of times to retry recovering from errors.
+     */
+    public TolerantEnumerator(Enumerator<E>               source,
                               Consumer<? super Exception> handler,
-                              int retries) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        Utils.ensureNonEnumerating(source);
-        Utils.ensureNotNull(handler, Messages.NULL_ENUMERATOR_HANDLER);
-        Utils.ensureNonNegative(retries, Messages.NEGATIVE_RETRIES);
+                              int                         retries) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonEnumerating(source);
+        Checks.ensureNotNull(handler, Messages.NULL_ENUMERATOR_HANDLER);
+        Checks.ensureNonNegative(retries, Messages.NEGATIVE_RETRIES);
 
         this.source = source;
         this.handler = handler;
@@ -69,6 +82,21 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
         return false;
     }
+    @Override
+    protected E internalNext() {
+        final E result = element.get();
+        element.clear();
+        return result;
+    }
+    @Override
+    protected void cleanup() {
+        source = null;
+        handler = null;
+        
+        element.clear();
+    }
+
+    // ---------------------------------------------------------------------- //
 
     private boolean safeHasNext() {
         try {
@@ -92,20 +120,5 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
             }
         }
         return false;
-    }
-
-    @Override
-    protected E internalNext() {
-        E result = element.get();
-        element.clear();
-        return result;
-    }
-
-    @Override
-    protected void cleanup() {
-        source = null;
-        handler = null;
-        
-        element.clear();
     }
 }

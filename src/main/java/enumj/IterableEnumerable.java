@@ -56,7 +56,7 @@ final class IterableEnumerable<E> extends AbstractEnumerable<E> {
      * @return {@link Enumerable} instance.
      */
     public static <E> Enumerable<E> of(Iterable<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         if (source instanceof Enumerable) {
             return (Enumerable<E>)source;
         }

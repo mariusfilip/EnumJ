@@ -38,7 +38,7 @@ final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
      * @param source {@link Enumeration} instance to get elements from.
      */
     public EnumerationEnumerator(Enumeration<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
     }
 

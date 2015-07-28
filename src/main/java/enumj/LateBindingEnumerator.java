@@ -37,12 +37,12 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     protected boolean internalHasNext() {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return source.hasNext();
     }
     @Override
     protected E internalNext() {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return source.next();
     }
     @Override
@@ -58,8 +58,8 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
      * @param source {@link Iterator} to get the elements from.
      */
     public void bind(Iterator<? extends E> source) {
-        Utils.ensureNonEnumerating(this);
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNonEnumerating(this);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = (Iterator<E>)source;
     }
 

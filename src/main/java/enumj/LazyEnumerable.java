@@ -56,7 +56,7 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
      */
     public static <E> LazyEnumerable<E> of(
             Supplier<? extends Iterable<E>> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         return new LazyEnumerable(source);
     }
 }

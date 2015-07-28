@@ -34,7 +34,7 @@ public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     private Enumerator<E> source;
 
     public OnceEnumerable(Iterator<E> source) {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = Enumerator.of(source);
     }
 
@@ -44,7 +44,7 @@ public final class OnceEnumerable<E> extends AbstractEnumerable<E> {
     }
     @Override
     protected Enumerator<E> internalEnumerator() {
-        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         final Enumerator<E> result = source;
         source = null;
         return result;
