@@ -24,8 +24,7 @@
 package enumj;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Type of {@link Enumerator} with support for element sharing.
@@ -58,19 +57,116 @@ import java.util.WeakHashMap;
  * {@link #next()}.
  * </p>
  * <p>
- * The spawned {@link SharingEnumerator} instances can traverse independently the
- * sequence of elements because {@link ShareableEnumerator} keeps a transient
- * internal buffer of elements, from the first in use to the last in use. While
- * the buffer allows for independent traversal of the same sequence, the
- * {@link SharingEnumerator} instances may not diverge too much without the danger
- * of buffer overflow.
+ * The spawned {@link SharingEnumerator} instances can traverse independently
+ * the sequence of elements because {@link ShareableEnumerator} keeps a
+ * transient internal buffer of elements, from the first in use to the last in
+ * use. While the buffer allows for independent traversal of the same sequence,
+ * the {@link SharingEnumerator} instances may not diverge too much without the
+ * danger of buffer overflow.
  * </p>
  * @param <E> type of shared elements
  * @see Enumerator
- * @see SharingEnumerator
  */
 public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
+    
+    private CachedEnumerable<E> source;
+    private Enumerator<E>       direct;
+    private boolean             isSharing;
+    private AtomicBoolean       isEnumerating;
+    private AtomicBoolean       isSharedEnumerating;
+    
+    public ShareableEnumerator(Iterator<E> source) {
+        Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        this.source = Enumerator.of(source)
+                                .asEnumerable()
+                                .cached();
+        this.isEnumerating = new AtomicBoolean(false);
+        this.isSharedEnumerating = new AtomicBoolean(false);
+    }
 
+    @Override
+    public ShareableEnumerator<E> asShareable() {
+        return this;
+    }
+    
+    @Override
+    protected boolean internalHasNext() {
+        startEnumerating();
+        return direct.hasNext();
+    }
+    @Override
+    protected E internalNext() {
+        return direct.next();
+    }
+    @Override
+    protected void cleanup() {
+        source = null;
+        direct = null;
+        isEnumerating = null;
+        isSharedEnumerating = null;
+    }
+    
+     // --------------------------------------------------------------------- //
+
+    /**
+     * Creates an {@link Enumerator} instance that will share the
+     * elements of the current enumerator.
+     *
+     * @return sharing {@link Enumerator} instance
+     */
+    public Enumerator<E> share() {
+        return share(1)[0];
+    }
+    /**
+     * Creates an array of {@link Enumerator} instances that will share
+     * the elements of the current enumerator.
+     *
+     * @param count the number of {@link Enumerator} instances to create
+     * @return array of new {@link Enumerator} instances
+     * @exception IllegalArgumentException <code>count</code> is negative
+     * @exception IllegalStateException enumeration has started
+     */
+    public Enumerator<E>[] share(int count) {
+        Utils.ensureNonNegative(count,
+                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
+        startSharing();
+
+        final Enumerator<E>[] result = new Enumerator[count];
+        for(int i=0; i<count; ++i) {
+            result[i] = new SharingEnumerator(this, source.enumerator());
+        }
+        return result;
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -//
+
+    private void startSharing() {
+        if (isEnumerating.get() || isSharedEnumerating.get()) {
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
+        }
+        isSharing = true;
+    }
+    private void startEnumerating() {
+        if (isSharing || isSharedEnumerating.get()) {
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
+        }
+        if (isEnumerating.compareAndSet(false, true)) {
+            source.disable();
+            direct = source.enumerator();
+            source = null;
+        }
+    }    
+    void startSharedEnumeration() {
+        if (isEnumerating.get()) {
+            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
+        }
+        if (isSharedEnumerating.compareAndSet(false, true)) {
+            source.disable();
+            source = null;
+        }
+    }
+
+    /*
     private Iterator<E> source;
     private boolean isEnumerating;
     private boolean isSharing;
@@ -89,7 +185,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @param source {@link Iterator} sharing the elements
      * @exception IllegalArgumentException <code>source</code> is
      * <code>null</code>
-     */
+     *
     public ShareableEnumerator(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = source;
@@ -107,7 +203,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * elements of the current enumerator.
      *
      * @return the new {@link SharingEnumerator} instance
-     */
+     *
     public SharingEnumerator<E> share() {
         return share(1)[0];
     }
@@ -120,7 +216,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @return array of new {@link SharingEnumerator} instances
      * @exception IllegalArgumentException <code>count</code> is negative
      * @exception IllegalStateException enumeration has started
-     */
+     *
     public SharingEnumerator<E>[] share(int count) {
         Utils.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
@@ -259,4 +355,5 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
                         ShareableElement<E>> waiting) {
         return new ShareableElement(value, waiting);
     }
+    */
 }

@@ -28,8 +28,47 @@ package enumj;
  * @see Enumerator
  * @see ShareableEnumerator
  */
-public final class SharingEnumerator<E> extends AbstractEnumerator<E> {
+final class SharingEnumerator<E> extends AbstractEnumerator<E> {
+    
+    private ShareableEnumerator<E> sharedSource;
+    private Enumerator<E>          cachedSource;
+    private Nullable<E>            value;
+    
+    SharingEnumerator(ShareableEnumerator<E> sharedSource,
+                      Enumerator<E>          cachedSource) {
+        Utils.ensureNotNull(sharedSource, Messages.NULL_ENUMERATOR_SOURCE);
+        Utils.ensureNotNull(cachedSource, Messages.NULL_ENUMERATOR_SOURCE);
+        this.sharedSource = sharedSource;
+        this.cachedSource = cachedSource;
+        this.value = cachedSource.hasNext()
+                     ? Nullable.of(cachedSource.next())
+                     : Nullable.empty();
+    }
 
+    @Override
+    protected boolean internalHasNext() {
+        sharedSource.startSharedEnumeration();
+        return value.isPresent();
+    }
+    @Override
+    protected E internalNext() {
+        final E result = value.get();
+        if (cachedSource.hasNext()) {
+            value.set(cachedSource.next());
+        } else {
+            value.clear();
+        }
+        return result;
+    }
+    @Override
+    protected void cleanup() {
+        sharedSource = null;
+        cachedSource = null;
+        value.clear();
+        value = null;
+    }
+
+    /*
     private ShareableEnumerator<E> source;
     private ShareableElement<E> consumedPtr;
 
@@ -55,4 +94,5 @@ public final class SharingEnumerator<E> extends AbstractEnumerator<E> {
             consumedPtr = null;
         }
     }
+    */
 }

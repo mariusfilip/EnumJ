@@ -1648,7 +1648,7 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Enumerator<E> repeatAll(int count) {
         Utils.ensureNonNegative(count,
                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
-        final SharingEnumerator<E>[] sharing = asShareable().share(count);
+        final Enumerator<E>[] sharing = asShareable().share(count);
         return Enumerator.rangeInt(0, sharing.length)
                          .flatMap(i -> sharing[i]);
     }

@@ -17,22 +17,22 @@ import static org.junit.Assert.*;
  * @author Marius
  */
 public class CachedEnumerableTest {
-    
+
     public CachedEnumerableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -88,7 +88,7 @@ public class CachedEnumerableTest {
         final CachedEnumerable<Integer> cen = new CachedEnumerable(
                 Enumerable.on(1, 2, 3, 4, 5),
                 3,
-                () -> {});
+                self -> {});
         assertEquals(5, cen.resize(5).limit);
     }
 
@@ -101,7 +101,7 @@ public class CachedEnumerableTest {
         final CachedEnumerable<Integer> cen =
                 new CachedEnumerable(Enumerable.on(1, 2, 3, 4, 5),
                                      3,
-                                     () -> {});
+                                     self -> {});
         assertTrue(cen.elementsEqual(Enumerable.on(1, 2, 3, 4, 5)));
     }
     

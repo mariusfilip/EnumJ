@@ -287,7 +287,7 @@ public class EnumeratorTest {
                                               .share(2)))
                 .map(p -> {
                     final LateBindingEnumerator<Double> en1 = p.getLeft();
-                    final SharingEnumerator<Double>[] sens = p.getRight();
+                    final Enumerator<Double>[] sens = p.getRight();
                     
                     en1.bind(sens[0]);
                     return Pair.of(en1, sens[1]);

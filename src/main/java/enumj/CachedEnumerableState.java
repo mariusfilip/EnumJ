@@ -25,6 +25,7 @@ package enumj;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Atomic composite state of {@link CachedEnumerable}.
@@ -37,13 +38,17 @@ public final class CachedEnumerableState<E> {
      */
     public final Enumerable<E> source;
     /**
+     * {@link CachedEnumerable} caching the instances of {@link #source}.
+     */
+    public final CachedEnumerable<E> cachedSource;
+    /**
      * Maximum size of the cache.
      */
     public final long limit;
     /**
      * Method to call when the cache limit is reached.
      */
-    public final Runnable callback;
+    public final Consumer<CachedEnumerable<E>> callback;
 
     private final AtomicBoolean disabled;
     private final Lazy<Enumerator<E>> enumerator;
@@ -58,19 +63,24 @@ public final class CachedEnumerableState<E> {
      * </p>
      * @param source {@link Enumerable} instance providing the elements to
      * cache.
+     * @param cachedSource {@link CachedEnumerable} caching the elements of
+     * {@code source}.
      * @param limit maximum cache size.
      * @param callback method to call when the cache limit is reached.
      */
     public CachedEnumerableState(Enumerable<E> source,
+                                 CachedEnumerable<E> cachedSource,
                                  long limit,
-                                 Runnable callback) {
-        this(source, limit, callback, false);
+                                 Consumer<CachedEnumerable<E>> callback) {
+        this(source, cachedSource, limit, callback, false);
     }
     private CachedEnumerableState(Enumerable<E> source,
+                                  CachedEnumerable<E> cachedSource,
                                   long limit,
-                                  Runnable callback,
+                                  Consumer<CachedEnumerable<E>> callback,
                                   boolean disabled) {
         this.source = source;
+        this.cachedSource = cachedSource;
         this.limit = limit;
         this.callback = callback;
 
@@ -81,7 +91,7 @@ public final class CachedEnumerableState<E> {
             final Enumerator<E> en = this.enumerator.get();
             final long lim = this.limit;
             final AtomicBoolean dis = this.disabled;
-            final Runnable clbk = this.callback;
+            final Consumer<CachedEnumerable<E>> clbk = this.callback;
 
             if (!en.hasNext()) {
                 return Optional.empty();
@@ -97,7 +107,7 @@ public final class CachedEnumerableState<E> {
                     () -> {
                         dis.set(true);
                         try {
-                            clbk.run();
+                            clbk.accept(cachedSource);
                         } catch(Throwable ex) {
                             // do nothing
                         }
@@ -120,6 +130,7 @@ public final class CachedEnumerableState<E> {
     public CachedEnumerableState<E> enable() {
         return new CachedEnumerableState(
                         source,
+                        cachedSource,
                         limit,
                         callback,
                         false);
@@ -132,6 +143,7 @@ public final class CachedEnumerableState<E> {
     public CachedEnumerableState<E> disable() {
         return new CachedEnumerableState(
                         source,
+                        cachedSource,
                         limit,
                         callback,
                         true);
@@ -143,7 +155,7 @@ public final class CachedEnumerableState<E> {
      * @return reset {@link CachedEnumerableState} limit.
      */
     public CachedEnumerableState<E> reset() {
-        return new CachedEnumerableState(source, limit, callback);
+        return new CachedEnumerableState(source, cachedSource, limit, callback);
     }
     /**
      * Gets a new {@link CachedEnumerableState} instance identical to the
@@ -157,7 +169,10 @@ public final class CachedEnumerableState<E> {
         Utils.ensureLessThan(limit,
                              newLimit,
                              Messages.ILLEGAL_ENUMERATOR_STATE);
-        return new CachedEnumerableState(source, newLimit, callback);
+        return new CachedEnumerableState(source,
+                                         cachedSource,
+                                         newLimit,
+                                         callback);
     }
 
     /**

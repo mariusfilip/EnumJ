@@ -45,8 +45,9 @@ public class CachedEnumerableStateTest {
         System.out.println("isDisabled");
         final CachedEnumerableState<Integer> ces =
                 new CachedEnumerableState(Enumerable.on(1, 2, 3),
+                                          null,
                                           1000,
-                                          () -> {});
+                                          self -> {});
         assertFalse(ces.isDisabled());
     }
 
@@ -58,8 +59,9 @@ public class CachedEnumerableStateTest {
         System.out.println("enable");
         final CachedEnumerableState<Integer> ces =
                 new CachedEnumerableState(Enumerable.on(1, 2, 3),
+                                          null,
                                           1000,
-                                          () -> {});
+                                          self -> {});
         assertFalse(ces.enable().isDisabled());
     }
 
@@ -71,8 +73,9 @@ public class CachedEnumerableStateTest {
         System.out.println("disable");
         final CachedEnumerableState<Integer> ces =
                 new CachedEnumerableState(Enumerable.on(1, 2, 3),
+                                          null,
                                           1000,
-                                          () -> {});
+                                          self -> {});
         assertTrue(ces.disable().isDisabled());
     }
 
@@ -84,8 +87,9 @@ public class CachedEnumerableStateTest {
         System.out.println("reset");
         final CachedEnumerableState<Integer> ces =
                 new CachedEnumerableState(Enumerable.on(1, 2, 3),
+                                          null,
                                           1000,
-                                          () -> {});
+                                          self -> {});
         assertEquals(ces.limit, ces.reset().limit);
     }
 
@@ -97,8 +101,9 @@ public class CachedEnumerableStateTest {
         System.out.println("resize");
         final CachedEnumerableState<Integer> ces =
                 new CachedEnumerableState(Enumerable.on(1, 2, 3),
+                                          null,
                                           1000,
-                                          () -> {});
+                                          self -> {});
         assertEquals(ces.limit+1000, ces.resize(2000).limit);
     }
 
@@ -112,14 +117,16 @@ public class CachedEnumerableStateTest {
             for(int limit=1; limit<21; ++limit) {
                 final CachedEnumerableState<Integer> ces =
                         new CachedEnumerableState(Enumerable.rangeInt(0, count),
+                                                  null,
                                                   limit,
-                                                  () -> {});
+                                                  self -> {});
                 assertTrue(Enumerator.rangeInt(0, count)
                                      .elementsEqual(ces.enumerator()));
                 final CachedEnumerableState<Integer> ces0 =
                         new CachedEnumerableState(Enumerable.empty(),
+                                                  null,
                                                   limit,
-                                                  () -> {});
+                                                  self -> {});
                 assertTrue(Enumerator.empty()
                                      .elementsEqual(ces0.enumerator()));
             }
@@ -127,8 +134,9 @@ public class CachedEnumerableStateTest {
         final CachedEnumerableState<Integer> ces_ =
                 new CachedEnumerableState(
                         Enumerable.on(1, 2, 3, 4, 5),
+                        null,
                         3,
-                        () -> { throw new IllegalArgumentException(); });
+                        self -> { throw new IllegalArgumentException(); });
         assertTrue(Enumerator.on(1, 2, 3, 4, 5)
                              .elementsEqual(ces_.enumerator()));
     }

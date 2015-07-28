@@ -23,6 +23,8 @@
  */
 package enumj;
 
+import java.util.function.Consumer;
+
 /**
  * Implementation of {@link Enumerable} that caches the elements being
  * enumerated.
@@ -42,7 +44,7 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
      * @param source {@link Enumerable} to cache.
      */
     CachedEnumerable(Enumerable<E> source) {
-        this(source, Long.MAX_VALUE, () -> {});
+        this(source, Long.MAX_VALUE, self -> {});
     }
     /**
      * Constructs a {@link CachedEnumerable} instance that caches the elements
@@ -53,12 +55,15 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
      */
     CachedEnumerable(Enumerable<E> source,
                      long limit,
-                     Runnable onLimitCallback) {
+                     Consumer<CachedEnumerable<E>> onLimitCallback) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Utils.ensureLessThan(0, limit, Messages.ILLEGAL_ENUMERATOR_STATE);
         Utils.ensureNotNull(onLimitCallback, Messages.NULL_ENUMERATOR_HANDLER);
 
-        this.state = new CachedEnumerableState(source, limit, onLimitCallback);
+        this.state = new CachedEnumerableState(source,
+                                               this,
+                                               limit,
+                                               onLimitCallback);
     }
 
     /**
@@ -112,7 +117,8 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
     @Override
     protected boolean internalOnceOnly() {
-        return state().onceOnly();
+        final CachedEnumerableState<E> state = state();
+        return state.isDisabled() && state.onceOnly();
     }
     @Override
     protected Enumerator<E> internalEnumerator() {

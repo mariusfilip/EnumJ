@@ -348,6 +348,34 @@ public interface Enumerable<E> extends Iterable<E> {
     }
 
     /**
+     * Returns a {@link CachedEnumerable} that caches the enumerated elements.
+     * @return {@link CachedEnumerable} instance.
+     * @see #cached(long, java.util.function.Consumer)
+     */
+    public default CachedEnumerable<E> cached() {
+        return new CachedEnumerable(this);
+    }
+
+    /**
+     * Returns a {@link CachedEnumerable} that caches the enumerated elements
+     * up to a given {@code limit}.
+     * <p>
+     * Enumeration does not stop at the given {@code limit} but the overflow
+     * callback may call {@link CachedEnumerable} methods to cancel caching
+     * on overflowing the limit.
+     * </p>
+     * @param limit cache limit.
+     * @param onLimitCallback handler called on surpassing the limit.
+     * @return {@link CachedEnumerable} instance.
+     * @see #cached()
+     */
+    public default CachedEnumerable<E> cached(
+            long limit,
+            Consumer<CachedEnumerable<E>> onLimitCallback) {
+        return new CachedEnumerable(this, limit, onLimitCallback);
+    }
+
+    /**
      * Returns an {@link Enumerable} that chooses its elements from other
      * {@link Iterable} instances.
      * @param <E> Type of enumerated elements.
