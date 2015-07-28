@@ -32,6 +32,7 @@ import java.util.function.Consumer;
  */
 public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
+    static  final    Consumer<?>              noAction = self -> {};
     private volatile CachedEnumerableState<E> state;
 
     /**
@@ -44,7 +45,7 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
      * @param source {@link Enumerable} to cache.
      */
     CachedEnumerable(Enumerable<E> source) {
-        this(source, Long.MAX_VALUE, self -> {});
+        this(source, Long.MAX_VALUE, (Consumer<CachedEnumerable<E>>)noAction);
     }
     /**
      * Constructs a {@link CachedEnumerable} instance that caches the elements

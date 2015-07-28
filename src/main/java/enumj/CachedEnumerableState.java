@@ -68,26 +68,28 @@ public final class CachedEnumerableState<E> {
      * @param limit maximum cache size.
      * @param callback method to call when the cache limit is reached.
      */
-    public CachedEnumerableState(Enumerable<E> source,
-                                 CachedEnumerable<E> cachedSource,
-                                 long limit,
+    public CachedEnumerableState(Enumerable<E>                 source,
+                                 CachedEnumerable<E>           cachedSource,
+                                 long                          limit,
                                  Consumer<CachedEnumerable<E>> callback) {
         this(source, cachedSource, limit, callback, false);
     }
-    private CachedEnumerableState(Enumerable<E> source,
-                                  CachedEnumerable<E> cachedSource,
-                                  long limit,
+    private CachedEnumerableState(Enumerable<E>                 source,
+                                  CachedEnumerable<E>           cachedSource,
+                                  long                          limit,
                                   Consumer<CachedEnumerable<E>> callback,
-                                  boolean disabled) {
-        this.source = source;
+                                  boolean                       disabled) {
+        this.source = (limit < Long.MAX_VALUE
+                       && callback != CachedEnumerable.noAction)
+                      ? source
+                      : null;
         this.cachedSource = cachedSource;
         this.limit = limit;
         this.callback = callback;
 
         this.disabled = new AtomicBoolean(disabled);
         this.enumerator = new Lazy(() -> this.source.enumerator());
-        this.cache = new Lazy(() ->
-        {
+        this.cache = new Lazy(() -> {
             final Enumerator<E> en = this.enumerator.get();
             final long lim = this.limit;
             final AtomicBoolean dis = this.disabled;

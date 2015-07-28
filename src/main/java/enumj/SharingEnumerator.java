@@ -33,9 +33,17 @@ final class SharingEnumerator<E> extends AbstractEnumerator<E> {
     private ShareableEnumerator<E> sharedSource;
     private Enumerator<E>          cachedSource;
     private Nullable<E>            value;
-    
-    SharingEnumerator(ShareableEnumerator<E> sharedSource,
-                      Enumerator<E>          cachedSource) {
+
+    /**
+     * Creates a {@link SharingEnumerator} instance that shares the elements
+     * of {@link #sharedSource} via {@link #cachedSource}.
+     * @param sharedSource owner {@link ShareableEnumerator} instance that
+     * needs to be notified that the shared enumeration has commenced.
+     * @param cachedSource {@link Enumerator} instance resulted from calling
+     * {@link CachedEnumerable#enumerator()}.
+     */
+    public SharingEnumerator(ShareableEnumerator<E> sharedSource,
+                             Enumerator<E>          cachedSource) {
         Utils.ensureNotNull(sharedSource, Messages.NULL_ENUMERATOR_SOURCE);
         Utils.ensureNotNull(cachedSource, Messages.NULL_ENUMERATOR_SOURCE);
         this.sharedSource = sharedSource;

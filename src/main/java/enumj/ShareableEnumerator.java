@@ -75,6 +75,11 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     private AtomicBoolean       isEnumerating;
     private AtomicBoolean       isSharedEnumerating;
     
+    /**
+     * Creates a {@link ShareableEnumerator} instance that will share the
+     * elements of the given {@code source}.
+     * @param source {@link Iterator} to share.
+     */
     public ShareableEnumerator(Iterator<E> source) {
         Utils.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = Enumerator.of(source)
@@ -88,9 +93,9 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     public ShareableEnumerator<E> asShareable() {
         return this;
     }
-    
+
     // ---------------------------------------------------------------------- //
-    
+
     @Override
     protected boolean internalHasNext() {
         startEnumerating();
@@ -107,7 +112,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         isEnumerating = null;
         isSharedEnumerating = null;
     }
-    
+
     // ---------------------------------------------------------------------- //
 
     /**
