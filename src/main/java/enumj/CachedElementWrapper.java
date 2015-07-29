@@ -27,7 +27,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Wraps enumerated elements into a single-linked list that grows dynamically.
+ * Wrapper of cached enumerated elements.
+ * <p>
+ * {@link CachedEnumerable} caches the enumerated elements in linked lists
+ * made of {@link CachedElementWrapper} instances and iterated upon
+ * by {@link CacheEnumerator} instances.
+ * </p>
+ * 
  * @param <E> Type of enumerated elements.
  */
 final class CachedElementWrapper<E> {
@@ -36,15 +42,19 @@ final class CachedElementWrapper<E> {
     private final Lazy<Optional<CachedElementWrapper<E>>> next;
 
     /**
-     * Constructs a {@link CachedElementWrapper} instance that wraps the given
+     * Constructs a {@code CachedElementWrapper} instance that wraps the given
      * element while allowing the generation of the next element up to the
      * given limit.
-     * @param elem Wrapped element.
-     * @param nextSupplier Supplier of the next element in the cached list.
-     * @param limit Maximum number of elements in the cached list.
-     * @param ordinal Position of the current element in the cached list. The
+     *
+     * @param elem wrapped element.
+     * @param nextSupplier supplier of the next element in the cached list.
+     * @param limit maximum number of elements in the cached list.
+     * @param ordinal position of the current element in the cached list. The
      * first element in the list has an {@code ordinal} of {@code 1}.
-     * @param disableProc Procedure to call when the cached list reaches limit.
+     * @param disableProc procedure to call when the cached list reaches limit.
+     * @see CachedElementWrapper
+     * @see CachedEnumerable
+     * @see CacheEnumerator
      */
     public CachedElementWrapper(E elem,
                                 Supplier<Nullable<E>> nextSupplier,
@@ -71,7 +81,8 @@ final class CachedElementWrapper<E> {
 
     /**
      * Gets the wrapped element.
-     * @return Wrapped element.
+     *
+     * @return wrapped element.
      */
     public E getElement() {
         return elem;
@@ -79,7 +90,8 @@ final class CachedElementWrapper<E> {
 
     /**
      * Gets the wrapper of the next element in the cached list, if any.
-     * @return Optional wrapper for the next element.
+     * 
+     * @return {@link Optional} wrapper for the next element.
      */
     public Optional<CachedElementWrapper<E>> getNextWrapper() {
         return next.get();

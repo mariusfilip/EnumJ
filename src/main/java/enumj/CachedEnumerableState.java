@@ -28,25 +28,36 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
- * Atomic composite state of {@link CachedEnumerable}.
+ * Atomic composite state of {@code CachedEnumerable}.
+ *
  * @param <E> Type of enumerated elements.
+ * @see CachedEnumerable
  */
 public final class CachedEnumerableState<E> {
 
     /**
-     * {@link Enumerable} instance providing the elements to cache.
+     * {@code Enumerable} instance providing the elements to cache.
      */
     public final Enumerable<E> source;
     /**
-     * {@link CachedEnumerable} caching the instances of {@link #source}.
+     * {@code CachedEnumerable} caching the instances of {@code source}.
+     * 
+     * @see #source
      */
     public final CachedEnumerable<E> cachedSource;
     /**
      * Maximum size of the cache.
+     *
+     * @see #callback
      */
     public final long limit;
     /**
      * Method to call when the cache limit is reached.
+     * <p>
+     * This method gets {@link #cachedSource} as a parameter.
+     * </p>
+     * 
+     * @see #limit
      */
     public final Consumer<CachedEnumerable<E>> callback;
 
@@ -55,12 +66,13 @@ public final class CachedEnumerableState<E> {
     private final Lazy<Optional<CachedElementWrapper<E>>> cache;
 
     /**
-     * Constructs a {@link CachedEnumerableState} containing the given
+     * Constructs a {@code CachedEnumerableState} containing the given
      * source, cache size and callback.
      * <p>
      * This constructor builds a {@link CachedEnumerableState} that is
      * enabled by default.
      * </p>
+     *
      * @param source {@link Enumerable} instance providing the elements to
      * cache.
      * @param cachedSource {@link CachedEnumerable} caching the elements of
@@ -119,15 +131,21 @@ public final class CachedEnumerableState<E> {
 
     /**
      * Gets whether the caching is disabled.
-     * @return {@code true} if caching is disabled, {@code false} otherwise.
+     *
+     * @return true if caching is disabled, false otherwise.
+     * @see #disable()
+     * @see #enable()
      */
     public boolean isDisabled() {
         return disabled.get();
     }
     /**
-     * Gets a new {@link CachedEnumerableState} instance identical to the
-     * current one with the exception of having caching enabled.
+     * Gets a new {@code CachedEnumerableState} instance identical to the
+     * current one with the exception of having caching <em>enabled</em>.
+     *
      * @return {@link CachedEnumerableState} with caching enabled.
+     * @see #isDisabled()
+     * @see #disable()
      */
     public CachedEnumerableState<E> enable() {
         return new CachedEnumerableState(
@@ -138,9 +156,12 @@ public final class CachedEnumerableState<E> {
                         false);
     }
     /**
-     * Gets a new {@link CachedEnumerableState} instance identical to the
-     * current one with the exception of having caching disabled.
+     * Gets a new {@code CachedEnumerableState} instance identical to the
+     * current one with the exception of having caching <em>disabled</em>.
+     * 
      * @return {@link CachedEnumerableState} with caching disabled.
+     * @see #isDisabled()
+     * @see #enable()
      */
     public CachedEnumerableState<E> disable() {
         return new CachedEnumerableState(
@@ -152,20 +173,24 @@ public final class CachedEnumerableState<E> {
     }
 
     /**
-     * Gets a new {@link CachedEnumerableState} instance identical to the
-     * current one with the exception that it is enabled.
+     * Gets a new {@code CachedEnumerableState} instance identical to the
+     * current one with the exception that it is <em>reset</em>.
+     * 
      * @return reset {@link CachedEnumerableState} limit.
+     * @see #resize(long)
      */
     public CachedEnumerableState<E> reset() {
         return new CachedEnumerableState(source, cachedSource, limit, callback);
     }
     /**
-     * Gets a new {@link CachedEnumerableState} instance identical to the
-     * current one with the exception of a greater limit.
+     * Gets a new {@code CachedEnumerableState} instance identical to the
+     * current one with the exception of a greater {@code limit}.
+     *
      * @param newLimit value for the cache limit, larger than the current one.
      * @return resized {@link CachedEnumerableState} limit.
      * @throws IllegalArgumentException {@code newLimit} is not larger than
      * the current limit.
+     * @see #reset()
      */
     public CachedEnumerableState<E> resize(long newLimit) {
         Checks.ensureLessThan(limit,
@@ -178,10 +203,10 @@ public final class CachedEnumerableState<E> {
     }
 
     /**
-     * Gets whether the source {@link Enumerable} is a <em>once only</em>
+     * Gets whether the source {@code Enumerable} is a <em>once only</em>
      * enumerator.
-     * @return {@code true} if {@code source.onceOnly()} returns {@code true},
-     * {@code false} otherwise.
+     *
+     * @return value of {@code source.onceOnly()}.
      * @see Enumerable#onceOnly()
      */
     public boolean onceOnly() {
@@ -189,11 +214,14 @@ public final class CachedEnumerableState<E> {
     }
 
     /**
-     * Gets an {@link Enumerator} instance that enumerates over the cached
-     * elements if caching is enabled or over the source {@link Enumerable}
+     * Gets an {@code Enumerator} instance that enumerates over the cached
+     * elements if caching is enabled or over the source {@code Enumerable}
      * if caching is disabled.
-     * @return Potentially caching {@link Enumerator} instance.
+     *
+     * @return potentially caching {@link Enumerator} instance.
      * @see CacheEnumerator
+     * @see Enumerable
+     * @see CachedEnumerable
      */
     public Enumerator<E> enumerator() {
         return disabled.get()

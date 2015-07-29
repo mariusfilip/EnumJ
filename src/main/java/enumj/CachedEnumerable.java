@@ -26,9 +26,11 @@ package enumj;
 import java.util.function.Consumer;
 
 /**
- * Implementation of {@link Enumerable} that caches the elements being
- * enumerated.
+ * {@code Enumerable} that caches the elements being enumerated.
+ *
  * @param <E> Type of enumerated elements.
+ * @see CacheEnumerator
+ * @see CachedElementWrapper
  */
 public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
@@ -36,20 +38,22 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     private volatile CachedEnumerableState<E> state;
 
     /**
-     * Constructs a {@link CachedEnumerable} instance that caches the elements
-     * of the given source {@link Enumerable}.
+     * Constructs a {@code CachedEnumerable} instance that caches the elements
+     * of the given source {@code Enumerable}.
      * <p>
      * The resulted {@link CachedEnumerable} has no size limit and it's internal
      * cache does not get replaced.
      * </p>
+     *
      * @param source {@link Enumerable} to cache.
      */
     CachedEnumerable(Enumerable<E> source) {
         this(source, Long.MAX_VALUE, (Consumer<CachedEnumerable<E>>)noAction);
     }
     /**
-     * Constructs a {@link CachedEnumerable} instance that caches the elements
+     * Constructs a {@code CachedEnumerable} instance that caches the elements
      * of the given source {@link Enumerable} up to the given limit.
+     *
      * @param source {@link Enumerable} to cache.
      * @param limit maximum size of the internal cache.
      * @param onLimitCallback method to call when the cache reaches the limit.
@@ -68,9 +72,15 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Gets a {@link CachedEnumerableState} instance representing the state
-     * of the current {@link CachedEnumerable}.
+     * Gets a {@code CachedEnumerableState} instance representing the state
+     * of the current {@code CachedEnumerable}.
+     *
      * @return {@link CachedEnumerableState} instance
+     * @see CachedEnumerable
+     * @see #disable()
+     * @see #enable()
+     * @see #reset()
+     * @see #resize(long)
      */
     public CachedEnumerableState<E> state() {
         return this.state;
@@ -78,7 +88,12 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
     /**
      * Disables caching and returns the disabled state.
+     *
      * @return {@link CachedEnumerableState} representing the disabled state.
+     * @see #state()
+     * @see #enable()
+     * @see #reset()
+     * @see #resize(long)
      */
     public CachedEnumerableState<E> disable() {
         final CachedEnumerableState<E> disabled = state().disable();
@@ -87,7 +102,12 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
     /**
      * Enables caching and returns the enabled state.
+     *
      * @return {@link CachedEnumerableState} representing the enabled state.
+     * @see #state()
+     * @see #disable()
+     * @see #reset()
+     * @see #resize(long)
      */
     public CachedEnumerableState<E> enable() {
         final CachedEnumerableState<E> enabled = state().enable();
@@ -97,8 +117,13 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
 
     /**
      * Resets the cache and returns the new state of the current
-     * {@link CachedEnumerable}.
+     * {@code CachedEnumerable}.
+     *
      * @return {@link CachedEnumerableState} representing the reset state.
+     * @see #state()
+     * @see #disable()
+     * @see #enable()
+     * @see #resize(long)
      */
     public CachedEnumerableState<E> reset() {
         final CachedEnumerableState<E> res = state().reset();
@@ -107,8 +132,13 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     }
     /**
      * Resizes the cache to a larger limit.
+     *
      * @param newLimit larger cache size.
      * @return {@link CachedEnumerableState} representing the resized state.
+     * @see #state()
+     * @see #disable()
+     * @see #enable()
+     * @see #reset()
      */
     public CachedEnumerableState<E> resize(long newLimit) {
         final CachedEnumerableState<E> res = state().resize(newLimit);

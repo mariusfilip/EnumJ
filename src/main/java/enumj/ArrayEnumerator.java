@@ -24,20 +24,24 @@
 package enumj;
 
 /**
- * {@link Enumerator} implementation for arrays.
+ * {@code Enumerator} implementation for arrays.
+ *
  * @param <E> Type of enumerated elements.
+ * @see Enumerator
  */
 final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
 
-    /**
-     * Array to enumerate over.
-     */
-    protected E[] source;
+    private E[] source;
     private int index;
 
     /**
-     * Constructs a {@link ArrayEnumerator} that enumerates over the given
+     * Constructs an {@code ArrayEnumerator} that enumerates over the given
      * array.
+     * <p>
+     * The new {@link ArrayEnumerator} stores the {@code source} array
+     * internally.
+     * </p>
+     * 
      * @param source Array to enumerate.
      */
     public ArrayEnumerator(E[] source) {
