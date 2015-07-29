@@ -26,8 +26,11 @@ package enumj;
 import java.util.function.Supplier;
 
 /**
- * Type of {@link Enumerable} that retrieves its source of elements lazily.
+ * {@code Enumerable} that retrieves its source of elements lazily.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerable
+ * @see AbstractEnumerable
  */
 final class LazyEnumerable<E> extends AbstractEnumerable<E> {
 
@@ -47,8 +50,9 @@ final class LazyEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Creates a {@link LazyEnumerable} instance that uses {@code source} to
+     * Creates a {@code LazyEnumerable} instance that uses {@code source} to
      * get its source of elements.
+     *
      * @param <E> type of enumerated elements.
      * @param source {@link Supplier} instance providing the source of elements
      * lazily.

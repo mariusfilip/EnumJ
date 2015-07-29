@@ -37,6 +37,8 @@ import java.util.function.Predicate;
  * This class is not {@code final} for testing purposes.
  * </p>
  * @param <E> type of enumerated elements.
+ * @see Enumerator
+ * @see AbstractEnumerator
  */
 class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
@@ -61,14 +63,15 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected Nullable<E> value;
     /**
-     * Number of elements in {@link #pipeline} that need a value in order to
-     * participate to the calculation of {@link #hasNext()}.
+     * Number of elements in {@code pipeline} that need a value in order to
+     * participate to the calculation of {@code hasNext()}.
      */
     protected long needValueForHasNext;
 
     /**
-     * Creates a new {@link PipeEnumerator} instance based on the given
-     * {@code source} {@link Enumerator}.
+     * Creates a new {@code PipeEnumerator} instance based on the given
+     * {@code source} {@code Enumerator}.
+     *
      * @param source {@link Enumerator} providing the elements that the pipeline
      * works upon.
      */
@@ -80,7 +83,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         this.sources.add(src);
     }
     /**
-     * Creates a new {@link PipeEnumerator} instance with an empty internal
+     * Creates a new {@code PipeEnumerator} instance with an empty internal
      * pipeline.
      */
     public PipeEnumerator() {
@@ -91,15 +94,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Creates a {@link PipeEnumerable} based on the given {@code source}
-     * {@link Iterator}.
+     * Creates a {@code PipeEnumerator} based on the given {@code source}
+     * {@code Iterator}.
      * <p>
      * If {@code source} is already a {@link PipeEnumerator} then this function
      * returns it unchanged.
      * </p>
+     *
      * @param <T> type of enumerated elements.
      * @param source {@link Iterator} to get elements from.
-     * @return created {@link PipeEnumerable}.
+     * @return created {@link PipeEnumerator}.
      */
     public static <T> PipeEnumerator<T> of(Iterator<T> source) {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
@@ -148,6 +152,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * {@link #needValueForHasNext} as well as
      * {@link AbstractPipeProcessor#next} of {@code processor}.
      * </p>
+     *
      * @param <X> type of elements produced by {@code processor}.
      * @param processor {@link AbstractPipeProcessor} to add.
      * @return the current {@link PipeEnumerator}.
@@ -174,6 +179,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * {@link PipeSource#firstProcessor} of the last element in
      * {@link #sources}.
      * </p>
+     *
      * @param <X> type of processed enumerated elements.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      * @return the current {@link PipeEnumerator}.
@@ -203,6 +209,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * {@link #needValueForHasNext} as well as
      * {@link AbstractPipeProcessor#next} of {@code processor}.
      * </p>
+     *
      * @param <X> type of elements produced by {@code processor}.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      * @return the current {@link PipeEnumerator}.
@@ -223,6 +230,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     /**
      * Enqueues the given mapper by aggregating it with the last mappers,
      * if possible.
+     *
      * @param <X> type of mapped enumerated elements.
      * @param processor mapping {@link Function}.
      * @return mapped {@link Enumerator}.
@@ -238,6 +246,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     /**
      * Prepends the given mapper to the existing pipeline by aggregating it with
      * the first mappers, if possible.
+     *
      * @param <X> type of enumerated elements to map.
      * @param processor mapping {@link Function}.
      * @return mapped {@link Enumerator}.
@@ -254,10 +263,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
     /**
-     * Adds the given {@code processor} to the end of {@link #pipeline}.
+     * Adds the given {@code processor} to the end of {@code pipeline}.
      * <p>
      * This method allows fault-injection for testing purposes.
      * </p>
+     *
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeProcessor} to add.
      */
@@ -267,12 +277,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds the given {@code processor} to the end of {@link #multiPipeline}.
+     * Adds the given {@code processor} to the end of {@code multiPipeline}.
      * <p>
      * This method calls
      * {@link #safePipelineAddLast(enumj.AbstractPipeProcessor)}
      * first.
      * </p>
+     *
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      */
@@ -288,7 +299,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds the given {@code processor} at the front of {@link #pipeline}.
+     * Adds the given {@code processor} at the front of {@code pipeline}.
+     *
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeProcessor} to add.
      */
@@ -298,12 +310,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds the given {@code processor} at the front of {@link #multiPipeline}.
+     * Adds the given {@code processor} at the front of {@code multiPipeline}.
      * <p>
      * This method calls
      * {@link #safePipelineAddFirst(enumj.AbstractPipeProcessor)}
      * first.
      * </p>
+     *
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      */
@@ -321,13 +334,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Removes the first source in {@link #sources}.
+     * Removes the first source in {@code sources}.
      * <p>
      * This happens because the first source in {@link #sources} has no more
      * elements. Removing the first source also involves removing the
      * {@link AbstractPipeProcessor} instances that were processing specifically
      * the elements of that source.
-     * </p>
      * <p>
      * This method clears {@link #value}.
      * </p>
@@ -339,11 +351,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Removes the front elements of {@link #sources} until the given
-     * {@link AbstractPipeProcessor} becomes first in {@link #pipeline}.
+     * {@code AbstractPipeProcessor} becomes first in {@code pipeline}.
      * <p>
      * This method keeps calling {@link #dequeueSourceWithProcessors()}
      * until the condition is met.
      * </p>
+     *
      * @param processor {@link AbstractPipeProcessor} to bring to the front
      * of {@link #sources}.
      */
@@ -356,8 +369,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Removes the processors of the given {@link PipeSource} from
-     * the {@link #pipeline}.
+     * Removes the processors of the given {@code PipeSource} from
+     * the {@code pipeline}.
+     *
      * @param removed {@link PipeSource} that has just been removed and need
      * its processors to be removed as well.
      */
@@ -387,17 +401,17 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Removes the element in front of {@link #pipeline} and returns the new
-     * head of {@link #pipeline}.
+     * Removes the element in front of {@code pipeline} and returns the new
+     * head of {@code pipeline}.
      * <p>
      * This method removes the same element from the front of
      * {@link #multiPipeline} if the removed element matches the head of
      * {@link #multiPipeline}.
-     * </p>
      * <p>
      * The method also maintains the consistency of
      * {@link #needValueForHasNext}.
      * </p>
+     *
      * @return the new head of {@link #pipeline}, if any.
      */
     protected AbstractPipeProcessor dequeueProcessor() {
@@ -414,11 +428,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Tries to obtain obtain an input value for the pipeline.
+     *
      * @param in {@link Out} value serving as input for the pipeline.
      * @param processor head of {@link #pipeline} if {@code in} gets
      * extracted successfully.
-     * @return {@code true} if the input value for {@link #pipeline} has been
-     * extracted successfully, {@code false} otherwise.
+     * @return true if the input value for {@link #pipeline} has been
+     * extracted successfully, false otherwise.
      */
     protected boolean tryPipelineIn(
             Out<Object>                in,
@@ -453,15 +468,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Tries to process the given {@code in} value through the {@link #pipeline}
-     * and produce an output in {@link #value}.
+     * Tries to process the given {@code in} value through the {@code pipeline}
+     * and produce an output in {@code value}.
+     *
      * @param in input for the {@link #pipeline}.
      * @param processor {@link AbstractPipeProcessor} instance in
      * {@link #pipeline} to start processing from.
      * @param nextOnSameSourceOnNoValue {@link Out} boolean telling whether
      * to keep the same source on a failure to process the input or not.
-     * @return {@code true} if the {@code in} value has been processed to the
-     * end, {@code false} otherwise.
+     * @return true if the {@code in} value has been processed to the
+     * end, false otherwise.
      */
     protected boolean tryPipelineOut(
             Object                in,
@@ -525,11 +541,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Gets whether there are elements in one of the {@link #sources}.
+     * Gets whether there are elements in one of the {@code sources}.
      * <p>
      * This method also discards the items in {@link #sources} with no elements.
      * </p>
-     * @return {@code true} if there are more elements, {@code false} otherwise.
+     * @return true if there are more elements, false otherwise.
      */
     protected final boolean straightHasNext() {
         while(!sources.isEmpty() && !sources.peekFirst().hasNext()) {
@@ -540,6 +556,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Tries to get the next value.
+     *
      * @return the next value.
      */
     protected final boolean tryGetNext() {
@@ -619,10 +636,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -//
 
     /**
-     * Zips the elements of the {@code first} {@link Iterator} with the
+     * Zips the elements of the {@code first} {@code Iterator} with the
      * elements of the {@code rest} of iterators.
+     *
      * @param first first {@link Iterator} to zip.
-     * @param rest rest of the {@link Iterator} instances to zip.
+     * @param rest rest of the {@code Iterator} instances to zip.
      * @return {@link Enumerator} of zipped elements.
      */
     public Enumerator<Optional<E>[]> zipAll(Iterator<E> first,
@@ -642,8 +660,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * in reverse order, during enumerator extraction from a
      * {@link PipeEnumerable}.
      * </p>
+     *
      * @param elements {@link Iterator} to set as source.
-     * @return the current {@link PipeEnumerator}.
+     * @return the current {@code PipeEnumerator}.
      */
     public PipeEnumerator<E> setSource(Iterator<?> elements) {
         final PipeSource<?> source = PipeSource.of(elements);
@@ -662,7 +681,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     
     /**
-     * Prepends the given {@code elements} at the front {@link #sources}.
+     * Prepends the given {@code elements} at the front of {@code sources}.
+     *
      * @param elements {@link Iterator} to prepend.
      * @return this {@link PipeEnumerator}.
      */
@@ -671,7 +691,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a filter processor at the front of the {@link #pipeline}.
+     * Adds a filter processor at the front of the {@code pipeline}.
+     *
      * @param predicate condition to filter elements upon.
      * @return this {@link PipeEnumerator}.
      */
@@ -680,7 +701,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a flat-map processor at the front of {@link #pipeline}.
+     * Adds a flat-map processor at the front of {@code pipeline}.
+     *
      * @param mapper {@link Function} mapping enumerated elements.
      * @return this {@link PipeEnumerator}.
      */
@@ -690,7 +712,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a map processor at the front of {@link #pipeline}.
+     * Adds a map processor at the front of {@code pipeline}.
+     *
      * @param <X> type of mapped elements. 
      * @param mapper {@link Function} mapping enumerated elements.
      * @return this {@link PipeEnumerator}.
@@ -701,7 +724,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a limit processor at the front of {@link #pipeline}.
+     * Adds a limit processor at the front of {@code pipeline}.
+     *
      * @param maxSize enumeration limit.
      * @return this {@link PipeEnumerator}.
      */
@@ -710,7 +734,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a skip processor at the front of {@link #pipeline}.
+     * Adds a skip processor at the front of {@code pipeline}.
+     *
      * @param n number of elements to skip.
      * @return this {@link PipeEnumerator}.
      */
@@ -722,7 +747,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a take-while processor at the front of {@link #pipeline}.
+     * Adds a take-while processor at the front of {@code pipeline}.
+     *
      * @param predicate condition to continue taking elements.
      * @return this {@link PipeEnumerator}.
      */
@@ -731,7 +757,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a skip-while processor at the front of {@link #pipeline}.
+     * Adds a skip-while processor at the front of {@code pipeline}.
+     *
      * @param predicate condition to continue skipping elements.
      * @return this {@link PipeEnumerator}.
      */
@@ -740,9 +767,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     /**
-     * Adds a zip-all processor at the front of {@link #pipeline}.
+     * Adds a zip-all processor at the front of {@code pipeline}.
+     *
      * @param first {@link Iterator} to zip.
-     * @param rest rest of {@link Iterator} instances to zip with.
+     * @param rest rest of {@code Iterator} instances to zip with.
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedZipAll(Iterator<?> first,

@@ -27,9 +27,12 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
- * Type of {@link AbstractEnumerator} that continues enumeration on errors by
- * passing errors to an error handler.
+ * {@code Enumerator} that continues enumeration even in presence of errors by
+ * passing them to an error handler.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerator
+ * @see AbstractEnumerator
  */
 final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
 
@@ -40,9 +43,10 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     private final Nullable<E> element;
 
     /**
-     * Creates a {@link TolerantEnumerator} that enumerates over the given
+     * Creates a {@code TolerantEnumerator} that enumerates over the given
      * {@code source} and handles errors by calling the given error
      * {@code handler} a given number of times.
+     *
      * @param source {@link Enumerator} to enumerate upon.
      * @param handler error handler.
      * @param retries number of times to retry recovering from errors.

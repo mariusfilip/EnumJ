@@ -24,12 +24,16 @@
 package enumj;
 
 /**
- * Type of {@link Enumerable} encapsulating an {@link Iterable}.
+ * {@code Enumerable} encapsulating an {@code Iterable}.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerable
+ * @see AbstractEnumerable
+ * @see Iterable
  */
 final class IterableEnumerable<E> extends AbstractEnumerable<E> {
 
-    protected Iterable<E> source;
+    private Iterable<E> source;
 
     private IterableEnumerable(Iterable<E> source) {
         this.source = source;
@@ -39,7 +43,6 @@ final class IterableEnumerable<E> extends AbstractEnumerable<E> {
     protected boolean internalOnceOnly() {
         return false;
     }
-
     @Override
     protected Enumerator<E> internalEnumerator() {
         return Enumerator.of(source.iterator());
@@ -48,9 +51,10 @@ final class IterableEnumerable<E> extends AbstractEnumerable<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Constructs an {@link Enumerable} from an {@link Iterable}. If the
+     * Constructs an {@code Enumerable} from an {@code Iterable}. If the
      * iterable is already an enumerable, it returns it unchanged, otherwise
      * it returns an {@link IterableEnumerable} encapsulating it.
+     *
      * @param <E> type of enumerated elements.
      * @param source {@link Iterable} to get elements from.
      * @return {@link Enumerable} instance.

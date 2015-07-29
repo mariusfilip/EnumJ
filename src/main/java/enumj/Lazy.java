@@ -28,9 +28,11 @@ import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 
 /**
- * Type of {@link LazyInitializer} that gets a {@link Supplier} to initialise
+ * {@code LazyInitializer} that gets a {@code Supplier} to initialise
  * with.
  * @param <T> type of lazily enumerated entity.
+ * @see LazyInitializer
+ * @see Supplier
  */
 public final class Lazy<T> extends LazyInitializer<T> {
 
@@ -38,9 +40,11 @@ public final class Lazy<T> extends LazyInitializer<T> {
     private volatile boolean initialized;
 
     /**
-     * Constructs a {@link Lazy} instance.
+     * Constructs a {@code Lazy} instance.
+     *
      * @param supplier {@link Supplier} instance providing the lazily
      * initialised non-null element.
+     * @see Lazy
      */
     public Lazy(Supplier<T> supplier) {
         this.supplier = supplier;
@@ -48,7 +52,8 @@ public final class Lazy<T> extends LazyInitializer<T> {
 
     /**
      * Gets whether this lazy instance has been initialised.
-     * @return {@code True} if the value has been initialised, {@code false}
+     *
+     * @return true if the value has been initialised, false
      * otherwise.
      */
     public boolean isInitialized() {

@@ -6,26 +6,27 @@
 package enumj;
 
 /**
- * Enumerator sharing the elements of a common {@link ShareableEnumerator}.
+ * {@code Enumerator} sharing the elements of a common
+ * {@code ShareableEnumerator}.
  * <p>
  * Sharing enumerators get spawned by {@link ShareableEnumerator} instances with
  * the purpose of sharing independently an enumerable sequence without
  * triggering the original enumeration multiple times.
- * </p>
  * <p>
- * A {@link ShareableEnumerator} enters its <em>shared mode</em> once it starts
+ * A {@code ShareableEnumerator} enters its <em>shared mode</em> once it starts
  * spawning sharing enumerators. When spawned {@link SharingEnumerator}
- * instances start enumerating, the common {@link ShareableEnumerator} enters
+ * instances start enumerating, the common {@code ShareableEnumerator} enters
  * its <em>shared enumerating mode</em> and further sharing is not possible.
- * </p>
  * <p>
- * {@link SharingEnumerator} instances can enumerate the shared elements
- * independently because the {@link ShareableEnumerator} behind them buffers
+ * {@code SharingEnumerator} instances can enumerate the shared elements
+ * independently because the {@code ShareableEnumerator} behind them buffers
  * the elements being shared. Allowing too much divergence between the sharing
  * enumerators may lead to buffer overflows.
  * </p>
+ *
  * @param <E> type of shared elements
  * @see Enumerator
+ * @see AbstractEnumerator
  * @see ShareableEnumerator
  */
 final class SharingEnumerator<E> extends AbstractEnumerator<E> {
@@ -35,8 +36,9 @@ final class SharingEnumerator<E> extends AbstractEnumerator<E> {
     private Nullable<E>            value;
 
     /**
-     * Creates a {@link SharingEnumerator} instance that shares the elements
-     * of {@link #sharedSource} via {@link #cachedSource}.
+     * Creates a {@code SharingEnumerator} instance that shares the elements
+     * of {@code sharedSource} via {@code cachedSource}.
+     *
      * @param sharedSource owner {@link ShareableEnumerator} instance that
      * needs to be notified that the shared enumeration has commenced.
      * @param cachedSource {@link Enumerator} instance resulted from calling

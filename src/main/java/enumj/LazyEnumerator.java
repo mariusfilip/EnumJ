@@ -27,14 +27,25 @@ import java.util.Iterator;
 import java.util.function.Supplier;
 
 /**
- * Type of {@link Enumerator} that retrieves its source of elements lazily.
+ * {@code Enumerator} that retrieves its source of elements lazily.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerator
+ * @see AbstractEnumerator
  */
 final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Iterator<E>> source;
     private Enumerator<E> iterator;
 
+    /**
+     * Constructs a {@code LazyEnumerator} instance.
+     * <p>
+     * The new {@link LazyEnumerator} stores its {@code source} internally.
+     * </p>
+     * 
+     * @param source {@link Supplier} for the internal {@link Iterator}.
+     */
     private LazyEnumerator(Supplier<Iterator<E>> source) {
         this.source = source;
     }
@@ -57,8 +68,9 @@ final class LazyEnumerator<E> extends AbstractEnumerator<E> {
     }
     
     /**
-     * Creates a {@link LazyEnumerator} instance that uses {@code source} to
+     * Creates a {@code LazyEnumerator} instance that uses {@code source} to
      * get its source of elements.
+     *
      * @param <E> type of enumerated elements.
      * @param source {@link Supplier} instance providing the source of elements
      * lazily.

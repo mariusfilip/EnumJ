@@ -27,9 +27,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
- * Type of {@link Enumerable} whose source of elements can be defined after
+ * {@code Enumerable} whose source of elements can be defined after
  * construction.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerable
+ * @see AbstractEnumerable
  */
 public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
 
@@ -52,9 +55,11 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Binds the current {@link LateBindingEnumerable} to the given
+     * Binds the current {@code LateBindingEnumerable} to the given
      * {@code source}.
+     *
      * @param source {@link Iterable} to get the elements from.
+     * @see LateBindingEnumerable
      */
     public void bind(Iterable<? extends E> source) {
         Checks.ensureNonEnumerating(this);
@@ -63,7 +68,8 @@ public final class LateBindingEnumerable<E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Gets the bound {@link Iterable} source, if any.
+     * Gets the bound {@code Iterable} source, if any.
+     *
      * @return optional source {@link Iterable}.
      */
     public Optional<Iterable<E>> binding() {

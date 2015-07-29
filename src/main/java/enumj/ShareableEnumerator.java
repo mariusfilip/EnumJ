@@ -27,20 +27,20 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Type of {@link Enumerator} with support for element sharing.
+ * {@code Enumerator} with support for element sharing.
  * <p>
- * Shareable enumerators encapsulate an {@link Iterator} and spawn
- * {@link SharingEnumerator} instances that can share the elements without the
+ * Shareable enumerators encapsulate an {@link Iterator} and spawn sharing
+ * {@link Enumerator} instances that can share the elements without the
  * original iterator being traversed more than once.
  * </p>
  * <p>
  * Shareable enumerators work in one of the following three modes:
  * </p>
  * <ul>
- *   <li><em>shared mode</em> in which the enumerator spawns
- * {@link SharingEnumerator} instances</li>
- *   <li><em>shared enumerating mode</em> in which the
- * {@link SharingEnumerator} instances enumerate and share the elements
+ *   <li><em>shared mode</em> in which the enumerator spawns sharing
+ * {@code Enumerator} instances</li>
+ *   <li><em>shared enumerating mode</em> in which the sharing
+ * {@code Enumerator} instances enumerate and share the elements
  * independently of each other</li>
  *   <li><em>enumerating mode</em> in which the current enumerator yields
  * the elements directly, like any other enumerator</li>
@@ -52,20 +52,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * The <em>shared mode</em> it triggered by calls to {@link #share()} or
  * {@link #share(int)}. The <em>shared enumerating mode</em> begins when
- * one of the spawned {@link SharingEnumerator} instances starts enumerating.
+ * one of the spawned sharing {@code Enumerator} instances starts enumerating.
  * The <em>enumerating mode</em> commences with calling {@link #hasNext()} or
  * {@link #next()}.
  * </p>
  * <p>
- * The spawned {@link SharingEnumerator} instances can traverse independently
+ * The spawned {@code Enumerator} instances can traverse independently
  * the sequence of elements because {@link ShareableEnumerator} keeps a
  * transient internal buffer of elements, from the first in use to the last in
  * use. While the buffer allows for independent traversal of the same sequence,
- * the {@link SharingEnumerator} instances may not diverge too much without the
+ * the sharing {@code Enumerator} instances may not diverge too much without
  * danger of buffer overflow.
  * </p>
  * @param <E> type of shared elements
  * @see Enumerator
+ * @see SharingEnumerator
  */
 public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     
@@ -76,9 +77,11 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     private AtomicBoolean       isSharedEnumerating;
     
     /**
-     * Creates a {@link ShareableEnumerator} instance that will share the
+     * Creates a {@code ShareableEnumerator} instance that will share the
      * elements of the given {@code source}.
+     *
      * @param source {@link Iterator} to share.
+     * @see ShareableEnumerator
      */
     public ShareableEnumerator(Iterator<E> source) {
         this.source = new EnumeratorEnumerable(source).cached();
@@ -113,23 +116,25 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Creates an {@link Enumerator} instance that will share the
+     * Creates an {@code Enumerator} instance that will share the
      * elements of the current enumerator.
      *
-     * @return sharing {@link Enumerator} instance
+     * @return sharing {@link Enumerator} instance.
+     * @see #share(int)
      */
     public Enumerator<E> share() {
         return share(1)[0];
     }
 
     /**
-     * Creates an array of {@link Enumerator} instances that will share
+     * Creates an array of {@code Enumerator} instances that will share
      * the elements of the current enumerator.
      *
-     * @param count the number of {@link Enumerator} instances to create
-     * @return array of new {@link Enumerator} instances
+     * @param count the number of {@link Enumerator} instances to create.
+     * @return array of new {@link Enumerator} instances.
      * @exception IllegalArgumentException <code>count</code> is negative
      * @exception IllegalStateException enumeration has started
+     * @see #share()
      */
     public Enumerator<E>[] share(int count) {
         Checks.ensureNonNegative(count,

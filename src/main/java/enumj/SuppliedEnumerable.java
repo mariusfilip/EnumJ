@@ -26,16 +26,20 @@ package enumj;
 import java.util.function.Supplier;
 
 /**
- * {@link Enumerable} implementation that returns enumerators yielded by
- * a {@link Supplier}.
+ * {@code Enumerable} that returns enumerators yielded by a {@code Supplier}.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerable
+ * @see AbstractEnumerable
+ * @see Supplier
  */
 class SuppliedEnumerable<E> extends AbstractEnumerable<E> {
 
     private final Supplier<Enumerator<E>> supplier;
 
     /**
-     * Constructs a {@link SuppliedEnumerable} instance.
+     * Constructs a {@code SuppliedEnumerable} instance.
+     *
      * @param supplier {@link Supplier} instance providing the
      * {@link Enumerator} instance to return.
      */

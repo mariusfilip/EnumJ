@@ -34,9 +34,12 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Type of {@link Enumerable} that support high compositionality.
+ * {@code Enumerable} that support high compositionality.
+ *
  * @param <T> type of source enumerated elements.
  * @param <E> type of enumerated elements.
+ * @see Enumerable
+ * @see AbstractEnumerable
  */
 final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
 
@@ -46,13 +49,15 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     private final Lazy<Boolean> onceOnly;
 
     /**
-     * Constructs a {@link PipeEnumerable} using a regular {@link Iterable}
+     * Constructs a {@code PipeEnumerable} using a regular {@code Iterable}
      * as a link.
+     *
      * @param source {@link Iterable} source.
      * @param operator {@link Enumerator} transformation being added to the
      * pipe.
-     * @param onceOnly {@code true} if {@code operator} is a once-only
-     * operation, {@code false} otherwise.
+     * @param onceOnly true if {@code operator} is a once-only
+     * operation, false otherwise.
+     * @see PipeEnumerable
      */
     protected PipeEnumerable(Iterable<T> source,
                              Function<Enumerator<E>, Enumerator<T>> operator,
@@ -65,12 +70,14 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
         this.onceOnly = new Lazy(this::getOnceOnly);
     }
     /**
-     * Constructs a {@link PipeEnumerable} using a {@link Enumerable} as a link.
+     * Constructs a {@code PipeEnumerable} using a {@code Enumerable} as a link.
+     *
      * @param source {@link Iterable} source.
      * @param operator {@link Enumerator} transformation being added to the
      * pipe.
-     * @param onceOnly {@code true} if {@code operator} is a once-only
-     * operation, {@code false} otherwise.
+     * @param onceOnly true if {@code operator} is a once-only
+     * operation, false otherwise.
+     * @see PipeEnumerable
      */
     protected PipeEnumerable(PipeEnumerable<?,T> source,
                              Function<Enumerator<E>, Enumerator<T>> operator,
@@ -110,7 +117,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     protected Enumerator<E> internalEnumerator() {
         PipeEnumerator en = new PipeEnumerator();
         PipeEnumerable<?,?> ptr = this;
-        
+
         while(true) {
             en = (PipeEnumerator)ptr.reversedOperator.apply(en);
             if (ptr.pipeSource.isPresent()) {
@@ -125,14 +132,15 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Creates a {@link PipeEnumerable} instance with the given {@code source},
+     * Creates a {@code PipeEnumerable} instance with the given {@code source},
      * {@code operator} and <em>once only</em> flag.
+     *
      * @param <T> type of source enumerated elements.
      * @param <E> type of enumerated elements.
      * @param source source of elements to transform.
      * @param operator transformation to apply on elements.
-     * @param onceOnly {@code True} of the operation can be applied only
-     * once, {@code false} otherwise.
+     * @param onceOnly true of the operation can be applied only
+     * once, false otherwise.
      * @return new {@link PipeEnumerable} instance.
      */
     public static <T,E> PipeEnumerable<T,E> of(
@@ -150,6 +158,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
 
     /**
      * Concatenates the given {@code elements} to the given {@code enumerable}.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable {@link Enumerable} to concatenate to.
      * @param elements {@link Iterable} to concatenate.
@@ -165,11 +174,12 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that has the same elements as the given
+     * Returns an {@code Enumerable} that has the same elements as the given
      * {@code enumerable} but with duplicates removed.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable {@link Enumerable} to get the elements from.
-     * @return {@link Enumerable} with duplicates removed.
+     * @return {@code Enumerable} with duplicates removed.
      */
     public static <E> Enumerable<E> distinct(Enumerable<E> enumerable) {
         return of(enumerable,
@@ -178,12 +188,13 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that has the elements of the given
+     * Returns an {@code Enumerable} that has the elements of the given
      * {@code enumerable} that pass the given {@code predicate}.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable {@link Enumerable} to filter.
      * @param predicate condition filtering the elements.
-     * @return filtered {@link Enumerable}.
+     * @return filtered {@code Enumerable}.
      */
     public static <E> Enumerable<E> filter(
             Enumerable<E> enumerable,
@@ -194,14 +205,16 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that replaces the elements of the given
-     * {@code enumerable} with the elements of the {@link Iterable} obtained
+     * Returns an {@code Enumerable} that replaces the elements of the given
+     * {@code enumerable} with the elements of the {@code Iterable} obtained
      * by applying the given {@code mapper} on the each element.
+     *
      * @param <E> type of enumerated elements to map.
      * @param <R> type of mapped enumerated elements.
      * @param enumerable {@link Enumerable} to flat-map.
      * @param mapper transformer to apply on each source enumerated element.
-     * @return flat-mapped {@link Enumerable}.
+     * @return flat-mapped {@code Enumerable}.
+     * @see Iterable
      */
     public static <E,R> Enumerable<R> flatMap(
             Enumerable<E> enumerable,
@@ -213,12 +226,13 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that limits the elements of the given
+     * Returns an {@code Enumerable} that limits the elements of the given
      * {@code enumerable} to the given limit.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable source {@link Enumerable}.
      * @param maxSize enumeration limit.
-     * @return limited {@link Enumerable}.
+     * @return limited {@code Enumerable}.
      */
     public static <E> Enumerable<E> limit(
             Enumerable<E> enumerable,
@@ -229,13 +243,14 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that limits the elements of the given
+     * Returns an {@code Enumerable} that limits the elements of the given
      * {@code enumerable} while the given {@code predicate} holds true when
      * applied on the elements of the given {@code enumerable}.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable source {@link Enumerable}.
-     * @param predicate limiting {@link Predicate}.
-     * @return limited {@link Enumerable}.
+     * @param predicate limiting {@code Predicate}.
+     * @return limited {@code Enumerable}.
      */
     public static <E> Enumerable<E> limitWhile(
             Enumerable<E> enumerable,
@@ -244,17 +259,18 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that maps the elements of the given
+     * Returns an {@code Enumerable} that maps the elements of the given
      * {@code enumerable} to the values mapped by {@code mapper} applied on
      * each element and its index.
      * <p>
      * The index of the first enumerated element is {@code 0}.
      * </p>
+     *
      * @param <E> type of source enumerated elements.
      * @param <R> type of mapped enumerated elements.
      * @param enumerable source {@link Enumerable}.
      * @param mapper element transformer.
-     * @return mapped {@link Enumerable}.
+     * @return mapped {@code Enumerable}.
      */
     public static <E,R> Enumerable<R> map(
             Enumerable<E> enumerable,
@@ -265,17 +281,18 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that maps the elements of the given
+     * Returns an {@code Enumerable} that maps the elements of the given
      * {@code enumerable} to the values mapped by {@code mapper} applied on
      * each element and its index.
      * <p>
      * The index of the first enumerated element is {@code 0}.
      * </p>
+     *
      * @param <E> type of source enumerated elements.
      * @param <R> type of mapped enumerated elements.
      * @param enumerable source {@link Enumerable}.
      * @param mapper element transformer.
-     * @return mapped {@link Enumerable}.
+     * @return mapped {@code Enumerable}.
      */
     public static <E,R> Enumerable<R> map(
             Enumerable<E> enumerable,
@@ -286,13 +303,14 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that peeks the elements of the given
+     * Returns an {@code Enumerable} that peeks the elements of the given
      * {@code enumerable}, applies the given {@code action} on each of them
      * and then returns the elements unchanged.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable source {@link Enumerable}.
      * @param action {@link Consumer} to apply on each element.
-     * @return peeked {@link Enumerable}.
+     * @return peeked {@code Enumerable}.
      */
     public static <E> Enumerable<E> peek(
             Enumerable<E> enumerable,
@@ -303,8 +321,9 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that skips {@code n} times over the
+     * Returns an {@code Enumerable} that skips {@code n} times over the
      * elements of the given {@code enumerable}.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable source {@code enumerable}.
      * @param n number of elements to skip.
@@ -317,12 +336,13 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that skips the elements of the given
+     * Returns an {@code Enumerable} that skips the elements of the given
      * {@code enumerable} while the given {@code predicate} holds true.
+     *
      * @param <E> type of enumerated elements.
-     * @param enumerable source {@code Enumerable}.
+     * @param enumerable source {@link Enumerable}.
      * @param predicate skipping {@link Predicate}.
-     * @return skipped {@link Enumerable}.
+     * @return skipped {@code Enumerable}.
      */
     public static <E> Enumerable<E> skipWhile(
             Enumerable<E> enumerable,
@@ -333,13 +353,14 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that limits the elements of the given
+     * Returns an {@code Enumerable} that limits the elements of the given
      * {@code enumerable} while the given {@code predicate} holds true when
      * applied on the elements of the given {@code enumerable}.
+     *
      * @param <E> type of enumerated elements.
      * @param enumerable source {@link Enumerable}.
      * @param predicate limiting {@link Predicate}.
-     * @return limited {@link Enumerable}.
+     * @return limited {@code Enumerable}.
      */
     public static <E> Enumerable<E> takeWhile(
             Enumerable<E> enumerable,
@@ -350,15 +371,16 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
     }
 
     /**
-     * Returns an {@link Enumerable} that zips the elements of the given
+     * Returns an {@code Enumerable} that zips the elements of the given
      * {@code enumerable} with the elements of the {@code first}
-     * {@link Iterable} and the elements of the {@code rest} of the given
-     * {@link Iterable} instances.
+     * {@code Iterable} and the elements of the {@code rest} of the given
+     * {@code Iterable} instances.
+     *
      * @param <E> type of enumerated elements to zip.
      * @param enumerable {@link Enumerable} to zip.
      * @param first first {@link Iterable} to zip with.
-     * @param rest rest of the {@link Iterable} to zip with.
-     * @return zipped {@link Enumerable}.
+     * @param rest rest of the {@code Iterable} to zip with.
+     * @return zipped {@code Enumerable}.
      */
     public static <E> Enumerable<Optional<E>[]> zipAll(
             Enumerable<E> enumerable,
@@ -373,7 +395,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
                 in -> {
                     final PipeEnumerator pipe = (PipeEnumerator)in;
                     final Iterator firstIt = first.iterator();
-                    final List<Iterator> restList = 
+                    final List<Iterator> restList =
                             Enumerator.of(Arrays.asList(rest))
                                       .map(Iterable::iterator)
                                       .map(it -> (Iterator)it)

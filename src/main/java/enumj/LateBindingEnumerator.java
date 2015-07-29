@@ -27,9 +27,12 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * Type of {@link Enumerator} whose source of elements can be defined after
+ * {@code Enumerator} whose source of elements can be defined after
  * construction.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerator
+ * @see AbstractEnumerator
  */
 public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
@@ -53,9 +56,11 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Binds the current {@link LateBindingEnumerator} to the given
+     * Binds the current {@code LateBindingEnumerator} to the given
      * {@code source}.
+     *
      * @param source {@link Iterator} to get the elements from.
+     * @see LateBindingEnumerator
      */
     public void bind(Iterator<? extends E> source) {
         Checks.ensureNonEnumerating(this);
@@ -65,6 +70,7 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Gets the bound {@link Iterable} source, if any.
+     *
      * @return optional source {@link Iterable}.
      */
     public Optional<Iterator<E>> binding() {

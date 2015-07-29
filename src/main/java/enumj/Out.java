@@ -28,10 +28,11 @@ import java.util.NoSuchElementException;
 /**
  * Encapsulates output method parameters.
  *
- * @param <T> Type of out parameter.
+ * @param <T> Type of output parameter.
  */
 public final class Out<T> {
-    private T value;
+
+    private T       value;
     private boolean hasValue;
 
     private Out() {}
@@ -60,9 +61,9 @@ public final class Out<T> {
     }
 
     /**
-     * Gets whether an output value has been set.
+     * Gets whether an output parameter has been set.
      *
-     * @return <code>true</code>
+     * @return true if this {@link Out} has been set, false otherwise.
      */
     public boolean hasValue() {
         return this.hasValue;
@@ -77,10 +78,10 @@ public final class Out<T> {
     }
 
     /**
-     * Creates a new, empty output method parameter.
+     * Creates a new, empty output parameter.
      *
      * @param <T> Type of output parameter.
-     * @return New {@link Out} instance.
+     * @return new {@link Out} instance.
      */
     public static <T> Out<T> empty() {
         return new Out<T>();

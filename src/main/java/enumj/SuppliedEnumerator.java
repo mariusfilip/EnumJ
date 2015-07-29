@@ -27,9 +27,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Type of {@link Enumerator} enumerating over optional elements supplied
- * by a {@link Supplier}.
+ * {@code Enumerator} over optional elements given by a {@code Supplier}.
+ *
  * @param <E> type of enumerated elements.
+ * @see Enumerator
+ * @see AbstractEnumerator
+ * @see Supplier
  */
 final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
@@ -37,8 +40,9 @@ final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
     private Optional<E> value;
 
     /**
-     * Creates a {@link SuppliedEnumerator} that enumerated over the optional
+     * Creates a {@code SuppliedEnumerator} that enumerated over the optional
      * elements supplied by {@code source}.
+     *
      * @param source {@link Supplier} of {@link Optional} instances representing
      * enumerated elements.
      */

@@ -27,8 +27,11 @@ import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 
 /**
- * Type of {@link Enumerator} and {@link PrimitiveIterator.OfLong} enumerating
+ * {@code Enumerator} and {@code PrimitiveIterator.OfLong} enumerating
  * over a range of long integers.
+ * 
+ * @see Enumerator
+ * @see PrimitiveIterator
  */
 public final class LongRangeEnumerator implements PrimitiveIterator.OfLong,
                                                   Enumerator<Long> {
@@ -41,10 +44,11 @@ public final class LongRangeEnumerator implements PrimitiveIterator.OfLong,
 
     /**
      * Constructs an {@link LongRangeEnumerator} instance.
+     *
      * @param start lower limit of long integer range.
      * @param end upper limit of long integer range.
-     * @param isInclusive {@code true} if {@code end} is an inclusive upper
-     * limit, {@code otherwise}.
+     * @param isInclusive true if {@code end} is an inclusive upper
+     * limit, false otherwise.
      */
     public LongRangeEnumerator(long start,
                                long end,

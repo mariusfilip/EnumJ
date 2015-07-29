@@ -27,8 +27,11 @@ import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 
 /**
- * Type of {@link Enumerator} and {@link PrimitiveIterator.OfInt} enumerating
+ * {@code Enumerator} and {@code PrimitiveIterator.OfInt} enumerating
  * over a range of integers.
+ * 
+ * @see Enumerator
+ * @see PrimitiveIterator
  */
 public final class IntRangeEnumerator implements PrimitiveIterator.OfInt,
                                                  Enumerator<Integer> {
@@ -40,11 +43,13 @@ public final class IntRangeEnumerator implements PrimitiveIterator.OfInt,
     private boolean enumerating;
 
     /**
-     * Constructs an {@link IntRangeEnumerator} instance.
+     * Constructs an {@code IntRangeEnumerator} instance.
+     *
      * @param start lower limit of integer range.
      * @param end upper limit of integer range.
-     * @param isInclusive {@code true} if {@code end} is an inclusive upper
-     * limit, {@code otherwise}.
+     * @param isInclusive true if {@code end} is an inclusive upper
+     * limit, false otherwise.
+     * @see IntRangeEnumerator
      */
     public IntRangeEnumerator(int start,
                               int end,

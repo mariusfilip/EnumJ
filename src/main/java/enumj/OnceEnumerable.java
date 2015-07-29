@@ -26,7 +26,7 @@ package enumj;
 import java.util.Iterator;
 
 /**
- * {@code Enumerator} that yields one enumerator only.
+ * {@code EnumeratorEnumerable} that yields one enumerator only.
  *
  * @param <E> type of enumerated elements.
  * @see Enumerator
@@ -34,6 +34,14 @@ import java.util.Iterator;
  */
 public final class OnceEnumerable<E> extends EnumeratorEnumerable<E> {
 
+    /**
+     * Creates an {@code OnceEnumerable} instance.
+     * <p>
+     * The new {@link OnceEnumerable} stores its {@code source} in its
+     * ancestor {@link EnumeratorEnumerable}.
+     * </p>
+     * @param source {@link Iterator} source.
+     */
     public OnceEnumerable(Iterator<E> source) {
         super(source);
     }

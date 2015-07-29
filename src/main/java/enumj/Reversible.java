@@ -31,20 +31,23 @@ import java.util.function.Function;
 import org.apache.commons.lang3.mutable.MutableLong;
 
 /**
- * Utility class containing methods for {@link Enumerable}.
+ * Utility class containing methods for {@code Enumerable}.
+ *
+ * @see Enumerable
  */
 final class Reversible {
 
     private Reversible() {}
 
     /**
-     * Applies a {@link Enumerator#distinct()} operation upon {@code source},
+     * Applies a {@code Enumerator.distinct()} operation upon {@code source},
      * in reverse if necessary.
+     *
      * @param <E> type of enumerated elements.
      * @param source {@link Enumerator} to apply the operation on.
-     * @param reversed {@code true} if the operation is applied in reverse,
-     * {@code false} otherwise.
-     * @return distinct {@link Enumerator}.
+     * @param reversed true if the operation is applied in reverse,
+     * false otherwise.
+     * @return distinct {@code Enumerator}.
      */
     public static <E> Enumerator<E> distinct(Enumerator<E> source,
                                              boolean       reversed) {
@@ -57,15 +60,16 @@ final class Reversible {
     }
 
     /**
-     * Applies a {@link Enumerator#map(java.util.function.BiFunction)} operation
+     * Applies a {@code Enumerator.map(BiFunction)} operation
      * upon {@code source}, in reverse if necessary.
+     *
      * @param <E> type of unmapped enumerated elements.
      * @param <R> type of mapped enumerated elements.
      * @param source {@link Enumerator} to apply the operation on.
-     * @param mapper operation to apply.
-     * @param reversed {@code true} if the operation is applied in reverse,
-     * {@code false} otherwise.
-     * @return mapped {@link Enumerator}.
+     * @param mapper {@link BiFunction} to apply.
+     * @param reversed true if the operation is applied in reverse,
+     * false otherwise.
+     * @return mapped {@code Enumerator}.
      */
     static <E,R> Enumerator<R> map(
             Enumerator<E> source,
@@ -86,14 +90,15 @@ final class Reversible {
     }
 
     /**
-     * Applies a {@link Enumerator#peek(java.util.function.Consumer)} operation
+     * Applies a {@code Enumerator.peek(Consumer)} operation
      * upon {@code source}, in reverse if necessary.
+     *
      * @param <E> type of enumerated elements.
      * @param source {@link Enumerator} to apply the operation on.
-     * @param action operation to apply.
-     * @param reversed {@code true} if the operation is applied in reverse,
-     * {@code false} otherwise.
-     * @return picked {@link Enumerator}.
+     * @param action {@link Consumer} to apply.
+     * @param reversed true if the operation is applied in reverse,
+     * false otherwise.
+     * @return picked {@code Enumerator}.
      */
     public static <E> Enumerator<E> peek(Enumerator<E>       source,
                                          Consumer<? super E> action,

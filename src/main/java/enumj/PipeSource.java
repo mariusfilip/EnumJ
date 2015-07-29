@@ -26,36 +26,45 @@ package enumj;
 import java.util.Iterator;
 
 /**
- * Type of {@link IteratorEnumerator} that acts as a source of enumerated
- * elements for {@link AbstractPipeProcessor} instances within
- * {@link PipeEnumerator#pipeline}.
+ * {@code IteratorEnumerator} that acts as a source of enumerated
+ * elements for {@code AbstractPipeProcessor} instances within
+ * {@code PipeEnumerator.pipeline}.
+ *
  * @param <E> type of enumerated elements.
+ * @see IteratorEnumerator
+ * @see PipeEnumerator
+ * @see PipeEnumerator#pipeline
+ * @see AbstractPipeProcessor
  */
 class PipeSource<E> extends IteratorEnumerator<E> {
 
     private AbstractPipeProcessor<?,?> firstProcessor;
 
     /**
-     * Constructs a new {@link PipeSource} instances based on the given
+     * Constructs a new {@code PipeSource} instances based on the given
      * {@code source}.
+     *
      * @param source {@link Iterator} supplying enumerated elements.
+     * @see PipeSource
      */
     protected PipeSource(Iterator<E> source) {
         super(source);
     }
 
     /**
-     * Gets the first {@link AbstractPipeProcessor} instance that processes the
-     * elements of this {@link PipeSource}
+     * Gets the first {@code AbstractPipeProcessor} instance that processes the
+     * elements of this {@code PipeSource}.
+     *
      * @return {@link AbstractPipeProcessor} instance.
      */
     public AbstractPipeProcessor<?,?> getFirstProcessor() {
         return this.firstProcessor;
     }
     /**
-     * Sets {@link #firstProcessor} to the given {@link AbstractPipeProcessor}
+     * Sets {@code firstProcessor} to the given {@code AbstractPipeProcessor}
      * if there is none.
-     * @param processor value for {@link #firstProcessor} is none.
+     *
+     * @param processor value for {@link #firstProcessor} if none.
      */
     public void setFirstProcessorIfNone(AbstractPipeProcessor<?,?> processor) {
         if (this.firstProcessor == null) {
@@ -64,8 +73,9 @@ class PipeSource<E> extends IteratorEnumerator<E> {
     }
 
     /**
-     * Creates a new instance of {@link PipeSource} with the given
+     * Creates a new instance of {@code PipeSource} with the given
      * {@code source}.
+     *
      * @param <T> type of enumerated elements.
      * @param source {@link Iterator} instance acting as a source of elements.
      * @return {@link PipeSource} instance.
