@@ -24,24 +24,24 @@
 package enumj;
 
 /**
- * Type of of {@link AbstractPipeProcessor} that skips over a number of
- * elements.
+ * Pipe processor that skips over a number of elements.
+ *
  * @param <E> type of enumerated elements.
+ * @see SkipWhilePipeProcessor
+ * @see WhilePipeProcessor
  */
 class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    /**
-     * Enumerated value.
-     */
-    protected E    value;
-    /**
-     * Number of values to skip.
-     */
-    protected long n;
+    private E    value;
+    private long n;
 
     /**
-     * Constructs a {@link SkipPipeProcessor} that skips over {@code n}
+     * Constructs a {@code SkipPipeProcessor} that skips over {@code n}
      * elements.
+     * <p>
+     * The new {@link SkipPipeProcessor} stores its limit internally.
+     * </p>
+     *
      * @param n number of elements to skip.
      */
     public SkipPipeProcessor(long n) {
@@ -51,13 +51,13 @@ class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    protected void processInputValue(E value) {
+    public void processInputValue(E value) {
         if (n == 0) {
             this.value = value;
         }
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         if (n == 0) {
             return true;
         }
@@ -73,7 +73,7 @@ class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return false;
     }
 }

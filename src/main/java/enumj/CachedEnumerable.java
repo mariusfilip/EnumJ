@@ -119,7 +119,7 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
     @Override
     protected boolean internalOnceOnly() {
         final CachedEnumerableState<E> state = state();
-        return state.isDisabled() && state.onceOnly();
+        return state.onceOnly();
     }
     @Override
     protected Enumerator<E> internalEnumerator() {

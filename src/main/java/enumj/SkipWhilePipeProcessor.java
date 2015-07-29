@@ -26,24 +26,25 @@ package enumj;
 import java.util.function.Predicate;
 
 /**
- * Type of {@link AbstractPipeProcessor} that skips over enumerated elements
- * as long as a condition holds {@code true}.
+ * Pipe processor that skips over enumerated elements
+ * as long as a condition holds true.
+ *
  * @param <E> type of enumerated elements.
+ * @see SkipPipeProcessor
+ * @see WhilePipeProcessor
  */
 class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    /**
-     * Enumerated value.
-     */
-    protected E            value;
-    /**
-     * {@link Predicate} that filters skipped elements.
-     */
-    protected Predicate<E> filter;
+    private E            value;
+    private Predicate<E> filter;
 
     /**
-     * Constructs a {@link SkipWhilePipeProcessor} that skips enumerated
+     * Constructs a {@code SkipWhilePipeProcessor} that skips enumerated
      * elements as long as the given {@code filter} holds {@code true}.
+     * <p>
+     * The new {@link SkipWhilePipeProcessor} stores its {@code filter}
+     * internally.
+     * </p>
      * @param filter {@link Predicate} filtering skipped elements.
      */
     public SkipWhilePipeProcessor(Predicate<E> filter) {
@@ -53,7 +54,7 @@ class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    protected void processInputValue(E value) {
+    public void processInputValue(E value) {
         if (this.filter == null) {
             this.value = value;
         }
@@ -63,7 +64,7 @@ class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         }
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         return filter == null;
     }
     @Override
@@ -75,7 +76,7 @@ class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return false;
     }
 }

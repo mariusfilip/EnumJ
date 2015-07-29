@@ -26,26 +26,38 @@ package enumj;
 import java.util.Iterator;
 
 /**
- * {@code Enumerator} that yields one enumerator only.
+ * {@code Enumerable} that encapsulates an enumerator.
+ * <p>
+ * This {@link Enumerable} supports only one enumerator, despite not
+ * stating this. It is the responsibility of the user to call its
+ * {@link #enumerator()} only once.
+ * </p>
  *
- * @param <E> type of enumerated elements.
- * @see Enumerator
- * @see AbstractEnumerator
+ * @see OnceEnumerable
  */
-public final class OnceEnumerable<E> extends EnumeratorEnumerable<E> {
+class EnumeratorEnumerable<E> extends AbstractEnumerable<E> {
 
-    public OnceEnumerable(Iterator<E> source) {
-        super(source);
+    protected Enumerator<E> source;
+
+    /**
+     * Creates a {@code EnumeratorEnumerable} instance.
+     * <p>
+     * The new {@link EnumeratorEnumerable} stores its {@code source}
+     * internally.
+     * </p>
+     *
+     * @param source {@link Iterator} providing the enumerated elements.
+     */
+    public EnumeratorEnumerable(Iterator<E> source) {
+        this.source = Enumerator.of(source);
     }
 
     @Override
     protected boolean internalOnceOnly() {
-        return true;
+        return false;
     }
     @Override
     protected Enumerator<E> internalEnumerator() {
-        final Enumerator<E> result = source;
-        source = null;
-        return result;
+        return source;
     }
 }

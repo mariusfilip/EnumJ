@@ -26,8 +26,9 @@ package enumj;
 import java.util.function.Predicate;
 
 /**
- * Type of {@link AbstractPipeProcessor} that knows how to filter elements in
+ * Pipe processor that knows how to filter elements in
  * the pipeline.
+ *
  * @param <E> type of enumerated elements.
  */
 final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
@@ -36,8 +37,12 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected Predicate<E> filter;
 
     /**
-     * Constructs a {@link FilterPipeProcessor} instance.
-     * @param filter predicate to apply on enumerated elements.
+     * Constructs a {@code FilterPipeProcessor} instance.
+     * <p>
+     * The new {@link FilterPipeProcessor} stores its {@code filter} internally.
+     * </p>
+     * 
+     * @param filter {@link Predicate} to apply on enumerated elements.
      */
     public FilterPipeProcessor(Predicate<E> filter) {
         super(true, true);
@@ -46,11 +51,11 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    protected void processInputValue(E value) {
+    public void processInputValue(E value) {
         this.value = value;
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         if (filter.test(value)) {
             return true;
         }
@@ -66,7 +71,7 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return false;
     }
 }

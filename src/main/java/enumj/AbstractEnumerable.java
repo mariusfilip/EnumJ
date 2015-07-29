@@ -26,15 +26,29 @@ package enumj;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Basis for all the {@link Enumerable} implementations of {@literal EnumJ}.
+ * Abstract implementation of the {@code Enumerable} interface.
+ * <p>
+ * This class forms the basis for all the concrete implementations of
+ * {@link Enumerable} within the {@code enumj} package.
+ * </p>
+ *
  * @param <E> Type of elements being enumerated.
+ * @see AbstractEnumerator
+ * @see Enumerable
+ * @see Enumerator
  */
 abstract class AbstractEnumerable<E> implements Enumerable<E> {
 
     private final AtomicBoolean enumerating;
 
     /**
-     * Constructs a new {@link AbstractEnumerable} instance.
+     * Constructs a new {@code AbstractEnumerable} instance.
+     * <p>
+     * The new {@link AbstractEnumerable} instance gets initialised as
+     * non-enumerating.
+     * </p>
+     *
+     * @see #enumerating
      */
     protected AbstractEnumerable() {
         enumerating = new AtomicBoolean(false);
@@ -68,16 +82,23 @@ abstract class AbstractEnumerable<E> implements Enumerable<E> {
     }
 
     /**
-     * Gets whether the current instance may yield an {@link Enumerator}
+     * Gets whether the current instance may yield a {@code Enumerator}
      * only once.
-     * @return {@code true} if {@link #enumerator()} may be called
-     * only once, {@code false} otherwise.
+     * <p>
+     * This method is the internal counterpart of {@link #onceOnly()}.
+     * </p>
+     *
+     * @return true if {@link #enumerator()} may be called
+     * only once, false otherwise.
      */
     protected abstract boolean internalOnceOnly();
     /**
-     * Gets a new {@link Enumerator} enumerating over the enumeration
-     * represented by the current {@link Enumerable}.
+     * Yields a new {@code Enumerator} for the current {@code Enumerable}.
+     * <p>
+     * This method is the internal counterpart of {@link #enumerator()}.
+     * </p>
      * @return {@link Enumerator} instance.
+     * @see Enumerable
      */
     protected abstract Enumerator<E> internalEnumerator();
 }

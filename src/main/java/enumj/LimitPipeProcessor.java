@@ -24,9 +24,11 @@
 package enumj;
 
 /**
- * Type of {@link AbstractPipeProcessor} that stops enumeration once a limit
- * is reached.
+ * Pipe processor that stops enumeration once a limit is reached.
+ *
  * @param <E> type of enumerated elements.
+ * @see WhilePipeProcessor
+ * @see SkipPipeProcessor
  */
 final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     
@@ -34,7 +36,11 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected long size;
 
     /**
-     * Constructs {@link LimitPipeProcessor} instance.
+     * Constructs a {@code LimitPipeProcessor} instance.
+     * <p>
+     * The new {@link LimitPipeProcessor} stores its limit internally.
+     * </p>
+     *
      * @param maxSize enumeration limit.
      */
     public LimitPipeProcessor(long maxSize) {
@@ -44,13 +50,13 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    protected void processInputValue(E value) {
+    public void processInputValue(E value) {
         if (size > 0) {
             this.value = value;
         }
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         return size > 0;
     }
     @Override
@@ -63,7 +69,7 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return size == 0;
     }
 }

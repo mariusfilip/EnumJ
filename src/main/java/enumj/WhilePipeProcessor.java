@@ -26,9 +26,13 @@ package enumj;
 import java.util.function.Predicate;
 
 /**
- * Type of {@link AbstractPipeProcessor} that lets enumeration through as long
+ * Pipe processor that lets enumeration through as long
  * as a predicate holds {@code true}.
+ *
  * @param <E> type of enumerated elements.
+ * @see SkipWhilePipeProcessor
+ * @see SkipPipeProcessor
+ * @see LimitPipeProcessor
  */
 class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
@@ -36,8 +40,12 @@ class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     protected Predicate<E> filter;
 
     /**
-     * Creates a {@link WhilePipeProcessor} that enumerates elements while
-     * {@code filter} holds {@code true}.
+     * Creates a {@code WhilePipeProcessor} that enumerates elements while
+     * {@code filter} holds true.
+     * <p>
+     * The new {@link WhilePipeProcessor} holds its {@code filter} internally.
+     * </p>
+     *
      * @param filter {@link Predicate} to filter enumerated elements.
      */
     public WhilePipeProcessor(Predicate<E> filter) {
@@ -47,7 +55,7 @@ class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    protected void processInputValue(E value) {
+    public void processInputValue(E value) {
         if (this.filter != null && this.filter.test(value)) {
             this.value = value;
         } else {
@@ -55,7 +63,7 @@ class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         }
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         return filter != null;
     }
     @Override
@@ -67,7 +75,7 @@ class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return filter == null;
     }
 }

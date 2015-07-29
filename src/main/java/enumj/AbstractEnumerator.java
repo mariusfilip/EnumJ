@@ -26,8 +26,16 @@ package enumj;
 import java.util.NoSuchElementException;
 
 /**
- * Basis for all the {@link Enumerator} implementations of {@code EnumJ}.
+ * Abstract implementation of the {@code Enumerator} interface.
+ * <p>
+ * This class forms the basis for all the concrete implementations of
+ * {@link Enumerator} within the {@code enumj} package.
+ * </p>
+ *
  * @param <E> Type of elements being enumerated.
+ * @see AbstractEnumerable
+ * @see Enumerable
+ * @see Enumerator
  */
 abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
@@ -35,9 +43,15 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     private boolean hasNextHasBeenCalled;
     private boolean hasNextHasThrown;
     private boolean done;
-    
+
     /**
-     * Constructs a new {@link AbstractEnumerator} instance.
+     * Constructs a new {@code AbstractEnumerator} instance.
+     * <p>
+     * The new {@link AbstractEnumerable} instance gets initialised as
+     * non-enumerating.
+     * </p>
+     *
+     * @see #enumerating
      */
     protected AbstractEnumerator() {
         // do nothing
@@ -99,21 +113,34 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
 
     /**
      * Returns whether the enumerator has more elements.
-     * @return {@code true} if the enumerator has more elements, {@code false}
+     * <p>
+     * This method is the internal counterpart of {@link #hasNext()}.
+     * </p>
+     *
+     * @return true if the enumerator has more elements, false
      * otherwise.
+     * @see #next()
      */
     protected abstract boolean internalHasNext();
     /**
      * Returns the next enumerated element.
-     * @return Next enumerated element.
+     * <p>
+     * This method is the internal counterpart of {@link #hasNext()}
+     * </p>
+     * @return next enumerated element.
      */
     protected abstract E internalNext();
     /**
-     * Cleans up the internals of the current enumerator after enumeration
-     * has ended.
+     * Cleans up the internals of the current enumerator when enumeration
+     * ends.
      * <p>
      * By default this method does nothing.
      * </p>
+     * 
+     * @see #hasNext()
+     * @see #next()
+     * @see #internalHasNext()
+     * @see #internalNext()
      */
     protected void cleanup() {}
 }

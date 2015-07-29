@@ -81,10 +81,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @param source {@link Iterator} to share.
      */
     public ShareableEnumerator(Iterator<E> source) {
-        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        this.source = Enumerator.of(source)
-                                .asEnumerable()
-                                .cached();
+        this.source = new EnumeratorEnumerable(source).cached();
         this.isEnumerating = new AtomicBoolean(false);
         this.isSharedEnumerating = new AtomicBoolean(false);
     }
@@ -163,7 +160,15 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
             direct = source.enumerator();
             source = null;
         }
-    }    
+    }
+
+    /**
+     * Marks the <em>shared enumeration</em> state consisting in the
+     * enumerators sharing this shareable enumerator starting their own
+     * enumeration.
+     *
+     * @see SharingEnumerator#hasNext()
+     */
     void startSharedEnumeration() {
         if (isEnumerating.get()) {
             throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);

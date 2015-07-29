@@ -23,30 +23,37 @@
  */
 package enumj;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Processing unit in the highly composable pipeline of {@link PipeEnumerator}.
+ * Pipe processor that receives an element, processes it and returns an output.
  *
  * @param <T> Type of element being processed.
  * @param <R> Type of processed result.
+ * @see PipeEnumerator
+ * @see AbstractPipeMultiProcessor
  */
 abstract class AbstractPipeProcessor<T,R> {
 
     /**
      * Represents whether the pipeline should proceed to the next element
-     * of the same source when {@link #hasOutputValue()} returns {@code false}.
+     * of the same source when {@code hasOutputValue()} returns false.
+     *
+     * @see #hasOutputValue()
+     * @see #hasNextNeedsValue
      */
     public final boolean nextOnSameSourceOnNoValue;
     /**
-     * Represents whether the processor needs a value fed in when participating
-     * to the outcome of {@link PipeEnumerator#hasNext()}.
+     * Represents whether the processor needs an input value to participate
+     * to the outcome of {@code PipeEnumerator.hasNext()}.
+     *
+     * @see PipeEnumerator#hasNext()
+     * @see #nextOnSameSourceOnNoValue
      */
     public final boolean hasNextNeedsValue;
 
     /**
-     * Constructs a new instance of {@link AbstractPipeProcessor}.
+     * Constructs a new instance of {@code AbstractPipeProcessor}.
      *
      * @param nextOnSameSourceOnNoValue value for
      * {@link #nextOnSameSourceOnNoValue}.
@@ -62,28 +69,37 @@ abstract class AbstractPipeProcessor<T,R> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Link to the next processor in the pipeline.
+     * Link to the next {@code AbstarctPipeProcessor} in the pipe.
+     *
+     * @see AbstractPipeProcessor
      */
     private AbstractPipeProcessor<? extends R,?> next;
     /**
-     * {@link PipeSource} instance which represents the source of data that is
-     * being processed starting with the current processor in the pipeline.
+     * The {@code PipeSource} instance whose elements this processor processes.
+     *
+     * @see AbstractPipeProcessor
+     * @see PipeSource
      */
     private PipeSource source;
 
     /**
-     * Returns the value of {@link #next}.
+     * Returns the value of {@code AbstractPipeProcessor.next}.
+     *
      * @return Value of {@link #next}.
+     * @see #setNext(enumj.AbstractPipeProcessor)
      */
     public AbstractPipeProcessor<? extends R,?> getNext() {
         return next;
     }
     /**
-     * Sets the value of {@link #next}.
+     * Sets the value of {@code AbstractPipeProcessor.next}.
      * <p>
-     * Once {@link next} is set to a non-null value, it cannot change.
+     * Once {@link next} is set to a non-null value, it may not change.
      * </p>
+     *
      * @param next Value for {@link #next}.
+     * @throws UnsupportedOperationException {@code next} is being set twice.
+     * @see #getNext()
      */
     public void setNext(AbstractPipeProcessor<? extends R,?> next) {
         if (this.next == null) {
@@ -94,18 +110,22 @@ abstract class AbstractPipeProcessor<T,R> {
     }
 
     /**
-     * Gets the value of {@link #source}.
+     * Gets the value of {@code AbstractPipeProcessor.source}.
+     *
      * @return Value of {@link #source}.
+     * @see #setSource(enumj.PipeSource)
      */
     public PipeSource getSource() {
         return source;
     }
     /**
-     * Sets the value of {@link #source}.
+     * Sets the value of {@code AbstractPipeProcessor.source}.
      * <p>
-     * Once {@link #source} is set to a non-null value, it cannot change.
+     * Once {@link #source} is set to a non-null value, it may not change.
      * </p>
+     *
      * @param reference Value for {@link #source}.
+     * @see #getSource()
      */
     public void setSource(PipeSource reference) {
         if (this.source == null) {
@@ -120,9 +140,15 @@ abstract class AbstractPipeProcessor<T,R> {
     /**
      * Returns {@code true} and aggregates the given {@code mapper} to the
      * top of the existing mappers, otherwise it returns {@code false}.
+     * <p>
+     * This method returns false by default. The only
+     * {@link AbstractPipeProcessor} capable of mapping aggregation is
+     * {@link MapPipeProcessor}.
+     * </p>
+     *
      * @param <U> type of mapped enumerated elements.
      * @param mapper mapping {@link Function}.
-     * @return {@code true} on successful aggregation of mappers, {@code false}
+     * @return true on successful aggregation of mappers, false
      * otherwise.
      */
     public <U> boolean pushFrontMap(Function<R,U> mapper) {
@@ -130,10 +156,15 @@ abstract class AbstractPipeProcessor<T,R> {
     }
     /**
      * Returns {@code true} and aggregates the given {@code mapper} to the
-     * existing mappers, otherwise it returns {@code false}.
+     * end of existing mappers, otherwise it returns {@code false}.
+     * <p>
+     * This method returns false by default. The only
+     * {@link AbstractPipeProcessor} capable of mapping aggregation is
+     * {@link MapPipeProcessor}.
+     * </p>
      * @param <U> type of mapped enumerated elements.
      * @param mapper mapping {@link Function}.
-     * @return {@code true} on successful aggregation of mappers, {@code false}
+     * @return true on successful aggregation of mappers, false
      * otherwise.
      */
     public <U> boolean enqueueMap(Function<R,U> mapper) {
@@ -143,44 +174,50 @@ abstract class AbstractPipeProcessor<T,R> {
     // ---------------------------------------------------------------------- //
 
     /**
-     * Processes an input value and returns the result, if any.
+     * Processes an input value in order to return a result, if any.
      * <p>
      * The result of processing must be stored internally.
      * </p>
+     * 
      * @param value Value to process.
+     * @see #hasOutputValue()
+     * @see #getOutputValue()
      */
-    abstract void    processInputValue(T value);
+    public abstract void    processInputValue(T value);
     /**
      * Gets whether processing was successful and the processor has a value
      * to yield.
      * <p>
-     * If {@link #hasOutputValue()} returns {@code false} than no internal
-     * storage of input or output should take place.
+     * If {@link #hasOutputValue()} returns false than no internal
+     * storage of input or output may take place.
      * </p>
-     * @return {@code true} if there is an output value to yield, {@code false}
+     *
+     * @return true if there is an output value to yield, false
      * otherwise.
      * @see #processInputValue(java.lang.Object)
      * @see #getOutputValue()
      */
-    abstract boolean hasOutputValue();
+    public abstract boolean hasOutputValue();
     /**
      * Gets the processed result produced by
-     * {@link #processInputValue(java.lang.Object)} and clears the internal
-     * storage of it.
+     * {@code AbstractPipeProcessor.processInputValue(T)} and
+     * clears the internal storage of it.
+     *
      * @return Processed result.
      * @see #processInputValue(Object)
      * @see #hasOutputValue()
      * @see #retrieveOutputValue()
      * @see #clearOutputValue()
      */
-    final R getOutputValue() {
+    public final R getOutputValue() {
         final R result = retrieveOutputValue();
         clearOutputValue();
         return result;
     }
     /**
      * Retrieves the processed result produced by
-     * {@link #processInputValue(Object)}.
+     * {@code AbstractPipeProcessor.processInputValue(Object)}.
+     *
      * @return Processed result.
      * @see #getOutputValue()
      * @see #clearOutputValue()
@@ -188,7 +225,10 @@ abstract class AbstractPipeProcessor<T,R> {
     protected abstract R retrieveOutputValue();
     /**
      * Clears the processed result after being returned by
-     * {@link #retrieveOutputValue()}.
+     * {@code AbstractPipeProcessor.retrieveOutputValue()}.
+     *
+     * @see #getOutputValue()
+     * @see #retrieveOutputValue()
      */
     protected abstract void clearOutputValue();
     /**
@@ -207,5 +247,5 @@ abstract class AbstractPipeProcessor<T,R> {
      * </p>
      * @return {@code true} if processing must stop, {@code false} otherwise.
      */
-    abstract boolean isInactive();
+    public abstract boolean isInactive();
 }

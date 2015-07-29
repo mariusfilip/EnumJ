@@ -24,19 +24,23 @@
 package enumj;
 
 /**
- * Specialised type of {@link AbstractPipeProcessor} that may produce multiple
- * elements for a single input element.
+ * Pipe processor that may produce multiple output elements for an input
+ * element.
+ *
  * @param <T> Type of input element.
  * @param <R> Type of resulted elements.
+ * @see AbstractPipeProcessor
+ * @see PipeEnumerator
  */
 abstract class AbstractPipeMultiProcessor<T,R>
                extends AbstractPipeProcessor<T,R> {
     /**
-     * Constructs a new {@link AbstractPipeMultiProcessor} instance.
-     * @param nextOnSameSourceOnNoValue {@code true} if the processor demands
-     * continuing to the next element of the same piped source when
-     * {@link #hasOutputValue()} value for {@link #nextOnSameSourceOnNoValue}.
+     * Constructs a new {@code AbstractPipeMultiProcessor} instance.
+     *
+     * @param nextOnSameSourceOnNoValue value for
+     * {@link #nextOnSameSourceOnNoValue}.
      * @param hasNextNeedsValue value for {@link #hasNextNeedsValue}.
+     * @see AbstractPipeProcessor
      */
     protected AbstractPipeMultiProcessor(boolean nextOnSameSourceOnNoValue,
                                          boolean hasNextNeedsValue) {
@@ -46,8 +50,17 @@ abstract class AbstractPipeMultiProcessor<T,R>
     /**
      * Gets whether the processor needs a fresh input value to produce output
      * values.
-     * @return {@code true} if the processor needs a new input to produce
-     * output, {@code false} otherwise.
+     * <p>
+     * Unlike {@link AbstractPipeProcessor}, this type of processor may yield
+     * more than one output for a single input. This means feeding in input
+     * values must be put on hold as long as the current processor still has
+     * output values to provide. This state ends when {@code needsValue} returns
+     * true.
+     * </p>
+     *
+     * @return true if the processor needs a new input to produce outputs, false
+     * otherwise.
+     * @see AbstractPipeProcessor
      */
     abstract boolean needsValue();
 }

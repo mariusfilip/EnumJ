@@ -28,8 +28,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Type of {@link AbstractPipeProcessor} that zips enumerated values together.
+ * Pipe processor that zips enumerated values together.
+ *
  * @param <E> type of enumerated elements to zip together.
+ * @see MapPipeProcessor
  */
 final class ZipPipeProcessor<E>
             extends AbstractPipeProcessor<Optional<E>,Optional<E>[]> {
@@ -39,8 +41,13 @@ final class ZipPipeProcessor<E>
     private       boolean       hasAny;
 
     /**
-     * Constructs a {@link ZipPipeProcessor} that zips together the processed
+     * Constructs a {@code ZipPipeProcessor} that zips together the processed
      * element with elements from other {@link Iterator} instances.
+     * <p>
+     * The new {@link ZipPipeProcessor} stores internally the participating
+     * iterators.
+     * </p>
+     *
      * @param first first {@link Iterator} to use in zipping.
      * @param rest rest of {@link Iterator} instances to use in zipping.
      */
@@ -54,7 +61,7 @@ final class ZipPipeProcessor<E>
     }
 
     @Override
-    protected void processInputValue(Optional<E> value) {
+    public void processInputValue(Optional<E> value) {
         final Optional[] tuple = new Optional[1+iterators.length];
         tuple[0] = value;
         hasAny = value.isPresent();
@@ -72,7 +79,7 @@ final class ZipPipeProcessor<E>
         }
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         return value != null;
     }
     @Override
@@ -84,7 +91,7 @@ final class ZipPipeProcessor<E>
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return false;
     }
 }

@@ -9,10 +9,13 @@ import java.util.LinkedList;
 import java.util.function.Function;
 
 /**
- * Type of {@link AbstractPipeMultiProcessor} that transforms elements
- * by mapping them.
+ * Pipe processor that transforms inputs elements by mapping them to output
+ * elements.
+ *
  * @param <In> input value to map.
  * @param <Out> mapped output value.
+ * @see FlatMapPipeProcessor
+ * @see ZipPipeProcessor
  */
 final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
 
@@ -20,8 +23,13 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
     protected Out                          value;
 
     /**
-     * Constructs {@link MapPipeProcessor} instances.
-     * @param functor {@link Function} instance mapping input elements to
+     * Constructs a {@code MapPipeProcessor} instance.
+     * <p>
+     * The new {@link MapPipeProcessor} instance stores its {@code functor}
+     * internally.
+     * </p>
+     *
+     * @param functor {@link Function} mapping input elements to
      * output elements.
      */
     public MapPipeProcessor(Function<In,Out> functor) {
@@ -46,14 +54,14 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    protected void processInputValue(In value) {
+    public void processInputValue(In value) {
         for(Function fun : mappers) {
             value = (In)fun.apply(value);
         }
         this.value = (Out)value;
     }
     @Override
-    protected boolean hasOutputValue() {
+    public boolean hasOutputValue() {
         return true;
     }
     @Override
@@ -65,7 +73,7 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
         value = null;
     }
     @Override
-    protected boolean isInactive() {
+    public boolean isInactive() {
         return false;
     }
 }
