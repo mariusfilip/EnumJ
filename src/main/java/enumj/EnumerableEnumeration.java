@@ -27,15 +27,25 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 /**
- * Type of {@link Enumeration} encapsulating an {@link Iterator}.
+ * {@code Enumeration} encapsulating an {@code Iterator}.
+ *
  * @param <E> Type of enumerated elements.
+ * @see Enumeration
+ * @see Iterator
+ * @see Enumerator
+ * @see EnumerationEnumerator
  */
 final class EnumerableEnumeration<E> implements Enumeration<E> {
 
     private Iterator<E> source;
 
     /**
-     * Constructs a new {@link EnumerableEnumeration} instance.
+     * Constructs a new {@code EnumerableEnumeration} instance.
+     * <p>
+     * The new {@link EnumerableEnumeration} stores its {@code source}
+     * internally.
+     * </p>
+     *
      * @param source {@link Iterator} instance to get elements from.
      */
     public EnumerableEnumeration(Iterator<E> source) {

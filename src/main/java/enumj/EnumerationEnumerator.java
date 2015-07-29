@@ -26,15 +26,24 @@ package enumj;
 import java.util.Enumeration;
 
 /**
- * Type of {@link Enumerator} encapsulating an {@link Enumeration}.
+ * {@code Enumerator} encapsulating an {@code Enumeration}.
+ *
  * @param <E> type of enumerated elements.
+ * @see EnumerableEnumeration
+ * @see Enumerator
+ * @see Enumeration
  */
 final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
 
     private Enumeration<E> source;
 
     /**
-     * Constructs an {@link EnumerationEnumerator} instance.
+     * Constructs an {@code EnumerationEnumerator} instance.
+     * <p>
+     * The new {@link EnumerationEnumerator} stores its {@code source}
+     * internally.
+     * </p>
+     *
      * @param source {@link Enumeration} instance to get elements from.
      */
     public EnumerationEnumerator(Enumeration<E> source) {

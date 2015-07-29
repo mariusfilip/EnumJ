@@ -29,21 +29,23 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
 /**
- * {@link Enumerable} implementation that enumerates by choosing among the
- * elements of given source {@link Iterable} instances.
+ * {@code Enumerable} that chooses among the elements of the given
+ * {@code Iterator} instances.
+ *
  * @param <E> Type of enumerated elements.
  */
 final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
 
-    private final Supplier<IntSupplier> indexSupplier;
+    private final Supplier<IntSupplier>      indexSupplier;
     private final Supplier<IntUnaryOperator> nextIndexSupplier;
-    private final Iterable<E> first;
-    private final Iterable<? extends E> second;
-    private final List<Iterable<E>> rest;
-    private final Lazy<Boolean> onceOnly;
+    private final Iterable<E>                first;
+    private final Iterable<? extends E>      second;
+    private final List<Iterable<E>>          rest;
+    private final Lazy<Boolean>              onceOnly;
 
     /**
-     * Constructs a {@link ChoiceEnumerable} instance.
+     * Constructs a {@code ChoiceEnumerable} instance.
+     *
      * @param indexSupplier lazily provided {@link IntSupplier} instance that
      * yields the index of the source {@link Iterable} instance to get the next
      * element from.
@@ -55,11 +57,11 @@ final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
      * @param second second {@link Iterable} source to choose elements from.
      * @param rest  rest of {@link Iterable} sources to choose elements from.
      */
-    public ChoiceEnumerable(Supplier<IntSupplier> indexSupplier,
+    public ChoiceEnumerable(Supplier<IntSupplier>      indexSupplier,
                             Supplier<IntUnaryOperator> nextIndexSupplier,
-                            Iterable<E> first,
-                            Iterable<? extends E> second,
-                            List<Iterable<E>> rest) {
+                            Iterable<E>                first,
+                            Iterable<? extends E>      second,
+                            List<Iterable<E>>          rest) {
         Checks.ensureNotNull(indexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
         Checks.ensureNotNull(nextIndexSupplier,
@@ -67,6 +69,7 @@ final class ChoiceEnumerable<E> extends AbstractEnumerable<E> {
         Checks.ensureNotNull(first, Messages.NULL_ENUMERATOR_SOURCE);
         Checks.ensureNotNull(second, Messages.NULL_ENUMERATOR_SOURCE);
         Checks.ensureNotNull(rest, Messages.NULL_ENUMERATOR_SOURCE);
+
         for(Iterable<? extends E> source : rest) {
             Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         }

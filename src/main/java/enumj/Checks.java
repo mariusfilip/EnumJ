@@ -31,11 +31,12 @@ final class Checks {
     private Checks() {}
 
     /**
-     * Checks whether {@code something} is not {@code null}.
+     * Checks whether {@code something} is not null.
+     *
      * @param <T> type of {@code something}.
-     * @param something object to check for {@code null}.
+     * @param something object to check for null.
      * @param message error message.
-     * @throws IllegalArgumentException {@code something} is {@code null}.
+     * @throws IllegalArgumentException {@code something} is null.
      */
     public static <T> void ensureNotNull(T something, String message) {
         if (something == null) {
@@ -44,6 +45,7 @@ final class Checks {
     }
     /**
      * Checks whether {@code something} is not negative.
+     *
      * @param something {@code long} value to check.
      * @param message error message.
      * @throws IllegalArgumentException {@code something} is negative.
@@ -55,6 +57,7 @@ final class Checks {
     }
     /**
      * Checks whether {@code something} is less than a {@code limit}.
+     *
      * @param something {@code long} value to check.
      * @param limit {@code long} limit to check against.
      * @param message error message.
@@ -66,12 +69,13 @@ final class Checks {
                                       String message) {
         if (something >= limit) {
             throw new IllegalArgumentException(
-                    message + ": " + 
+                    message + ": " +
                     something + " is not less than " + limit);
         }
     }
     /**
      * Checks that an {@code enumerator} is not enumerating.
+     *
      * @param enumerator {@link Enumerator} to check.
      * @throws IllegalStateException {@code enumerator} is enumerating.
      * @see Enumerator#enumerating()

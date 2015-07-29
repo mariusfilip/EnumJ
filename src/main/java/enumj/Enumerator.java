@@ -57,7 +57,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
- * A type of iterator with high composability.
+ * {@code Iterator} with high composability.
  * <p>
  * Enumerators are {@link Iterator} objects with the following characteristics:
  * </p>
@@ -100,10 +100,10 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #concat(java.util.function.Supplier)}</li>
  *   <li>{@link #filter(java.util.function.Predicate)}</li>
  *   <li>{@link #flatMap(java.util.function.Function)}</li>
- *   <li>{@link #map(java.util.function.BiFunction)}</li>
  *   <li>{@link #limit(long)}</li>
  *   <li>{@link #limitWhile(java.util.function.Predicate)}</li>
  *   <li>{@link #map(java.util.function.Function)}</li>
+ *   <li>{@link #map(java.util.function.BiFunction)}</li>
  *   <li>{@link #peek(java.util.function.Consumer)}</li>
  *   <li>{@link #prependOn(java.lang.Object...)}</li>
  *   <li>{@link #prepend(java.util.Enumeration)}</li>
@@ -182,52 +182,58 @@ import org.apache.commons.lang3.tuple.Pair;
  *   <li>{@link #zipLeft(java.util.Iterator)}</li>
  *   <li>{@link #zipRight(java.util.Iterator)}</li>
  * </ul>
- * @param <E> the type of elements returned by this enumerator.
+ * @param <E> type of enumerated elements.
  */
 public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns whether the enumerator has started enumerating.
      * <p>
-     * This method returns <code>false</code> before the first call
-     * to {@link hasNext} and <code>true</code> afterwards.
+     * This method returns false before the first call
+     * to {@link hasNext} and true afterwards.
      * </p>
      *
-     * @return <code>true</code> if the enumerator has started enumerating.
-     * @see hasNext
-     * @see next
+     * @return true if the enumerator has started enumerating, false otherwise.
+     * @see #hasNext()
+     * @see #next()
      */
     public boolean enumerating();
 
     /**
      * Returns an enumerator returning the given elements.
      *
-     * @param <E> the type of elements being enumerated
-     * @param elements the elements returned by the enumerator
-     * @return the new enumerator
+     * @param <E> the type of elements being enumerated.
+     * @param elements the elements returned by the enumerator.
+     * @return the new {@link Enumerator}.
      */
     @SafeVarargs
     public static <E> Enumerator<E> on(E... elements) {
         return new ArrayEnumerator(elements);
     }
 
+    /**
+     * Returns an enumerator iterating over the given array.
+     *
+     * @param <E> type of enumerated elements.
+     * @param elements array to iterate upon.
+     * @return the new {@link Enumerator}.
+     */
     public static <E> Enumerator<E> of(E[] elements) {
         return new ArrayEnumerator(elements);
     }
 
     /**
      * Returns an enumerator enumerating over an existing
-     * {@link Iterator}.
+     * {@code Iterator}.
      * <p>
-     * If <code>source</code> is of type {@link Enumerator} then this method
-     * returns <code>source</code>.
+     * If {@code source} is of type {@link Enumerator} then this method
+     * returns {@code source}.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Iterator} being enumerated upon
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@link Iterator} being enumerated upon.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Iterator<E> source) {
         return IteratorEnumerator.of(source);
@@ -235,13 +241,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the elements of an
-     * existing {@link Iterable}.
+     * existing {@code Iterable}.
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Iterable} being enumerated upon
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@link Iterable} being enumerated upon.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Iterable<E> source) {
         return of(source.iterator());
@@ -249,13 +254,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the elements of an
-     * existing {@link Enumeration}.
+     * existing {@code Enumeration}.
      *
-     * @param <E> the type of elements being enumerated
+     * @param <E> the type of elements being enumerated.
      * @param source the {@link Enumeration} being enumerated upon
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Enumeration<E> source) {
         return new EnumerationEnumerator(source);
@@ -263,17 +267,16 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the elements of an existing
-     * {@link Stream}.
+     * {@code Stream}.
      * <p>
-     * If {@link Stream#isParallel()} returns <code>true</code> on
-     * <code>source</code> then the order of elements is undetermined.
+     * If {@link Stream#isParallel()} returns true on
+     * {@code source} then the order of elements is undetermined.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Stream} being enumerated upon
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@link Stream} being enumerated upon.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Stream<E> source) {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
@@ -282,13 +285,12 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the elements of an existing
-     * {@link Spliterator}.
+     * {@code Spliterator}.
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Spliterator} being enumerated upon
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@link Spliterator} being enumerated upon.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Spliterator<E> source) {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
@@ -297,18 +299,17 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the elements supplied by an
-     * existing {@link Supplier}.
+     * existing {@code Supplier}.
      * <p>
      * The enumerator extracts and returns elements from <code>source</code>
      * up to the first empty {@link Optional} value.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
+     * @param <E> the type of elements being enumerated.
      * @param source the {@link Supplier} of elements being enumerated.
-     * Enumeration continues up to the first empty {@link Optional}
-     * @return the new enumerator
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * Enumeration continues up to the first empty {@link Optional}.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> of(Supplier<Optional<E>> source) {
         return new SuppliedEnumerator(source);
@@ -322,14 +323,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * distinction that <code>source</code> is supplied by a {@link Supplier}.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
+     * @param <E> the type of elements being enumerated.
      * @param source the {@link Supplier} supplying the {@link Iterator} to
-     * enumerate upon
-     * @return the new enumerator
-     * @see Supplier
+     * enumerate upon.
+     * @return the new enumerator.
      * @see #of(java.util.Iterator)
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> ofLazyIterator(
             Supplier<? extends Iterator<E>> source) {
@@ -337,21 +336,19 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator enumerating over an {@link Iterable} supplied
+     * Returns an enumerator enumerating over an {@code Iterable} supplied
      * lazily.
      * <p>
      * This method works like {@link #of(java.lang.Iterable)} with the
      * distinction that <code>source</code> is supplied by a {@link Supplier}.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Supplier} supplying the {@link Iterable} to
-     * enumerate upon
-     * @return the new enumerator
-     * @see Supplier
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@code Supplier} supplying the {@link Iterable} to
+     * enumerate upon.
+     * @return the new enumerator.
      * @see #of(java.lang.Iterable)
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> ofLazyIterable(
             Supplier<? extends Iterable<E>> source) {
@@ -360,21 +357,19 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator enumerating over an {@link Enumeration} supplied
+     * Returns an enumerator enumerating over an {@code Enumeration} supplied
      * lazily.
      * <p>
      * This method works like {@link #of(java.util.Enumeration)} with the
-     * distinction that <code>source</code> is supplied by a {@link Supplier}.
+     * distinction that {@code source} is supplied by a {@link Supplier}.
      * </p>
      *
      * @param <E> the type of elements being enumerated
-     * @param source the {@link Supplier} supplying the {@link Enumeration} to
+     * @param source the {@code Supplier} supplying the {@link Enumeration} to
      * enumerate upon
      * @return the new enumerator
-     * @see Supplier
      * @see #of(java.util.Enumeration)
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> ofLazyEnumeration(
             Supplier<? extends Enumeration<E>> source) {
@@ -383,20 +378,18 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator enumerating over a {@link Stream} supplied lazily.
+     * Returns an enumerator enumerating over a {@code Stream} supplied lazily.
      * <p>
      * This method works like {@link #of(java.util.stream.Stream)} with the
-     * distinction that <code>source</code> is supplied by a {@link Supplier}.
+     * distinction that {@code source} is supplied by a {@link Supplier}.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Supplier} supplying the {@link Stream} to
-     * enumerate upon
-     * @return the new enumerator
-     * @see Supplier
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@code Supplier} supplying the {@link Stream} to
+     * enumerate upon.
+     * @return the new enumerator.
      * @see #of(java.util.stream.Stream)
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> ofLazyStream(
             Supplier<? extends Stream<E>> source) {
@@ -405,21 +398,19 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator enumerating over a {@link Spliterator} supplied
+     * Returns an enumerator enumerating over a {@code Spliterator} supplied
      * lazily.
      * <p>
      * This method works like {@link #of(java.util.Spliterator)} with the
-     * distinction that <code>source</code> is supplied by a {@link Supplier}.
+     * distinction that {@code source} is supplied by a {@link Supplier}.
      * </p>
      *
-     * @param <E> the type of elements being enumerated
-     * @param source the {@link Supplier} supplying the {@link Spliterator} to
-     * enumerate upon
-     * @return the new enumerator
-     * @see Supplier
+     * @param <E> the type of elements being enumerated.
+     * @param source the {@code Supplier} supplying the {@link Spliterator} to
+     * enumerate upon.
+     * @return the new enumerator.
      * @see #of(java.util.Spliterator)
-     * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code source} is null.
      */
     public static <E> Enumerator<E> ofLazySpliterator(
             Supplier<? extends Spliterator<E>> source) {
@@ -429,9 +420,10 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator that supports late-binding.
-     * @param <E> type of enumerated elements
-     * @param clazz class of enumerated elements
-     * @return the new enumerator
+     *
+     * @param <E> type of enumerated elements.
+     * @param clazz class of enumerated elements.
+     * @return the new enumerator.
      * @see LateBindingEnumerator
      */
     public static <E> LateBindingEnumerator<E> ofLateBinding(Class<E> clazz) {
@@ -446,13 +438,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * Casting takes place upon the enumerator only. Element casting is
      * considered implicit.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <T> type of elements of the resulted enumerator
-     * @param clazz class of the type to cast to
-     * @return the type-casted enumerator
+     *
+     * @param <T> type of elements of the resulted enumerator.
+     * @param clazz class of the type to cast to.
+     * @return the type-casted enumerator.
      * @see #asFiltered(java.lang.Class)
      */
     public default <T> Enumerator<T> as(Class<T> clazz) {
@@ -467,9 +459,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * This method works exactly like
      * {@code this.filter(e -> clazz.isInstance(e)).as(clazz)}.
      * </p>
-     * @param <T> type of elements of the resulted enumerator
-     * @param clazz class of the type to cast and filter to
-     * @return the resulted enumerator
+     *
+     * @param <T> type of elements of the resulted enumerator.
+     * @param clazz class of the type to cast and filter to.
+     * @return the resulted enumerator.
      * @see #as(java.lang.Class)
      * @see #filter(java.util.function.Predicate)
      */
@@ -479,14 +472,14 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a {@link OnceEnumerable} instance enumerating over the current
+     * Returns a {@code OnceEnumerable} instance enumerating over the current
      * enumerator.
      * <p>
      * This method satisfies the condition
      * <code>this.asEnumerable().iterator() == this</code>.
      * </p>
      *
-     * @return the new {@link OnceEnumerable}
+     * @return the new {@link OnceEnumerable}.
      */
     public default OnceEnumerable<E> asEnumerable() {
         Checks.ensureNonEnumerating(this);
@@ -494,8 +487,9 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an {@link Enumeration} enumerating over the current enumerator.
-     * @return the new {@link Enumeration}
+     * Returns an {@code Enumeration} enumerating over the current enumerator.
+     *
+     * @return the new {@link Enumeration}.
      * @see #asEnumerable()
      */
     public default Enumeration<E> asEnumeration() {
@@ -504,16 +498,16 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an infinite enumerator of non-empty {@link Optional} instances
+     * Returns an infinite enumerator of non-empty {@code Optional} instances
      * containing the current elements as long as they last or empty
-     * {@link Optional} instances if the current enumerator has no more
+     * {@code Optional} instances if the current enumerator has no more
      * elements.
      * <p>
-     * The current enumerator may not return <code>null</code> elements.
+     * The current enumerator may not return null elements.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @return the infinite enumerator of {@link Optional} instances
+     * @return the infinite enumerator of {@link Optional} instances.
      */
     public default Enumerator<Optional<E>> asOptional() {
         return Enumerator.this.map(e -> Optional.of(e))
@@ -521,10 +515,10 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a sequential {@link Spliterator} iterating over the current
+     * Returns a sequential {@code Spliterator} iterating over the current
      * enumerator.
      *
-     * @return the new {@link Spliterator}
+     * @return the new {@link Spliterator}.
      * @see #asStream()
      */
     public default Spliterator<E> asSpliterator() {
@@ -533,10 +527,10 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a sequential {@link Stream} streaming over the current
+     * Returns a sequential {@code Stream} streaming over the current
      * enumerator.
      *
-     * @return the new {@link Stream}
+     * @return the new {@link Stream}.
      * @see #asSpliterator()
      * @see #asSupplier()
      */
@@ -546,15 +540,15 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a {@link Supplier} supplying the elements of the current
+     * Returns a {@code Supplier} supplying the elements of the current
      * enumerator.
      * <p>
      * The resulted {@link Supplier} supplies non-empty {@link Optional}
      * instances as long as the current enumerator has elements. The current
-     * enumerator may not yield <code>null</code> elements.
+     * enumerator may not yield null elements.
      * </p>
      *
-     * @return the new {@link Supplier}
+     * @return the new {@code Supplier}.
      * @see #asStream()
      */
     public default Supplier<Optional<E>> asSupplier() {
@@ -563,16 +557,17 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a {@link ShareableEnumerator} sharing the elements of the
+     * Returns a {@code ShareableEnumerator} sharing the elements of the
      * current enumerator.
      * <p>
      * A {@link ShareableEnumerator} can either enumerate the elements of the
      * current enumerator itself or it can produce a collection of
-     * {@link SharingEnumerator} instances that will share the elements of the
+     * {@link Enumerator} instances that will share the elements of the
      * current iterator when enumerating independently of each other. The two
      * modes are mutually exclusive.
      * </p>
-     * @return the new {@link ShareableEnumerator}
+     * @return the new {@link ShareableEnumerator}.
+     * @see SharingEnumerator
      */
     public default ShareableEnumerator<E> asShareable() {
         Checks.ensureNonEnumerating(this);
@@ -595,10 +590,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * </ul>
      *
      * @param handler {@link Consumer} handling {@link Exception} instances
-     * thrown by {@link #hasNext()} or {@link #next()}
-     * @return the new fault-tolerant enumerator
-     * @exception IllegalArgumentException <code>handler</code> is
-     * <code>null</code>
+     * thrown by {@code hasNext()} or {@code next()}.
+     * @return the new fault-tolerant enumerator.
+     * @exception IllegalArgumentException {@code handler} is null.
      * @see #asTolerant(java.util.function.Consumer, int)
      */
     public default Enumerator<E> asTolerant(
@@ -622,12 +616,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * </ul>
      *
      * @param handler {@link Consumer} handling {@link Exception} instances
-     * thrown by {@link #hasNext()} or {@link #next()}
-     * @param retries number of retries to {@link #hasNext()} before returning
-     * <code>false</code> if {@link #hasNext()} throws
-     * @return the new fault-tolerant enumerator
-     * @exception IllegalArgumentException <code>handler</code> is
-     * <code>null</code> or <code>retries</code> is negative
+     * thrown by {@code hasNext()} or {@code next()}.
+     * @param retries number of retries to {@code hasNext()} before returning
+     * false if {@code hasNext()} throws.
+     * @return the new fault-tolerant enumerator.
+     * @exception IllegalArgumentException {@code handler} is
+     * null or {@code retries} is negative.
      * @see #asTolerant(java.util.function.Consumer)
      */
     public default Enumerator<E> asTolerant(
@@ -642,13 +636,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns whether all the elements of the current enumerator match the
      * provided predicate.
      *
-     * @param predicate state-less predicate to apply to the enumerated elements
-     * @return <code>true</code> if all the elements satisfy
-     * <code>predicate</code>, <code>false</code> otherwise
+     * @param predicate state-less predicate to apply to the enumerated
+     * elements.
+     * @return true if all the elements satisfy.
+     * {@code predicate}, false otherwise
      * @see #anyMatch(java.util.function.Predicate)
      * @see #noneMatch(java.util.function.Predicate)
-     * @exception IllegalArgumentException <code>predicate</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code predicate} is null.
      */
     public default boolean allMatch(Predicate<? super E> predicate) {
         Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
@@ -664,13 +658,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns whether any elements of the current enumerator match the
      * provided predicate.
      *
-     * @param predicate state-less predicate to apply to the enumerated elements
-     * @return <code>true</code> if some elements satisfy
-     * <code>predicate</code>, <code>false</code> otherwise
+     * @param predicate state-less predicate to apply to the enumerated
+     * elements.
+     * @return true if some elements satisfy
+     * {@code predicate}, false otherwise.
      * @see #allMatch(java.util.function.Predicate)
      * @see #noneMatch(java.util.function.Predicate)
-     * @exception IllegalArgumentException <code>predicate</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code predicate} is null.
      */
     public default boolean anyMatch(Predicate<? super E> predicate) {
         Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
@@ -688,8 +682,8 @@ public interface Enumerator<E> extends Iterator<E> {
      * <em>This operation is highly composable.</em>
      * </p>
      *
-     * @param elements values to append
-     * @return the appended enumerator
+     * @param elements values to append.
+     * @return the appended enumerator.
      * @see #concatOn(java.lang.Object...)
      */
     public default Enumerator<E> append(E... elements) {
@@ -705,16 +699,16 @@ public interface Enumerator<E> extends Iterator<E> {
      *                  java.util.Iterator,
      *                  java.util.Iterator,
      *                  java.util.Iterator...)}
-     * with the distinction that <code>altIndexSupplier</code> is
+     * with the distinction that {@code altIndexSupplier} is
      * {@code i -> (i+1)%(2+rest.length)}.
      * </p>
-     * @param <E> the type of elements being enumerated
+     * @param <E> the type of elements being enumerated.
      * @param indexSupplier {@link Supplier} instance supplying the index of
-     * the iterator to get the next element from
-     * @param first the first iterator to choose elements from
-     * @param second the second iterator to choose elements from
-     * @param rest other iterators to choose elements from
-     * @return the new enumerator
+     * the iterator to get the next element from.
+     * @param first the first iterator to choose elements from.
+     * @param second the second iterator to choose elements from.
+     * @param rest other iterators to choose elements from.
+     * @return the new enumerator.
      * @see #choiceOf(java.util.function.IntSupplier,
      *                java.util.function.IntUnaryOperator,
      *                java.util.Iterator,
@@ -723,8 +717,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see #zipBoth(java.util.Iterator)
      * @see #zipLeft(java.util.Iterator)
      * @see #zipRight(java.util.Iterator)
-     * @exception IllegalArgumentException any argument is
-     * <code>null</code>
+     * @exception IllegalArgumentException any argument is null.
      */
     public static <E> Enumerator<E> choiceOf(
             IntSupplier indexSupplier,
@@ -743,14 +736,14 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns an enumerator that chooses elements from the provided iterators.
      * <p>
-     * The pair formed of <code>indexSupplier</code> and
-     * <code>altIndexSupplier</code> makes the choice algorithm. The resulted
- enumerator chooses its next element in a multi-step tryPipelineOut:
- </p>
+     * The pair formed of {@code indexSupplier} and
+     * {@code altIndexSupplier} makes the choice algorithm. The resulted
+     * enumerator chooses its next element in a multi-step tryPipelineOut:
+     * </p>
      * <ul>
-     *   <li>it calls <code>indexSupplier.get()</code> to get the index of a
+     *   <li>it calls {@code indexSupplier.get()} to get the index of a
      * provided iterator. That iterator will provide the next element.
-     * Index <code>0</code> means the first iterator, index <code>1</code>
+     * Index {@code 0} means the first iterator, index {@code 1}
      * means the second iterator and so on.</li>
      *   <li>if the chosen iterator has no elements, the resulted enumerator
      * calls <code>altIndexSupplier.apply(index)</code> repeatedly until
@@ -784,18 +777,17 @@ public interface Enumerator<E> extends Iterator<E> {
      * </code>
      * will produce the sequence 1, 2, 3, 4, 5 and 6.
      * </pre>
-     * @param <E> type of elements being enumerated
+     * @param <E> type of elements being enumerated.
      * @param indexSupplier {@link Supplier} instance supplying the index of the
-     * provided iterator to get the next element from
+     * provided iterator to get the next element from.
      * @param altIndexSupplier {@link IntUnaryOperator} instance supplying the
      * index of the next provided iterator if the iterator chosen by
-     * <code>indexSupplier</code> has no more elements
-     * @param first the first iterator to choose elements from
-     * @param second the second iterator to choose elements from
-     * @param rest other iterators to choose elements from
-     * @return the new enumerator
-     * @exception IllegalArgumentException any argument is
-     * <code>null</code>
+     * <code>indexSupplier</code> has no more elements.
+     * @param first the first iterator to choose elements from.
+     * @param second the second iterator to choose elements from.
+     * @param rest other iterators to choose elements from.
+     * @return the new enumerator.
+     * @exception IllegalArgumentException any argument is null.
      */
     public static <E> Enumerator<E> choiceOf(
             IntSupplier indexSupplier,
@@ -812,21 +804,20 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Collects the elements of the current enumerator according to the
-     * provided {@link Collector}.
+     * provided {@code Collector}.
      * <p>
      * This methods works exactly like
      * <code>this.asStream().collect(collector)</code>.
      * </p>
-     * @param <R> the collected type
-     * @param <A> the type of the intermediate accumulator during collection
+     * @param <R> the collected type.
+     * @param <A> the type of the intermediate accumulator during collection.
      * @param collector {@link Collector} instance collecting the enumerated
-     * elements
-     * @return the result of the collection
+     * elements.
+     * @return the result of the collection.
      * @see #asStream()
      * @see Stream
      * @see Collector
-     * @exception IllegalArgumentException <code>collector</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException {@code collector} is null.
      */
     public default <R, A> R collect(Collector<? super E, A, R> collector) {
         Checks.ensureNotNull(collector, Messages.NULL_ENUMERATOR_HANDLER);
@@ -834,29 +825,28 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Concatenates the current enumerator with the provided {@link Iterator}.
-     *
+     * Concatenates the current enumerator with the provided {@code Iterator}.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Iterator} instance to concatenate with
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException {@code elements} is null.
      */
     public default Enumerator<E> concat(Iterator<? extends E> elements) {
         return new PipeEnumerator(this).concat(elements);
     }
 
     /**
-     * Concatenates the current enumerator with the provided {@link Iterable}.
+     * Concatenates the current enumerator with the provided {@code Iterable}.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param elements {@link Iterable} instance to concatenate with
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     *
+     * @param elements {@link Iterable} instance to concatenate with.
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> concat(Iterable<? extends E> elements) {
         return concat(of(elements));
@@ -864,14 +854,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Concatenates the current enumerator with the provided
-     * {@link Enumeration}.
+     * {@code Enumeration}.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Enumeration} instance to concatenate with
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> concat(Enumeration<? extends E> elements) {
         return concat(of(elements));
@@ -879,14 +869,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Concatenates the current enumerator with the provided sequential
-     * {@link Stream}.
+     * {@code Stream}.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Stream} instance to concatenate with
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> concat(Stream<? extends E> elements) {
         return concat(of(elements));
@@ -894,14 +884,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Concatenates the current enumerator with the provided sequential
-     * {@link Spliterator}.
+     * {@code Spliterator}.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Spliterator} instance to concatenate with
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> concat(Spliterator<? extends E> elements) {
         return concat(of(elements));
@@ -909,19 +899,18 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Concatenates the current enumerator with the sequence formed of
-     * the elements supplied by the provided {@link Supplier}.
+     * the elements supplied by the provided {@code Supplier}.
      * <p>
      * The first value supplied by <code>elements</code> that is an empty
      * {@link Optional} marks the end of the sequence to concatenate to.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Supplier} instance supplying the elements to
-     * concatenate to
-     * @return the concatenated enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * concatenate to.
+     * @return the concatenated enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> concat(Supplier<Optional<E>> elements) {
         return concat(of(elements));
@@ -932,13 +921,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * provided elements
      * <p>
      * This method works exactly like {@link #append(java.lang.Object...)}.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements the values to concatenate at the end of the current
-     * enumerator
-     * @return the concatenated enumerator
+     * enumerator.
+     * @return the concatenated enumerator.
      */
     public default Enumerator<E> concatOn(E... elements) {
         return concat(on(elements));
@@ -948,11 +937,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns whether the current enumerator has an element equalling the
      * provided value.
      *
-     * @param element value to look for
-     * @return <code>true</code> if value equals an element in the current
-     * enumerator, <code>false</code> otherwise
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @param element value to look for.
+     * @return true if value equals an element in the current
+     * enumerator, false otherwise.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default boolean contains(E element) {
         while (hasNext()) {
@@ -966,7 +954,7 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns the number of elements in the current enumerator.
      *
-     * @return the number of enumerated elements
+     * @return the number of enumerated elements.
      */
     public default long count() {
         long cnt = 0;
@@ -983,9 +971,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @return the new enumerator
+     *
+     * @return the new enumerator.
      * @see #sorted()
-     * @see Stream
      */
     public default Enumerator<E> distinct() {
         return Reversible.distinct(this, false);
@@ -999,10 +987,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * This method returns an empty {@link Optional} if <code>index</code> is
      * larger than or equal to <code>this.count()</code>.
      * </p>
-     * @param index 0-based index for the element to return
+     *
+     * @param index {@code 0}-based index for the element to return.
      * @return {@link Optional} instance containing the element at the
-     * required <code>index</code>
-     * @exception IllegalArgumentException <code>index</code> is negative
+     * required <code>index</code>.
+     * @exception IllegalArgumentException <code>index</code> is negative.
      */
     public default Optional<E> elementAt(long index) {
         Checks.ensureNonNegative(index, Messages.NEGATIVE_ENUMERATOR_INDEX);
@@ -1025,14 +1014,14 @@ public interface Enumerator<E> extends Iterator<E> {
      *                                      p.getRight().get()))
      * </code>
      * </pre>
-     * @param <T> type of elements to match the enumerated elements against
+     *
+     * @param <T> type of elements to match the enumerated elements against.
      * @param elements {@link Iterator} instance whose elements get matched
-     * against the enumerated elements
-     * @return <code>true</code> if the enumerated elements match the
-     * elements of {@link Iterator} in both value and position,
-     * <code>false</code> otherwise
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * against the enumerated elements.
+     * @return true if the enumerated elements match the
+     * elements of {@code Iterator} in both value and position,
+     * false otherwise
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default <T> boolean elementsEqual(Iterator<T> elements) {
         Checks.ensureNotNull(elements, Messages.NULL_ITERATOR);
@@ -1055,8 +1044,8 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns en enumerator with no elements.
      *
-     * @param <E> type of the enumerated elements
-     * @return the empty enumerator
+     * @param <E> type of the enumerated elements.
+     * @return the empty enumerator.
      */
     public static <E> Enumerator<E> empty() {
         return of(Collections.emptyIterator());
@@ -1065,12 +1054,12 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns an enumerator consisting of the elements of the current
      * enumerator that match the provided predicate.
-     *
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param predicate state-less predicate to apply on each element
-     * @return the filtered enumerator
+     *
+     * @param predicate state-less predicate to apply on each element.
+     * @return the filtered enumerator.
      */
     public default Enumerator<E> filter(Predicate<? super E> predicate) {
         Checks.ensureNotNull(predicate, Messages.NULL_ENUMERATOR_PREDICATE);
@@ -1080,7 +1069,7 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns the first element of the current enumerator, if any.
      *
-     * @return {@link Optional} instance containing the first element
+     * @return {@link Optional} instance containing the first element.
      */
     public default Optional<E> first() {
         return hasNext() ? Optional.of(next()) : Optional.empty();
@@ -1101,13 +1090,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * </code>
      * will produce the sequence 1, 2, 4, 6, 9 and 12.
      * </pre>
-     * <p>
-     * @param <R> the element type of the new enumerator
+     *
+     * @param <R> the element type of the new enumerator.
      * @param mapper {@link Function} instance to apply on each enumerated
-     * element of the current enumerator
-     * @return the flattened enumerator
-     * @exception IllegalArgumentException <code>mapper</code> is
-     * <code>null</code>
+     * element of the current enumerator.
+     * @return the flattened enumerator.
+     * @exception IllegalArgumentException <code>mapper</code> is null.
      */
     public default <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
@@ -1118,9 +1106,8 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Performs an action on each enumerated element.
      *
-     * @param consumer action to perform on each enumerated element
-     * @exception IllegalArgumentException <code>consumer</code> is
-     * <code>null</code>
+     * @param consumer action to perform on each enumerated element.
+     * @exception IllegalArgumentException <code>consumer</code> is null.
      */
     public default void forEach(Consumer<? super E> consumer) {
         Checks.ensureNotNull(consumer, Messages.NULL_ENUMERATOR_CONSUMER);
@@ -1136,12 +1123,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * The resulted enumerator returns <code>seed</code>,
      * <code>f(seed)</code>, <code>f(f(seed))</code> ...
      * </p>
+     *
      * @param <E> the type of enumerated elements
      * @param seed the initial element
      * @param f state-less {@link Function} instance to apply on the previous
      * element to obtain the next element
      * @return the iterated enumerator
-     * @exception IllegalArgumentException <code>f</code> is <code>null</code>
+     * @exception IllegalArgumentException <code>f</code> is null.
      */
     public static <E> Enumerator<E> iterate(E seed, UnaryOperator<E> f) {
         Checks.ensureNotNull(f, Messages.NULL_ENUMERATOR_GENERATOR);
@@ -1160,7 +1148,7 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns the last element of the current enumerator, if any.
      *
-     * @return {@link Optional} instance containing the last element
+     * @return {@link Optional} instance containing the last element.
      */
     public default Optional<E> last() {
         E result = null;
@@ -1174,13 +1162,14 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns the current enumerator truncated to the given size.
      * <p>
      * This method works exactly like <code>take(long)</code>.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param maxSize the maximum number of elements in the resulted enumerator
-     * @return the truncated enumerator
-     * @exception IllegalArgumentException <code>maxSize</code> is negative
+     *
+     * @param maxSize the maximum number of elements in the resulted
+     * enumerator.
+     * @return the truncated enumerator.
+     * @exception IllegalArgumentException <code>maxSize</code> is negative/
      */
     public default Enumerator<E> limit(long maxSize) {
         return new PipeEnumerator(this).limit(maxSize);
@@ -1193,15 +1182,14 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * this method works exactly like
      * {@link #takeWhile(java.util.function.Predicate)}.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param predicate state-less {@link Predicate} instance to apply on
-     * enumerated elements
-     * @return the truncated enumerator
-     * @exception IllegalArgumentException <code>predicate</code> is
-     * <code>null</code>
+     * enumerated elements.
+     * @return the truncated enumerator.
+     * @exception IllegalArgumentException <code>predicate</code> is null.
      */
     public default Enumerator<E> limitWhile(Predicate<? super E> predicate) {
         return takeWhile(predicate);
@@ -1213,9 +1201,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <R> the element type of the new enumerator
+     *
+     * @param <R> the element type of the new enumerator.
      * @param mapper state-less {@link Function} to apply on each enumerated
-     * element
+     * element.
      * @return the mapped enumerator
      * @see #map(java.util.function.BiFunction)
      */
@@ -1232,12 +1221,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * the distinction that each enumerated element is accompanied by its
      * <code>0</code>-based index.
      * </p>
-     * @param <R> the element type of the resulted enumerator
+     *
+     * @param <R> the element type of the resulted enumerator.
      * @param mapper state-less {@link  BiFunction} to apply on each enumerated
-     * element
-     * @return the mapped enumerator
-     * @exception IllegalArgumentException <code>mapper</code> is
-     * <code>null</code>
+     * element.
+     * @return the mapped enumerator.
+     * @exception IllegalArgumentException <code>mapper</code> is null.
      * @see #map(java.util.function.Function)
      */
     public default <R> Enumerator<R> map(
@@ -1250,13 +1239,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * comparator.
      *
      * @param comparator state-less {@link Comparator} instance
-     * to compare enumerated elements
+     * to compare enumerated elements.
      * @return {@link Optional} instance containing the maximal enumerated
-     * element
+     * element.
      * @exception IllegalArgumentException <code>comparator</code>
-     * is <code>null</code>
+     * is null.
      * @see #min(java.util.Comparator)
-     * @see Comparator
      */
     public default Optional<E> max(Comparator<? super E> comparator) {
         Checks.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
@@ -1273,13 +1261,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * comparator.
      *
      * @param comparator state-less {@link Comparator} instance
-     * to compare enumerated elements
+     * to compare enumerated elements.
      * @return {@link Optional} instance containing the minimal enumerated
-     * element
+     * element.
      * @exception IllegalArgumentException <code>comparator</code>
-     * is <code>null</code>
+     * is null.
      * @see #max(java.util.Comparator)
-     * @see Comparator
      */
     public default Optional<E> min(Comparator<? super E> comparator) {
         E m = null;
@@ -1294,11 +1281,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns whether no enumerated element matches the provided predicate.
      *
      * @param predicate state-less {@link Predicate} instance to apply
-     * to enumerated elements
-     * @return <code>true</code> if no enumerated element matches
-     * <code>predicate</code>, <code>false</code> otherwise
-     * @exception IllegalArgumentException <code>predicate</code> is
-     * <code>null</code>
+     * to enumerated elements.
+     * @return true if no enumerated element matches
+     * <code>predicate</code>, false otherwise.
+     * @exception IllegalArgumentException <code>predicate</code> is null.
      * @see #allMatch(java.util.function.Predicate)
      * @see #anyMatch(java.util.function.Predicate)
      */
@@ -1319,11 +1305,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param action {@link Consumer} instance to apply on the elements as they
-     * get enumerated
-     * @return the peeked enumerator
-     * @exception IllegalArgumentException <code>action</code> is
-     * <code>null</code>
+     * get enumerated.
+     * @return the peeked enumerator.
+     * @exception IllegalArgumentException <code>action</code> is null.
      */
     public default Enumerator<E> peek(Consumer<? super E> action) {
         return Reversible.peek(this, action, false);
@@ -1331,15 +1317,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Prepends the current enumerator with the provided {@link Iterator}.
-     *
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Iterator} instance to prepend in front of the
-     * current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Iterator<? extends E> elements) {
         return new PipeEnumerator(this).reversedConcat(elements);
@@ -1350,11 +1335,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Iterable} instance to prepend in front of the
-     * current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Iterable<? extends E> elements) {
         return prepend(of(elements));
@@ -1366,11 +1351,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Enumeration} instance to prepend in front of the
-     * current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Enumeration<? extends E> elements) {
         return prepend(of(elements));
@@ -1382,11 +1367,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Stream} instance to prepend in front of the
-     * current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Stream<? extends E> elements) {
         return prepend(of(elements));
@@ -1398,11 +1383,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Spliterator} instance to prepend in front of the
-     * current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Spliterator<? extends E> elements) {
         return prepend(of(elements));
@@ -1410,20 +1395,19 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Prepends the current enumerator with the sequence formed of
-     * the elements supplied by the provided {@link Supplier}.
+     * the elements supplied by the provided {@code Supplier}.
      * <p>
      * The first value supplied by <code>elements</code> that is an empty
      * {@link Optional} marks the end of the sequence to prepend with.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements {@link Supplier} instance supplying the elements to
-     * prepend in front of the current enumerator
-     * @return the prepended enumerator
-     * @exception IllegalStateException the current enumerator is enumerating
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * prepend in front of the current enumerator.
+     * @return the prepended enumerator.
+     * @exception IllegalStateException the current enumerator is enumerating.
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default Enumerator<E> prepend(Supplier<Optional<E>> elements) {
         return prepend(of(elements));
@@ -1435,13 +1419,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * This method works like <code>concatOn(elements)</code> but at the
      * opposite end.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param elements the values to prepend at the beginning of the current
-     * enumerator
-     * @return the prepended enumerator
+     * enumerator.
+     * @return the prepended enumerator.
      */
     public default Enumerator<E> prependOn(E... elements) {
         return prepend(on(elements));
@@ -1451,15 +1435,15 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an ordered sequence between
      * a start and an exclusive end.
      *
-     * @param <E> type of enumerated elements
-     * @param startInclusive the first element in the sequence
-     * @param endExclusive the exclusive sequence end
+     * @param <E> type of enumerated elements.
+     * @param startInclusive the first element in the sequence.
+     * @param endExclusive the exclusive sequence end.
      * @param succ {@link UnaryOperator} instance returning the successor of
-     * a given element
+     * a given element.
      * @param cmp {@link Comparator} instance comparing enumerated elements
-     * @return the enumerator covering the range
+     * @return the enumerator covering the range.
      * @exception IllegalArgumentException <code>succ</code> or <code>cmp</code>
-     * is <code>null</code>
+     * is null.
      */
     public static <E> Enumerator<E> range(E startInclusive,
                                           E endExclusive,
@@ -1477,15 +1461,15 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an ordered sequence between
      * a start and an inclusive end.
      *
-     * @param <E> type of enumerated elements
-     * @param startInclusive the first element in the sequence
-     * @param endInclusive the last element in the sequence
+     * @param <E> type of enumerated elements.
+     * @param startInclusive the first element in the sequence.
+     * @param endInclusive the last element in the sequence.
      * @param succ {@link UnaryOperator} instance returning the successor of
-     * a given element
+     * a given element.
      * @param cmp {@link Comparator} instance comparing enumerated elements
-     * @return the enumerator covering the range
+     * @return the enumerator covering the range.
      * @exception IllegalArgumentException <code>succ</code> or <code>cmp</code>
-     * is <code>null</code>
+     * is null.
      */
     public static <E> Enumerator<E> rangeClosed(E startInclusive,
                                                 E endInclusive,
@@ -1503,9 +1487,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an integral range, upper limit
      * excluded.
      *
-     * @param startInclusive the lower bound of the range
-     * @param endExclusive the exclusive upper bound of the range
-     * @return the enumerator covering the range
+     * @param startInclusive the lower bound of the range.
+     * @param endExclusive the exclusive upper bound of the range.
+     * @return the enumerator covering the range.
      */
     public static IntRangeEnumerator rangeInt(int startInclusive,
                                               int endExclusive) {
@@ -1516,9 +1500,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an integral range, upper limit
      * included.
      *
-     * @param startInclusive the lower bound of the range
-     * @param endInclusive the inclusive upper bound of the range
-     * @return the enumerator covering the range
+     * @param startInclusive the lower bound of the range.
+     * @param endInclusive the inclusive upper bound of the range.
+     * @return the enumerator covering the range.
      */
     public static IntRangeEnumerator rangeIntClosed(int startInclusive,
                                                     int endInclusive) {
@@ -1529,9 +1513,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an long integral range, upper
      * limit excluded.
      *
-     * @param startInclusive the lower bound of the range
-     * @param endExclusive the exclusive upper bound of the range
-     * @return the enumerator covering the range
+     * @param startInclusive the lower bound of the range.
+     * @param endExclusive the exclusive upper bound of the range.
+     * @return the enumerator covering the range.
      */
     public static LongRangeEnumerator rangeLong(long startInclusive,
                                                 long endExclusive) {
@@ -1542,9 +1526,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator enumerating over an long integral range, upper
      * limit included.
      *
-     * @param startInclusive the lower bound of the range
-     * @param endInclusive the inclusive upper bound of the range
-     * @return the enumerator covering the range
+     * @param startInclusive the lower bound of the range.
+     * @param endInclusive the inclusive upper bound of the range.
+     * @return the enumerator covering the range.
      */
     public static LongRangeEnumerator rangeLongClosed(long startInclusive,
                                                       long endInclusive) {
@@ -1556,10 +1540,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * accumulation function and returns the reduced value, if any.
      *
      * @param accumulator associative {@link BinaryOperator} combining two
-     * enumerated elements
-     * @return {@link Optional} instance containing the reduced value
-     * @exception IllegalArgumentException <code>accumulator</code> is
-     * <code>null</code>
+     * enumerated elements.
+     * @return {@link Optional} instance containing the reduced value.
+     * @exception IllegalArgumentException <code>accumulator</code> is null.
      */
     public default Optional<E> reduce(BinaryOperator<E> accumulator) {
         Checks.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
@@ -1574,12 +1557,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * Performs a reduction on enumerated elements using an identity element
      * and an associative accumulation function and returns the reduced value.
      *
-     * @param identity starting point for the reduction
+     * @param identity starting point for the reduction.
      * @param accumulator associative {@link BinaryOperator} combining
-     * two enumerated elements
-     * @return the reduced value
-     * @exception IllegalArgumentException <code>accumulator</code> is
-     * <code>null</code>
+     * two enumerated elements.
+     * @return the reduced value.
+     * @exception IllegalArgumentException <code>accumulator</code> is null.
      */
     public default E reduce(E identity, BinaryOperator<E> accumulator) {
         Checks.ensureNotNull(accumulator, Messages.NULL_ENUMERATOR_ACCUMULATOR);
@@ -1594,11 +1576,11 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator that enumerates the same element the given number
      * of times.
      *
-     * @param <E> type of enumerated element
-     * @param element the element to return
-     * @param count the number of elements to return
-     * @return the enumerator repeating the element
-     * @exception IllegalArgumentException <code>count</code> is negative
+     * @param <E> type of enumerated element.
+     * @param element the element to return.
+     * @param count the number of elements to return.
+     * @return the enumerator repeating the element.
+     * @exception IllegalArgumentException <code>count</code> is negative.
      * @see #repeatAll(java.util.function.Supplier, long)
      * @see #repeatAll(int)
      * @see #repeatEach(int)
@@ -1612,12 +1594,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns an enumerator that enumerates over the iterator supplied lazily
      * the given number of times.
      *
-     * @param <E> type of enumerated element
-     * @param source supplier of the iterator to repeat
-     * @param count the number of times to repeat
-     * @return the repeated enumerator
+     * @param <E> type of enumerated element.
+     * @param source supplier of the iterator to repeat.
+     * @param count the number of times to repeat.
+     * @return the repeated enumerator.
      * @exception IllegalArgumentException <code>source</code> is
-     * <code>null</code> or <code>count</code> is negative
+     * null or <code>count</code> is negative.
      * @see #repeat(java.lang.Object, long)
      * @see #repeatAll(int)
      * @see #repeatEach(int)
@@ -1636,11 +1618,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * The current enumerator gets iterated only once.
      * </p>
+     *
      * @param count the number of times to repeatAll the <code>elements</code>
-     * sequence
-     * @return the repeating enumerator
+     * sequence.
+     * @return the repeating enumerator.
      * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code> or <code>count</code> is negative
+     * <code>null</code> or <code>count</code> is negative.
      * @see #repeat(java.lang.Object, long)
      * @see #repeatAll(java.util.function.Supplier, long)
      * @see #repeatEach(int)
@@ -1659,11 +1642,12 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param count the number of times to repeatAll the elements in the
-     * sequence
-     * @return the enumerator of repeated elements
+     * sequence.
+     * @return the enumerator of repeated elements.
      * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code> or <code>count</code> is negative
+     * <code>null</code> or <code>count</code> is negative.
      * @see #repeat(java.lang.Object, long)
      * @see #repeatAll(java.util.function.Supplier, long)
      * @see #repeatAll(int)
@@ -1690,9 +1674,9 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns the one and only element of the current enumerator.
      *
-     * @return the single element
+     * @return the single element.
      * @exception InputMismatchException the current enumerator has
-     * <code>0</code> or more than <code>1</code> elements
+     * <code>0</code> or more than <code>1</code> elements.
      */
     public default E single() {
         if (!hasNext()) {
@@ -1713,8 +1697,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param n the number of front elements to drop
-     * @return the truncated enumerator
+     *
+     * @param n the number of front elements to drop.
+     * @return the truncated enumerator.
      */
     public default Enumerator<E> skip(long n) {
         return new PipeEnumerator(this).skip(n);
@@ -1726,9 +1711,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param predicate {@link Predicate} instance to match the enumerated
-     * elements against
-     * @return the enumerator with front elements dropped
+     * elements against.
+     * @return the enumerator with front elements dropped.
      */
     public default Enumerator<E> skipWhile(Predicate<? super E> predicate) {
         return new PipeEnumerator(this).skipWhile(predicate);
@@ -1737,7 +1723,7 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Returns an enumerator the sorts the enumerated elements.
      *
-     * @return the sorted enumerator
+     * @return the sorted enumerator.
      */
     public default Enumerator<E> sorted() {
         return of(asStream().sorted());
@@ -1748,10 +1734,9 @@ public interface Enumerator<E> extends Iterator<E> {
      * given comparator.
      *
      * @param comparator {@link Comparator} instance to compare enumerated
-     * elements
-     * @return the sorted enumerator
-     * @exception IllegalArgumentException <code>comparator</code> is
-     * <code>null</code>
+     * elements.
+     * @return the sorted enumerator.
+     * @exception IllegalArgumentException <code>comparator</code> is null.
      */
     public default Enumerator<E> sorted(Comparator<? super E> comparator) {
         Checks.ensureNotNull(comparator, Messages.NULL_ENUMERATOR_COMPARATOR);
@@ -1762,13 +1747,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * Returns the current enumerator truncated to the given size.
      * <p>
      * This method works exactly like <code>limit(long)</code>.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param n the maximum number of elements in the resulted enumerator
-     * @return the truncated enumerator
-     * @exception IllegalArgumentException <code>n</code> is negative
+     *
+     * @param n the maximum number of elements in the resulted enumerator.
+     * @return the truncated enumerator.
+     * @exception IllegalArgumentException <code>n</code> is negative.
      */
     public default Enumerator<E> take(long n) {
         return limit(n);
@@ -1780,15 +1765,14 @@ public interface Enumerator<E> extends Iterator<E> {
      * the provided predicate.
      * <p>
      * this method works exactly like <code>limitWhile(Predicate)</code>.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
+     *
      * @param predicate state-less {@link Predicate} instance to apply on
-     * enumerated elements
-     * @return the truncated enumerator
-     * @exception IllegalArgumentException <code>predicate</code> is
-     * <code>null</code>
+     * enumerated elements.
+     * @return the truncated enumerator.
+     * @exception IllegalArgumentException <code>predicate</code> is null.
      */
     public default Enumerator<E> takeWhile(Predicate<? super E> predicate) {
         return new PipeEnumerator(this).takeWhile(predicate);
@@ -1797,11 +1781,9 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Collects the current enumerator into an array of elements of given class.
      *
-     * @param clazz {@link Class} of array elements
-     * @return the array of elements
-     * @see Class
-     * @exception IllegalArgumentException <code>clazz</code> is
-     * <code>null</code>
+     * @param clazz {@link Class} of array elements.
+     * @return the array of elements.
+     * @exception IllegalArgumentException <code>clazz</code> is null.
      */
     public default E[] toArray(Class<E> clazz) {
         Checks.ensureNotNull(clazz, Messages.NULL_ENUMERATOR_CLASS);
@@ -1811,26 +1793,24 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Collects the current enumerator into a list of elements.
      *
-     * @return the list of elements
-     * @see List
+     * @return the list of elements.
      */
     public default List<E> toList() {
         return collect(Collectors.toList());
     }
 
     /**
-     * Collects the current enumerator into a {@link Map} according to
+     * Collects the current enumerator into a {@code Map} according to
      * a key mapping function and a value mapping function.
      *
-     * @param <K> the map key type
-     * @param <V> the map value type
+     * @param <K> the map key type.
+     * @param <V> the map value type.
      * @param keyMapper {@link Function} instance extracting the map key
-     * from enumerated elements
-     * @param valueMapper {@link Function} instance extracting the map value
-     * from enumerated elements
+     * from enumerated elements.
+     * @param valueMapper {@code Function} instance extracting the map value
+     * from enumerated elements.
      * @return {@link Map} instance containing the results of key and value
-     * mappings
-     * @see Map
+     * mappings.
      */
     public default <K, V> Map<K, V> toMap(Function<? super E, K> keyMapper,
                                           Function<? super E, V> valueMapper) {
@@ -1840,8 +1820,7 @@ public interface Enumerator<E> extends Iterator<E> {
     /**
      * Collects the current enumerator into a set.
      *
-     * @return the set of elements
-     * @see Set
+     * @return the set of elements.
      */
     public default Set<E> toSet() {
         return collect(Collectors.toSet());
@@ -1853,10 +1832,10 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * This method works exactly like {@code this.concat(others).distinct()}.
      * </p>
-     * @param others enumerator to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others enumerator to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Iterator<? extends E> others) {
         return concat(others).distinct();
@@ -1864,14 +1843,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the current enumerator and
-     * the provided {@link Iterable}, all duplicates removed.
+     * the provided {@code Iterable}, all duplicates removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others {@link Iterable} to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others {@link Iterable} to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Iterable<? extends E> others) {
         return union(of(others));
@@ -1879,14 +1858,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the current enumerator and
-     * the provided {@link Enumeration}, all duplicates removed.
+     * the provided {@code Enumeration}, all duplicates removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others {@link Enumeration} to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others {@link Enumeration} to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Enumeration<? extends E> others) {
         return union(of(others));
@@ -1894,14 +1873,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the current enumerator and
-     * the provided {@link Stream}, all duplicates removed.
+     * the provided {@code Stream}, all duplicates removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others {@link Stream} to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others {@link Stream} to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Stream<? extends E> others) {
         return union(of(others));
@@ -1909,14 +1888,14 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the current enumerator and
-     * the provided {@link Spliterator}, all duplicates removed.
+     * the provided {@code Spliterator}, all duplicates removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others {@link Spliterator} to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others {@link Spliterator} to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Spliterator<? extends E> others) {
         return union(of(others));
@@ -1924,28 +1903,29 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator enumerating over the current enumerator and
-     * the elements supplied by the provided {@link Supplier}, all duplicates
+     * the elements supplied by the provided {@code Supplier}, all duplicates
      * removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others {@link Supplier} to perform union with
-     * @return the unified enumerator
-     * @exception IllegalArgumentException <code>others</code> is
-     * <code>null</code>
+     *
+     * @param others {@link Supplier} to perform union with.
+     * @return the unified enumerator.
+     * @exception IllegalArgumentException <code>others</code> is null.
      */
     public default Enumerator<E> union(Supplier<Optional<E>> others) {
         return union(of(others));
     }
 
     /**
-     * Returns an enumeratore enumerating over the current enumerator
+     * Returns an enumerator enumerating over the current enumerator
      * and the given elements, all duplicates removed.
      * <p>
      * This method works exactly like {@code this.union(on(others))}.
      * </p>
-     * @param others elements to perform union with
-     * @return the unified enumerator
+     *
+     * @param others elements to perform union with.
+     * @return the unified enumerator.
      */
     public default Enumerator<E> unionOn(E... others) {
         return union(on(others));
@@ -1953,26 +1933,25 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator consisting of pairs of elements from the
-     * current enumerator and the given {@link Iterator}, while any
+     * current enumerator and the given {@code Iterator}, while any
      * of them has elements.
      * <p>
      * The resulted enumerator stops when both the current enumerator and the
      * provided {@link Iterator} stop. The first element of a returned
      * pair is empty {@link Optional} if the current enumerator has no
      * elements. Likewise, the second element of a returned pair is empty
-     * {@link Optional} if the provided {@link Iterator} has no elements.
-     * </p>
+     * {@code Optional} if the provided {@code Iterator} has no elements.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <T> the of elements to zip with
-     * @param elements {@link Iterator} to zip with
-     * @return the zipped enumerator
+     *
+     * @param <T> the of elements to zip with.
+     * @param elements {@code Iterator} to zip with.
+     * @return the zipped enumerator.
      * @see #zipBoth(java.util.Iterator)
      * @see #zipLeft(java.util.Iterator)
      * @see #zipRight(java.util.Iterator)
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default <T>
                    Enumerator<Pair<Optional<E>, Optional<T>>>
@@ -1983,23 +1962,22 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator consisting of pairs of elements from the
-     * current enumerator and the given {@link Iterator}, while both
+     * current enumerator and the given {@code Iterator}, while both
      * have elements.
      * <p>
      * The resulted enumerator stops when aby of the current enumerator or the
      * provided {@link Iterator} stop.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <T> the of elements to zip with
-     * @param elements {@link Iterator} to zip with
-     * @return the zipped enumerator
+     *
+     * @param <T> the of elements to zip with.
+     * @param elements {@code Iterator} to zip with.
+     * @return the zipped enumerator.
      * @see #zipAny(java.util.Iterator)
      * @see #zipLeft(java.util.Iterator)
      * @see #zipRight(java.util.Iterator)
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default <T>
                    Enumerator<Pair<E, T>>
@@ -2011,24 +1989,22 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator consisting of pairs of elements from the
-     * current enumerator and the given {@link Iterator}, while the current
+     * current enumerator and the given {@code Iterator}, while the current
      * enumerator has elements.
      * <p>
      * The resulted enumerator stops when the current enumerator stops.
      * The second element of a returned pair is empty {@link Optional} if
      * the provided {@link Iterator} has no elements.
-     * </p>
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <T> the of elements to zip with
-     * @param elements {@link Iterator} to zip with
-     * @return the zipped enumerator
+     * @param <T> the of elements to zip with.
+     * @param elements {@code Iterator} to zip with.
+     * @return the zipped enumerator.
      * @see #zipAny(java.util.Iterator)
      * @see #zipBoth(java.util.Iterator)
      * @see #zipRight(java.util.Iterator)
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default <T>
                    Enumerator<Pair<E, Optional<T>>>
@@ -2040,7 +2016,7 @@ public interface Enumerator<E> extends Iterator<E> {
 
     /**
      * Returns an enumerator consisting of pairs of elements from the
-     * current enumerator and the given {@link Iterator}, while the provided
+     * current enumerator and the given {@code Iterator}, while the provided
      * iterator has elements.
      * <p>
      * The resulted enumerator stops when the provided {@link Iterator} stops.
@@ -2050,14 +2026,13 @@ public interface Enumerator<E> extends Iterator<E> {
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param <T> the of elements to zip with
-     * @param elements {@link Iterator} to zip with
-     * @return the zipped enumerator
+     * @param <T> the of elements to zip with.
+     * @param elements {@code Iterator} to zip with.
+     * @return the zipped enumerator.
      * @see #zipAny(java.util.Iterator)
      * @see #zipBoth(java.util.Iterator)
      * @see #zipLeft(java.util.Iterator)
-     * @exception IllegalArgumentException <code>elements</code> is
-     * <code>null</code>
+     * @exception IllegalArgumentException <code>elements</code> is null.
      */
     public default <T>
                    Enumerator<Pair<Optional<E>, T>>
@@ -2068,15 +2043,15 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns an enumerator consisting of an array of {@link Optional}
+     * Returns an enumerator consisting of an array of {@code Optional}
      * objects containing elements from the current enumerator and
-     * the given {@link Iterator} instances, while any has elements.
+     * the given {@code Iterator} instances, while any has elements.
      * <p>
      * <em>This operation is highly composable.</em>
      * </p>
-     * @param first first iterator to zip with
-     * @param rest the rest of iterators to zip with
-     * @return the zipped enumerator
+     * @param first first {@link Iterator} to zip with.
+     * @param rest the rest of iterators to zip with.
+     * @return the zipped enumerator of arrays of {@link Optional} instances.
      */
     public default Enumerator<Optional<E>[]>
                    zipAll(Iterator<? extends E> first,

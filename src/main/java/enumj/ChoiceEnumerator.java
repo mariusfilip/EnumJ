@@ -12,8 +12,9 @@ import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 
 /**
- * {@link Enumerator} implementation that enumerates by choosing among the
+ * {@code Enumerator} implementation that enumerates by choosing among the
  * elements of given source {@link Iterator} instances.
+ *
  * @param <E> Type of enumerated elements.
  */
 final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
@@ -25,6 +26,7 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
     /**
      * Constructs a {@link ChoiceEnumerator} instance.
+     *
      * @param indexSupplier {@link IntSupplier} instance that yields the index
      * of the source {@link Iterator} instance to get the next element from.
      * @param nextIndexSupplier {@link IntSupplier} instance that yields the
@@ -35,10 +37,10 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
      * @param second second {@link Iterator} source to choose elements from.
      * @param rest rest of {@link Iterator} sources to choose elements from.
      */
-    public ChoiceEnumerator(IntSupplier indexSupplier,
-                            IntUnaryOperator nextIndexSupplier,
-                            Iterator<E> first,
-                            Iterator<E> second,
+    public ChoiceEnumerator(IntSupplier       indexSupplier,
+                            IntUnaryOperator  nextIndexSupplier,
+                            Iterator<E>       first,
+                            Iterator<E>       second,
                             List<Iterator<E>> rest) {
         Checks.ensureNotNull(indexSupplier,
                             Messages.NULL_ENUMERATOR_GENERATOR);
@@ -47,6 +49,7 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         Checks.ensureNotNull(first, Messages.NULL_ENUMERATOR_SOURCE);
         Checks.ensureNotNull(second, Messages.NULL_ENUMERATOR_SOURCE);
         Checks.ensureNotNull(rest, Messages.NULL_ENUMERATOR_SOURCE);
+
         for(Iterator<E> source : rest) {
             Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         }
