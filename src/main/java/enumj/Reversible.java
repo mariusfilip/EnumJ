@@ -37,8 +37,6 @@ import org.apache.commons.lang3.mutable.MutableLong;
  */
 final class Reversible {
 
-    private Reversible() {}
-
     /**
      * Applies a {@code Enumerator.distinct()} operation upon {@code source},
      * in reverse if necessary.

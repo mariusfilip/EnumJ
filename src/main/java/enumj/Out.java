@@ -24,6 +24,7 @@
 package enumj;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Encapsulates output method parameters.
@@ -36,6 +37,24 @@ public final class Out<T> {
     private boolean hasValue;
 
     private Out() {}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Out) {
+            final Out<?> other = (Out<?>)obj;
+            return hasValue == other.hasValue
+                   && Objects.equals(value, other.value);
+        }
+        return super.equals(obj);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(hasValue) + Objects.hashCode(value);
+    }
+    @Override
+    public String toString() {
+        return hasValue ? value.toString() : "<none>";
+    }
 
     /**
      * Gets the value of the output parameter.

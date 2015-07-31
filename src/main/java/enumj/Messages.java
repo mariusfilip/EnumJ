@@ -28,8 +28,6 @@ package enumj;
  */
 public final class Messages {
 
-    private Messages() {}
-
     /**
      * Enumerator source is {@code null}.
      */

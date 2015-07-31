@@ -23,7 +23,6 @@
  */
 package enumj;
 
-import java.util.Iterator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -51,11 +50,13 @@ public class FlatMapPipeProcessorTest {
     @Before
     public void setUp() {
         processor0 = new FlatMapPipeProcessor<>(x -> Enumerator.empty());
+        processor1 = new FlatMapPipeProcessor<>(x -> null);
         processor = new FlatMapPipeProcessor<>(x -> 
                 Enumerator.on(x, x+1, x+2));
     }
 
     FlatMapPipeProcessor<Integer,Integer> processor0;
+    FlatMapPipeProcessor<Integer,Integer> processor1;
     FlatMapPipeProcessor<Integer,Integer> processor;
 
     @After
@@ -77,10 +78,12 @@ public class FlatMapPipeProcessorTest {
      * Test of processInputValue method, of class FlatMapPipeProcessor.
      */
     @Test
-    public void testProcess() {
+    public void testProcessInputValue() {
         System.out.println("process");
         processor0.processInputValue(0);
         assertFalse(processor0.hasOutputValue());
+        processor1.processInputValue(1);
+        assertFalse(processor1.hasOutputValue());
         processor.processInputValue(1);
         assertTrue(processor.hasOutputValue());
     }
@@ -92,6 +95,7 @@ public class FlatMapPipeProcessorTest {
     public void testHasValue() {
         System.out.println("hasValue");
         assertFalse(processor0.hasOutputValue());
+        assertFalse(processor1.hasOutputValue());
         assertFalse(processor.hasOutputValue());
     }
 

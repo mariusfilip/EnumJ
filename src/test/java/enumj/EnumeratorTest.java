@@ -75,6 +75,17 @@ public class EnumeratorTest {
      * Test of of method, of class Enumerator.
      */
     @Test
+    public void testOf_Array() {
+        System.out.println("of array");
+        assertTrue(Enumerator.of(Enumerator.on(1, 2, 3)
+                                           .toArray(Integer.class))
+                             .elementsEqual(Enumerator.on(1, 2, 3)));
+    }
+
+    /**
+     * Test of of method, of class Enumerator.
+     */
+    @Test
     public void testOf_Iterator() {
         System.out.println("of iterator");
         EnumeratorGenerator

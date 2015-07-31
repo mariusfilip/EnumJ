@@ -42,6 +42,7 @@ public class AbstractEnumeratorTest {
     public void testEnumerating() {
         System.out.println("enumerating");
         assertFalse(enumerator.enumerating());
+        assertNotNull(new Reversible());
     }
 
     @Test

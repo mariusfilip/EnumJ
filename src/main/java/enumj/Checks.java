@@ -28,8 +28,6 @@ package enumj;
  */
 final class Checks {
 
-    private Checks() {}
-
     /**
      * Checks whether {@code something} is not null.
      *

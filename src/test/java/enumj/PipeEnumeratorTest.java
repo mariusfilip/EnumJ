@@ -23,10 +23,6 @@
  */
 package enumj;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -121,7 +117,7 @@ public class PipeEnumeratorTest {
             super(source);
         }
         @Override
-        protected <X> void safeMultiPipelineAddLast(
+        protected <X> void multiPipelineAddLast(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
             throw new IllegalStateException();
         }
@@ -143,7 +139,7 @@ public class PipeEnumeratorTest {
             super(source);
         }
         @Override
-        protected <X> void safeMultiPipelineAddFirst(
+        protected <X> void multiPipelineAddFirst(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
             throw new IllegalStateException();
         }

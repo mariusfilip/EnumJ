@@ -287,15 +287,29 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      */
-    protected <X> void safeMultiPipelineAddLast(
+    private <X> void safeMultiPipelineAddLast(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         safePipelineAddLast(processor);
         try {
-            multiPipeline.addLast(processor);
+            multiPipelineAddLast(processor);
         } catch(Throwable err) {
             pipeline.removeLast();
             throw err;
         }
+    }
+
+    /**
+     * Adds the given {@code processor} to the end of {@code multiPipeLine}.
+     * <p>
+     * This method exists for testing purposes, to support fault injection.
+     * </p>
+     *
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeProcessor} to add.
+     */
+    protected <X> void multiPipelineAddLast(
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
+        multiPipeline.addLast(processor);
     }
 
     /**
@@ -320,15 +334,30 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @param <X> type of processed elements.
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      */
-    protected <X> void safeMultiPipelineAddFirst(
+    private <X> void safeMultiPipelineAddFirst(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
         safePipelineAddFirst(processor);
         try {
-            multiPipeline.addFirst(processor);
+            multiPipelineAddFirst(processor);
         } catch(Throwable err) {
             pipeline.removeFirst();
             throw err;
         }
+    }
+
+    /**
+     * Adds the given {@code processor} to the beginning of
+     * {@code multiPipeline}.
+     * <p>
+     * This method exists for testing purposes, to support fault injection.
+     * </p>
+     *
+     * @param <X> type of processed elements.
+     * @param processor {@link AbstractPipeMultiProcessor} to add.
+     */
+    protected <X> void multiPipelineAddFirst(
+            AbstractPipeMultiProcessor<? super X, ?> processor) {
+        multiPipeline.addFirst(processor);
     }
 
     // ---------------------------------------------------------------------- //

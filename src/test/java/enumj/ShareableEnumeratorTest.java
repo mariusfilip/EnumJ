@@ -23,10 +23,6 @@
  */
 package enumj;
 
-import java.util.Iterator;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -34,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class ShareableEnumeratorTest {
 
     public ShareableEnumeratorTest() {

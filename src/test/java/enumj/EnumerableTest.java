@@ -23,10 +23,15 @@
  */
 package enumj;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
@@ -1071,5 +1076,80 @@ public class EnumerableTest {
                                   .max(Comparator.comparingLong(x->x))
                                   .get(),
                         0.000001));
+    }
+
+    /**
+     * Test of onceOnly method, of class Enumerable.
+     */
+    @Test
+    public void testOnceOnly_0args() {
+        System.out.println("onceOnly");
+        assertTrue(Enumerator.empty()
+                             .asEnumerable()
+                             .onceOnly());
+    }
+
+    /**
+     * Test of onceOnly method, of class Enumerable.
+     */
+    @Test
+    public void testOnceOnly_Iterable() {
+        System.out.println("onceOnly");
+        assertTrue(Enumerable.onceOnly(Enumerator.empty().asEnumerable()));
+    }
+
+    /**
+     * Test of cached method, of class Enumerable.
+     */
+    @Test
+    public void testCached_0args() {
+        System.out.println("cached");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .cached()
+                             .elementsEqual(Enumerable.on(1, 2, 3)));
+    }
+
+    /**
+     * Test of cached method, of class Enumerable.
+     */
+    @Test
+    public void testCached_long_Consumer() {
+        System.out.println("cached");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .cached(2, en -> en.disable())
+                             .elementsEqual(Enumerable.on(1, 2, 3)));
+    }
+
+    /**
+     * Test of map method, of class Enumerable.
+     */
+    @Test
+    public void testMap_Function() {
+        System.out.println("map");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .map(x -> x+1)
+                             .elementsEqual(Enumerable.on(2, 3, 4)));
+    }
+
+    /**
+     * Test of map method, of class Enumerable.
+     */
+    @Test
+    public void testMap_BiFunction() {
+        System.out.println("map");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .map((x, i) -> x+i.intValue())
+                             .elementsEqual(Enumerable.on(1, 3, 5)));
+    }
+
+    /**
+     * Test of peek method, of class Enumerable.
+     */
+    @Test
+    public void testPeek() {
+        System.out.println("peek");
+        assertTrue(Enumerable.on(1, 2, 3)
+                             .peek(x -> System.out.println(x))
+                             .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 }

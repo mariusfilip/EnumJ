@@ -55,13 +55,8 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
     private void ensureMappers() {
         if (mappers == null) {
             mappers = new LinkedList<>();
-            try {
-                mappers.add(mapper);
-                mapper = null;
-            } catch(Throwable err) {
-                mappers = null;
-                throw err;
-            }
+            mappers.add(mapper);
+            mapper = null;
         }
     }
 

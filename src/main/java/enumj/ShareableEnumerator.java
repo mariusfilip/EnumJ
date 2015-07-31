@@ -138,7 +138,7 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      */
     public Enumerator<E>[] share(int count) {
         Checks.ensureNonNegative(count,
-                                Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
+                                 Messages.NEGATIVE_ENUMERATOR_EXPECTED_COUNT);
         startSharing();
 
         final Enumerator<E>[] result = new Enumerator[count];
@@ -175,9 +175,6 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
      * @see SharingEnumerator#hasNext()
      */
     void startSharedEnumeration() {
-        if (isEnumerating.get()) {
-            throw new IllegalStateException(Messages.ILLEGAL_ENUMERATOR_STATE);
-        }
         if (isSharedEnumerating.compareAndSet(false, true)) {
             source.disable();
             source = null;
