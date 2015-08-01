@@ -50,8 +50,8 @@ public class EnumeratorStreamComparisonTest {
         rnd = new Random(9691);
         statistics = new StreamComparatorStatistics();
     }
-    private Random rnd;
-    private StreamComparatorStatistics statistics;
+    protected Random rnd;
+    protected StreamComparatorStatistics statistics;
 
     @After
     public void tearDown() {
