@@ -24,6 +24,7 @@
 package enumj;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Pipe processor that receives an element, processes it and returns an output.
@@ -135,11 +136,11 @@ abstract class AbstractPipeProcessor<T,R> {
         }
     }
 
-    // ---------------------------------------------------------------------- //    
+    // ---------------------------------------------------------------------- //
 
     /**
-     * Returns {@code true} and aggregates the given {@code mapper} to the
-     * top of the existing mappers, otherwise it returns {@code false}.
+     * Returns true and aggregates the given {@code mapper} to the
+     * top of the existing mappers, otherwise it returns false.
      * <p>
      * This method returns false by default. The only
      * {@link AbstractPipeProcessor} capable of mapping aggregation is
@@ -155,8 +156,8 @@ abstract class AbstractPipeProcessor<T,R> {
         return false;
     }
     /**
-     * Returns {@code true} and aggregates the given {@code mapper} to the
-     * end of existing mappers, otherwise it returns {@code false}.
+     * Returns true and aggregates the given {@code mapper} to the
+     * end of existing mappers, otherwise it returns false.
      * <p>
      * This method returns false by default. The only
      * {@link AbstractPipeProcessor} capable of mapping aggregation is
@@ -170,7 +171,38 @@ abstract class AbstractPipeProcessor<T,R> {
     public <U> boolean enqueueMap(Function<R,U> mapper) {
         return false;
     }
-    
+    /**
+     * Returns true and aggregates the given {@code predicate} to the
+     * top of the existing predicates, otherwise it returns false.
+     * <p>
+     * This method returns false by default. The only
+     * {@link AbstractPipeProcessor} capable of predicate aggregation is
+     * {@link FilterPipeProcessor}.
+     * </p>
+     *
+     * @param predicate filtering {@link Predicate}.
+     * @return true on successful aggregation of predicates, false
+     * otherwise.
+     */
+    public boolean pushFrontFilter(Predicate<R> predicate) {
+        return false;
+    }
+    /**
+     * Returns true and aggregates the given {@code predicate} to the
+     * end of existing predicates, otherwise it returns false.
+     * <p>
+     * This method returns false by default. The only
+     * {@link AbstractPipeProcessor} capable of mapping aggregation is
+     * {@link FilterPipeProcessor}.
+     * </p>
+     * @param predicate filtering {@link Predicate}.
+     * @return true on successful aggregation of predicates, false
+     * otherwise.
+     */
+    public boolean enqueueFilter(Predicate<R> predicate) {
+        return false;
+    }
+
     // ---------------------------------------------------------------------- //
 
     /**
@@ -178,7 +210,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * <p>
      * The result of processing must be stored internally.
      * </p>
-     * 
+     *
      * @param value Value to process.
      * @see #hasOutputValue()
      * @see #getOutputValue()

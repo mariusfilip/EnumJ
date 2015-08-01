@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.LinkedList;
 import java.util.function.Predicate;
 
 /**
@@ -33,8 +34,9 @@ import java.util.function.Predicate;
  */
 final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    protected E            value;
-    protected Predicate<E> filter;
+    private Predicate<E>             filter;
+    private LinkedList<Predicate<E>> filters;
+    private E                        value;
 
     /**
      * Constructs a {@code FilterPipeProcessor} instance.
@@ -46,9 +48,32 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
      */
     public FilterPipeProcessor(Predicate<E> filter) {
         super(true, true);
-        Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.filter = filter;
     }
+
+    // ---------------------------------------------------------------------- //
+
+    @Override
+    public boolean pushFrontFilter(Predicate<E> predicate) {
+        ensureFilters();
+        this.filters.addFirst((Predicate<E>)predicate);
+        return true;
+    }
+    @Override
+    public boolean enqueueFilter(Predicate<E> predicate) {
+        ensureFilters();
+        this.filters.addLast((Predicate<E>)predicate);
+        return true;
+    }
+    private void ensureFilters() {
+        if (filters == null) {
+            filters = new LinkedList<>();
+            filters.add(filter);
+            filter = null;
+        }
+    }
+
+    // ---------------------------------------------------------------------- //
 
     @Override
     public void processInputValue(E value) {
@@ -56,7 +81,7 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
     @Override
     public boolean hasOutputValue() {
-        if (filter.test(value)) {
+        if (testOutputValue()) {
             return true;
         }
         value = null;
@@ -73,5 +98,17 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     @Override
     public boolean isInactive() {
         return false;
+    }
+
+    private boolean testOutputValue() {
+        if (filter != null) {
+            return filter.test(value);
+        }
+        for(Predicate<E> pred : filters) {
+            if (!pred.test(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

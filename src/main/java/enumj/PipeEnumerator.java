@@ -232,13 +232,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * if possible.
      *
      * @param <X> type of mapped enumerated elements.
-     * @param processor mapping {@link Function}.
+     * @param mapper mapping {@link Function}.
      * @return mapped {@link Enumerator}.
      */
     protected <X> Enumerator<X> enqueueMapProcessor(
-            Function<? super E, ? extends X> processor) {
-        if (pipeline.isEmpty() || !pipeline.getLast().enqueueMap(processor)) {
-            return enqueueProcessor(new MapPipeProcessor(processor));
+            Function<? super E, ? extends X> mapper) {
+        if (pipeline.isEmpty() || !pipeline.getLast().enqueueMap(mapper)) {
+            return enqueueProcessor(new MapPipeProcessor(mapper));
         }
         return (Enumerator<X>)this;
     }
@@ -248,14 +248,45 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * the first mappers, if possible.
      *
      * @param <X> type of enumerated elements to map.
-     * @param processor mapping {@link Function}.
+     * @param mapper mapping {@link Function}.
      * @return mapped {@link Enumerator}.
      */
     protected <X> PipeEnumerator<E> pushFrontMapProcessor(
-            Function<? super X, ?> processor) {
+            Function<? super X, ?> mapper) {
         if (pipeline.isEmpty()
-            || !pipeline.getFirst().pushFrontMap(processor)) {
-            return pushFrontProcessor(new MapPipeProcessor(processor));
+            || !pipeline.getFirst().pushFrontMap(mapper)) {
+            return pushFrontProcessor(new MapPipeProcessor(mapper));
+        }
+        return this;
+    }
+
+    /**
+     * Enqueues the given filter by aggregating it with the last predicates,
+     * if possible.
+     *
+     * @param filter filtering {@link Predicate}.
+     * @return filtered {@link Enumerator}.
+     */
+    protected Enumerator<E> enqueueFilterProcessor(
+            Predicate<? super E> filter) {
+        if (pipeline.isEmpty()
+            || !pipeline.getLast().enqueueFilter(filter)) {
+            return enqueueProcessor(new FilterPipeProcessor(filter));
+        }
+        return this;
+    }
+
+    /**
+     * Prepends the given filter to the existing pipeline by aggregating it with
+     * the first filters, if possible.
+     *
+     * @param filter filtering {@link Predicate}.
+     * @return filtered {@link Enumerator}.
+     */
+    protected PipeEnumerator<E> pushFrontFilterProcessor(Predicate<?> filter) {
+        if (pipeline.isEmpty()
+            || !pipeline.getFirst().pushFrontFilter(filter)) {
+            return pushFrontProcessor(new FilterPipeProcessor(filter));
         }
         return this;
     }
@@ -621,7 +652,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     public Enumerator<E> filter(Predicate<? super E> predicate) {
-        return enqueueProcessor(new FilterPipeProcessor(predicate));
+        return enqueueFilterProcessor(predicate);
     }
     @Override
     public <R> Enumerator<R> flatMap(
@@ -727,7 +758,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedFilter(Predicate<?> predicate) {
-        return pushFrontProcessor(new FilterPipeProcessor(predicate));
+        return pushFrontFilterProcessor(predicate);
     }
 
     /**

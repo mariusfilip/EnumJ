@@ -49,7 +49,7 @@ final class MapPipeProcessor<In,Out> extends AbstractPipeProcessor<In,Out> {
     @Override
     public <R> boolean enqueueMap(Function<Out,R> mapper) {
         ensureMappers();
-        this.mappers.add((Function<In,Out>)mapper);
+        this.mappers.addLast((Function<In,Out>)mapper);
         return true;
     }
     private void ensureMappers() {
