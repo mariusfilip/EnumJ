@@ -23,6 +23,9 @@
  */
 package enumj;
 
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -162,6 +165,58 @@ public class PipeEnumeratorTest {
         assertTrue(pipe.filter(x -> true)
                        .map(x -> x)
                        .elementsEqual(Enumerator.rangeInt(-2, 3)));
+    }
+    
+    class FailingMultiPipeProcessor<In,Out>
+          extends AbstractPipeMultiProcessor<In,Out> {
+        private Out value;
+        private boolean inactive;
+
+        FailingMultiPipeProcessor() {
+            super(true,true);
+        }
+
+        @Override
+        public boolean needsValue() {
+            return value == null;
+        }
+        @Override
+        public void processInputValue(In value) {
+            this.value = (Out)value;
+        }
+        @Override
+        public boolean hasOutputValue() {
+            return value != null;
+        }
+        @Override
+        protected Out retrieveOutputValue() {
+            return value;
+        }
+        @Override
+        protected void clearOutputValue() {
+            value = null;
+            inactive = true;
+        }
+        @Override
+        public boolean isInactive() {
+            return inactive;
+        }
+    }
+
+    class PipeEnumeratorWithFailingMulti extends PipeEnumerator<Integer> {
+
+        public PipeEnumeratorWithFailingMulti() {
+            super(Enumerator.on(1, 2, 3));
+            this.enqueueProcessor(new FailingMultiPipeProcessor());
+        }
+    }
+
+    @Test
+    public void testTryPipelineInWithFailingMulti() {
+        System.out.println("testTryPipelineInWithFailingMulti");
+        final PipeEnumeratorWithFailingMulti pipe =
+                new PipeEnumeratorWithFailingMulti();
+        assertTrue(pipe.elementsEqual(Enumerator.on(1)));
     }
 
     @Test
@@ -402,5 +457,121 @@ public class PipeEnumeratorTest {
     @Test
     public void testReversedZipAll() {
         System.out.println("reversedZipAll");
+    }
+
+    /**
+     * Test of enqueueProcessor method, of class PipeEnumerator.
+     */
+    @Test
+    public void testEnqueueProcessor_AbstractPipeMultiProcessor() {
+        System.out.println("enqueueProcessor");
+    }
+
+    /**
+     * Test of pushFrontProcessor method, of class PipeEnumerator.
+     */
+    @Test
+    public void testPushFrontProcessor_AbstractPipeMultiProcessor() {
+        System.out.println("pushFrontProcessor");
+    }
+
+    /**
+     * Test of enqueueMapProcessor method, of class PipeEnumerator.
+     */
+    @Test
+    public void testEnqueueMapProcessor() {
+        System.out.println("enqueueMapProcessor");
+    }
+
+    /**
+     * Test of pushFrontMapProcessor method, of class PipeEnumerator.
+     */
+    @Test
+    public void testPushFrontMapProcessor() {
+        System.out.println("pushFrontMapProcessor");
+    }
+
+    /**
+     * Test of safePipelineAddLast method, of class PipeEnumerator.
+     */
+    @Test
+    public void testSafePipelineAddLast() {
+        System.out.println("safePipelineAddLast");
+    }
+
+    /**
+     * Test of safePipelineAddFirst method, of class PipeEnumerator.
+     */
+    @Test
+    public void testSafePipelineAddFirst() {
+        System.out.println("safePipelineAddFirst");
+    }
+
+    /**
+     * Test of dequeueSourcesUpToProcessor method, of class PipeEnumerator.
+     */
+    @Test
+    public void testDequeueSourcesUpToProcessor() {
+        System.out.println("dequeueSourcesUpToProcessor");
+    }
+
+    /**
+     * Test of limit method, of class PipeEnumerator.
+     */
+    @Test
+    public void testLimit() {
+        System.out.println("limit");
+    }
+
+    /**
+     * Test of prepend method, of class PipeEnumerator.
+     */
+    @Test
+    public void testPrepend() {
+        System.out.println("prepend");
+        assertTrue(Enumerator.on(5, 6)
+                             .map(x -> x)
+                             .prepend(Enumerator.on(1, 2, 3, 4))
+                             .elementsEqual(Enumerator.on(1, 2, 3, 4, 5, 6)));
+    }
+
+    /**
+     * Test of skip method, of class PipeEnumerator.
+     */
+    @Test
+    public void testSkip() {
+        System.out.println("skip");
+    }
+
+    /**
+     * Test of skipWhile method, of class PipeEnumerator.
+     */
+    @Test
+    public void testSkipWhile() {
+        System.out.println("skipWhile");
+    }
+
+    /**
+     * Test of reversedLimit method, of class PipeEnumerator.
+     */
+    @Test
+    public void testReversedLimit() {
+        System.out.println("reversedLimit");
+    }
+
+    /**
+     * Test of reversedSkip method, of class PipeEnumerator.
+     */
+    @Test
+    public void testReversedSkip() {
+        System.out.println("reversedSkip");
+    }
+
+    /**
+     * Test of reversedSkipWhile method, of class PipeEnumerator.
+     */
+    @Test
+    public void testReversedSkipWhile() {
+        System.out.println("reversedSkipWhile");
     }
 }

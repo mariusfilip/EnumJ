@@ -62,5 +62,5 @@ abstract class AbstractPipeMultiProcessor<T,R>
      * otherwise.
      * @see AbstractPipeProcessor
      */
-    abstract boolean needsValue();
+    public abstract boolean needsValue();
 }

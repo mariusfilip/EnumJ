@@ -59,7 +59,7 @@ final class FlatMapPipeProcessor<In,Out>
     }
 
     @Override
-    protected boolean needsValue() {
+    public boolean needsValue() {
         return !value.isPresent();
     }
     @Override

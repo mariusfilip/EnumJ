@@ -551,10 +551,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     protected E internalNext() {
-        if (value.isPresent() || tryGetNext()) {
-            return retrieveValue();
+        if (!value.isPresent()) {
+            final boolean gotten = tryGetNext();
+            assert gotten; // should always be true;
         }
-        throw new UnsupportedOperationException("Should never be here");
+        return retrieveValue();
     }    
     private E retrieveValue() {
         final E result = value.get();
