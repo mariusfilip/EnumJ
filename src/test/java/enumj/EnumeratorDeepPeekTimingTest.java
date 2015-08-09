@@ -1,13 +1,3 @@
-package enumj;
-
-
-import enumj.Enumerator;
-import enumj.EnumeratorStringTimingTestBase;
-import enumj.StringTimingTestArgs;
-import enumj.TimingTestKind;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
 /*
  * The MIT License
  *
@@ -31,6 +21,10 @@ import java.util.stream.Stream;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package enumj;
+
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class EnumeratorDeepPeekTimingTest
              extends EnumeratorStringTimingTestBase {

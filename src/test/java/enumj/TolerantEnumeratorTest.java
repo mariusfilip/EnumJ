@@ -31,10 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class TolerantEnumeratorTest {
 
     public TolerantEnumeratorTest() {
@@ -197,9 +193,6 @@ public class TolerantEnumeratorTest {
         assertFalse(it123_throw_hasNext.hasNext());
     }
 
-    /**
-     * Test of internalNext method, of class TolerantEnumerator.
-     */
     @Test
     public void testInternalNext() {
         System.out.println("internalNext");
@@ -208,9 +201,6 @@ public class TolerantEnumeratorTest {
                                 .elementsEqual(Enumerator.on(1, 2, 3)));
     }
 
-    /**
-     * Test of cleanup method, of class TolerantEnumerator.
-     */
     @Test
     public void testCleanup() {
         System.out.println("cleanup");

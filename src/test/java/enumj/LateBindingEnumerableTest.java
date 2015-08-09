@@ -32,29 +32,26 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LateBindingEnumerableTest {
-    
+
     public LateBindingEnumerableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of internalEnumerator method, of class LateBindingEnumerable.
-     */
     @Test(expected = NoSuchElementException.class)
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
@@ -63,9 +60,6 @@ public class LateBindingEnumerableTest {
         assertNull(lben.enumerator());
     }
 
-    /**
-     * Test of bind method, of class LateBindingEnumerable.
-     */
     @Test
     public void testBind() {
         System.out.println("bind");
@@ -75,9 +69,6 @@ public class LateBindingEnumerableTest {
         assertTrue(lben.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of binding method, of class LateBindingEnumerable.
-     */
     @Test
     public void testBinding() {
         System.out.println("binding");

@@ -23,15 +23,10 @@
  */
 package enumj;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
@@ -68,18 +63,12 @@ public class EnumerableTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of iterator method, of class OnceEnumerable.
-     */
     @Test
     public void testIterator() {
         System.out.println("iterator");
         assertSame(onceEnumerable.iterator(), iterator);
     }
 
-    /**
-     * Test of enumerator method, of class Enumerable.
-     */
     @Test
     public void testEnumerator() {
         System.out.println("enumerator");
@@ -95,9 +84,6 @@ public class EnumerableTest {
                            });
     }
 
-    /**
-     * Test of enumerating method, of class Enumerable.
-     */
     @Test
     public void testEnumerating() {
         System.out.println("enumerating");
@@ -107,9 +93,6 @@ public class EnumerableTest {
                            .forEach(en -> assertFalse(en.enumerating()));
     }
 
-    /**
-     * Test of on method, of class Enumerable.
-     */
     @Test
     public void testOn() {
         System.out.println("on");
@@ -122,9 +105,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Iterable() {
         System.out.println("of");
@@ -137,9 +117,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Iterator() {
         System.out.println("of");
@@ -152,9 +129,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Enumeration() {
         System.out.println("of");
@@ -167,9 +141,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Stream() {
         System.out.println("of");
@@ -182,9 +153,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Spliterator() {
         System.out.println("of");
@@ -197,9 +165,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerable.
-     */
     @Test
     public void testOf_Supplier() {
         System.out.println("of");
@@ -212,9 +177,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyIterable method, of class Enumerable.
-     */
     @Test
     public void testOfLazyIterable() {
         System.out.println("ofLazyIterable");
@@ -227,9 +189,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyIterator method, of class Enumerable.
-     */
     @Test
     public void testOfLazyIterator() {
         System.out.println("ofLazyIterator");
@@ -242,9 +201,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyEnumeration method, of class Enumerable.
-     */
     @Test
     public void testOfLazyEnumeration() {
         System.out.println("ofLazyEnumeration");
@@ -257,9 +213,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyStream method, of class Enumerable.
-     */
     @Test
     public void testOfLazyStream() {
         System.out.println("ofLazyStream");
@@ -272,9 +225,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazySpliterator method, of class Enumerable.
-     */
     @Test
     public void testOfLazySpliterator() {
         System.out.println("ofLazySpliterator");
@@ -287,9 +237,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLateBinding method, of class Enumerable.
-     */
     @Test
     public void testOfLateBinding() {
         System.out.println("ofLateBinding");
@@ -308,9 +255,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of as method, of class Enumerable.
-     */
     @Test
     public void testAs() {
         System.out.println("as");
@@ -326,9 +270,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of asFiltered method, of class Enumerable.
-     */
     @Test
     public void testAsFiltered() {
         System.out.println("asFiltered");
@@ -340,9 +281,6 @@ public class EnumerableTest {
                 .forEach(en -> assertEquals(0, en.enumerator().count()));
     }
 
-    /**
-     * Test of asEnumeration method, of class Enumerable.
-     */
     @Test
     public void testAsEnumeration() {
         System.out.println("asEnumeration");
@@ -357,9 +295,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of asSpliterator method, of class Enumerable.
-     */
     @Test
     public void testAsSpliterator() {
         System.out.println("asSpliterator");
@@ -374,9 +309,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of asStream method, of class Enumerable.
-     */
     @Test
     public void testAsStream() {
         System.out.println("asStream");
@@ -391,9 +323,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of asTolerant method, of class Enumerable.
-     */
     @Test
     public void testAsTolerant_Consumer() {
         System.out.println("asTolerant");
@@ -408,9 +337,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of asTolerant method, of class Enumerable.
-     */
     @Test
     public void testAsTolerant_Consumer_int() {
         System.out.println("asTolerant");
@@ -425,9 +351,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of append method, of class Enumerable.
-     */
     @Test
     public void testAppend() {
         System.out.println("append");
@@ -460,9 +383,6 @@ public class EnumerableTest {
                 });
     }
 
-    /**
-     * Test of choiceOf method, of class Enumerable.
-     */
     @Test
     public void testChoiceOf_4args() {
         System.out.println("choiceOf");
@@ -481,9 +401,6 @@ public class EnumerableTest {
                                              7, 8, 9, 10, 11, 12)));
     }
 
-    /**
-     * Test of choiceOf method, of class Enumerable.
-     */
     @Test
     public void testChoiceOf_5args() {
         System.out.println("choiceOf");
@@ -506,9 +423,6 @@ public class EnumerableTest {
                                              7, 8, 9, 10, 11, 12)));
     }
 
-    /**
-     * Test of concat method, of class Enumerable.
-     */
     @Test
     public void testConcat() {
         System.out.println("concat");
@@ -531,9 +445,6 @@ public class EnumerableTest {
                                            0.000001));
     }
 
-    /**
-     * Test of concatOn method, of class Enumerable.
-     */
     @Test
     public void testConcatOn() {
         System.out.println("concatOn");
@@ -558,9 +469,6 @@ public class EnumerableTest {
                                            0.000001));
     }
 
-    /**
-     * Test of distinct method, of class Enumerable.
-     */
     @Test
     public void testDistinct() {
         System.out.println("distinct");
@@ -579,9 +487,6 @@ public class EnumerableTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of elementsEqual method, of class Enumerable.
-     */
     @Test
     public void testElementsEqual() {
         System.out.println("elementsEqual");
@@ -597,18 +502,12 @@ public class EnumerableTest {
                 .forEach(p -> p.getLeft().elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of empty method, of class Enumerable.
-     */
     @Test
     public void testEmpty() {
         System.out.println("empty");
         assertEquals(0, Enumerable.empty().enumerator().count());
     }
 
-    /**
-     * Test of filter method, of class Enumerable.
-     */
     @Test
     public void testFilter() {
         System.out.println("filter");
@@ -621,9 +520,6 @@ public class EnumerableTest {
                                  .allMatch(x -> x > 0));
     }
 
-    /**
-     * Test of flatMap method, of class Enumerable.
-     */
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
@@ -637,9 +533,6 @@ public class EnumerableTest {
                 .forEach(x -> assertEquals("", 0, x.orElse(0.0), 0.000001));
     }
 
-    /**
-     * Test of map method, of class Enumerable.
-     */
     @Test
     public void testIndexedMap() {
         System.out.println("indexedMap");
@@ -660,9 +553,6 @@ public class EnumerableTest {
                                            0.000001));
     }
 
-    /**
-     * Test of iterate method, of class Enumerable.
-     */
     @Test
     public void testIterate() {
         System.out.println("iterate");
@@ -672,9 +562,6 @@ public class EnumerableTest {
                                                       .filter(i -> 0 == i%2)));
     }
 
-    /**
-     * Test of limit method, of class Enumerable.
-     */
     @Test
     public void testLimit() {
         System.out.println("limit");
@@ -689,9 +576,6 @@ public class EnumerableTest {
                                .elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of limitWhile method, of class Enumerable.
-     */
     @Test
     public void testLimitWhile() {
         System.out.println("limitWhile");
@@ -706,9 +590,6 @@ public class EnumerableTest {
                                .elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of map method, of class Enumerable.
-     */
     @Test
     public void testMap() {
         System.out.println("map");
@@ -723,9 +604,6 @@ public class EnumerableTest {
                                                .map(x -> -x)));
     }
 
-    /**
-     * Test of prepend method, of class Enumerable.
-     */
     @Test
     public void testPrepend() {
         System.out.println("prepend");
@@ -742,9 +620,6 @@ public class EnumerableTest {
                                .elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of prependOn method, of class Enumerable.
-     */
     @Test
     public void testPrependOn() {
         System.out.println("prependOn");
@@ -764,9 +639,6 @@ public class EnumerableTest {
                                .elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of range method, of class Enumerable.
-     */
     @Test
     public void testRange() {
         System.out.println("range");
@@ -785,9 +657,6 @@ public class EnumerableTest {
                         .sorted()));
     }
 
-    /**
-     * Test of rangeClosed method, of class Enumerable.
-     */
     @Test
     public void testRangeClosed() {
         System.out.println("rangeClosed");
@@ -806,9 +675,6 @@ public class EnumerableTest {
                         .sorted()));
     }
 
-    /**
-     * Test of rangeInt method, of class Enumerable.
-     */
     @Test
     public void testRangeInt() {
         System.out.println("rangeInt");
@@ -816,9 +682,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.rangeInt(0, 6)));
     }
 
-    /**
-     * Test of rangeIntClosed method, of class Enumerable.
-     */
     @Test
     public void testRangeIntClosed() {
         System.out.println("rangeIntClosed");
@@ -826,9 +689,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.rangeIntClosed(0, 5)));
     }
 
-    /**
-     * Test of rangeLong method, of class Enumerable.
-     */
     @Test
     public void testRangeLong() {
         System.out.println("rangeLong");
@@ -836,9 +696,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.rangeLong(0, 6)));
     }
 
-    /**
-     * Test of rangeLongClosed method, of class Enumerable.
-     */
     @Test
     public void testRangeLongClosed() {
         System.out.println("rangeLongClosed");
@@ -846,9 +703,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.rangeLongClosed(0, 5)));
     }
 
-    /**
-     * Test of repeat method, of class Enumerable.
-     */
     @Test
     public void testRepeat() {
         System.out.println("repeat");
@@ -856,9 +710,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.repeat(1, 5)));
     }
 
-    /**
-     * Test of repeatAll method, of class Enumerable.
-     */
     @Test
     public void testRepeatAll() {
         System.out.println("repeatAll");
@@ -867,9 +718,6 @@ public class EnumerableTest {
                                                       .repeatAll(3)));
     }
 
-    /**
-     * Test of repeatEach method, of class Enumerable.
-     */
     @Test
     public void testRepeatEach() {
         System.out.println("repeatEach");
@@ -878,9 +726,6 @@ public class EnumerableTest {
                                                       .repeatEach(3)));
     }
 
-    /**
-     * Test of reverse method, of class Enumerable.
-     */
     @Test
     public void testReverse() {
         System.out.println("reverse");
@@ -889,9 +734,6 @@ public class EnumerableTest {
                                                       .reverse()));
     }
 
-    /**
-     * Test of skip method, of class Enumerable.
-     */
     @Test
     public void testSkip() {
         System.out.println("skip");
@@ -900,9 +742,6 @@ public class EnumerableTest {
                                                       .skip(50)));
     }
 
-    /**
-     * Test of skipWhile method, of class Enumerable.
-     */
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
@@ -911,9 +750,6 @@ public class EnumerableTest {
                                                       .skipWhile(x -> x<50)));
     }
 
-    /**
-     * Test of sorted method, of class Enumerable.
-     */
     @Test
     public void testSorted_0args() {
         System.out.println("sorted");
@@ -923,9 +759,6 @@ public class EnumerableTest {
                                                       .sorted()));
     }
 
-    /**
-     * Test of sorted method, of class Enumerable.
-     */
     @Test
     public void testSorted_Comparator() {
         System.out.println("sorted");
@@ -936,9 +769,6 @@ public class EnumerableTest {
                                      .sorted(Comparator.comparingInt(x->-x))));
     }
 
-    /**
-     * Test of take method, of class Enumerable.
-     */
     @Test
     public void testTake() {
         System.out.println("take");
@@ -947,9 +777,6 @@ public class EnumerableTest {
                                                       .take(50)));
     }
 
-    /**
-     * Test of takeWhile method, of class Enumerable.
-     */
     @Test
     public void testTakeWhile() {
         System.out.println("takeWhile");
@@ -958,9 +785,6 @@ public class EnumerableTest {
                                                       .takeWhile(x -> x<50)));
     }
 
-    /**
-     * Test of union method, of class Enumerable.
-     */
     @Test
     public void testUnion() {
         System.out.println("union");
@@ -974,9 +798,6 @@ public class EnumerableTest {
                                   .get()));
     }
 
-    /**
-     * Test of unionOn method, of class Enumerable.
-     */
     @Test
     public void testUnionOn() {
         System.out.println("unionOn");
@@ -986,9 +807,6 @@ public class EnumerableTest {
                                      .unionOn(3, 4, 5)));
     }
 
-    /**
-     * Test of zipAny method, of class Enumerable.
-     */
     @Test
     public void testZipAny() {
         System.out.println("zipAny");
@@ -999,9 +817,6 @@ public class EnumerableTest {
                                .count());
     }
 
-    /**
-     * Test of zipBoth method, of class Enumerable.
-     */
     @Test
     public void testZipBoth() {
         System.out.println("zipBoth");
@@ -1012,9 +827,6 @@ public class EnumerableTest {
                                .count());
     }
 
-    /**
-     * Test of zipLeft method, of class Enumerable.
-     */
     @Test
     public void testZipLeft() {
         System.out.println("zipLeft");
@@ -1025,9 +837,6 @@ public class EnumerableTest {
                                .count());
     }
 
-    /**
-     * Test of zipRight method, of class Enumerable.
-     */
     @Test
     public void testZipRight() {
         System.out.println("zipRight");
@@ -1038,9 +847,6 @@ public class EnumerableTest {
                                .count());
     }
 
-    /**
-     * Test of zipAll method, of class Enumerable.
-     */
     @Test
     public void testZipAll() {
         System.out.println("zipAll");
@@ -1078,9 +884,6 @@ public class EnumerableTest {
                         0.000001));
     }
 
-    /**
-     * Test of onceOnly method, of class Enumerable.
-     */
     @Test
     public void testOnceOnly_0args() {
         System.out.println("onceOnly");
@@ -1089,18 +892,12 @@ public class EnumerableTest {
                              .onceOnly());
     }
 
-    /**
-     * Test of onceOnly method, of class Enumerable.
-     */
     @Test
     public void testOnceOnly_Iterable() {
         System.out.println("onceOnly");
         assertTrue(Enumerable.onceOnly(Enumerator.empty().asEnumerable()));
     }
 
-    /**
-     * Test of cached method, of class Enumerable.
-     */
     @Test
     public void testCached_0args() {
         System.out.println("cached");
@@ -1109,9 +906,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of cached method, of class Enumerable.
-     */
     @Test
     public void testCached_long_Consumer() {
         System.out.println("cached");
@@ -1120,9 +914,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of map method, of class Enumerable.
-     */
     @Test
     public void testMap_Function() {
         System.out.println("map");
@@ -1131,9 +922,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.on(2, 3, 4)));
     }
 
-    /**
-     * Test of map method, of class Enumerable.
-     */
     @Test
     public void testMap_BiFunction() {
         System.out.println("map");
@@ -1142,9 +930,6 @@ public class EnumerableTest {
                              .elementsEqual(Enumerable.on(1, 3, 5)));
     }
 
-    /**
-     * Test of peek method, of class Enumerable.
-     */
     @Test
     public void testPeek() {
         System.out.println("peek");

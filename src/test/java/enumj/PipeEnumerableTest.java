@@ -30,34 +30,27 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class PipeEnumerableTest {
-    
+
     public PipeEnumerableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of internalOnceOnly method, of class PipeEnumerable.
-     */
     @Test
     public void testInternalOnceOnly() {
         System.out.println("internalOnceOnly");
@@ -72,9 +65,6 @@ public class PipeEnumerableTest {
         assertTrue(more.onceOnly());
     }
 
-    /**
-     * Test of internalEnumerator method, of class PipeEnumerable.
-     */
     @Test
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
@@ -83,9 +73,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerator.on(1, 2, 3)));
     }
 
-    /**
-     * Test of of method, of class PipeEnumerable.
-     */
     @Test
     public void testOf() {
         System.out.println("of");
@@ -93,9 +80,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of concat method, of class PipeEnumerable.
-     */
     @Test
     public void testConcat() {
         System.out.println("concat");
@@ -104,9 +88,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3, 4, 5)));
     }
 
-    /**
-     * Test of distinct method, of class PipeEnumerable.
-     */
     @Test
     public void testDistinct() {
         System.out.println("distinct");
@@ -115,9 +96,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of filter method, of class PipeEnumerable.
-     */
     @Test
     public void testFilter() {
         System.out.println("filter");
@@ -127,9 +105,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of flatMap method, of class PipeEnumerable.
-     */
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
@@ -139,9 +114,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of limit method, of class PipeEnumerable.
-     */
     @Test
     public void testLimit() {
         System.out.println("limit");
@@ -151,9 +123,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of limitWhile method, of class PipeEnumerable.
-     */
     @Test
     public void testLimitWhile() {
         System.out.println("limitWhile");
@@ -163,9 +132,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of map method, of class PipeEnumerable.
-     */
     @Test
     public void testMap_Enumerable_Function() {
         System.out.println("map");
@@ -174,9 +140,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(2, 3, 4)));
     }
 
-    /**
-     * Test of map method, of class PipeEnumerable.
-     */
     @Test
     public void testMap_Enumerable_BiFunction() {
         System.out.println("map");
@@ -185,9 +148,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(1, 3, 5)));
     }
 
-    /**
-     * Test of peek method, of class PipeEnumerable.
-     */
     @Test
     public void testPeek() {
         System.out.println("peek");
@@ -196,9 +156,6 @@ public class PipeEnumerableTest {
                              .elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of skip method, of class PipeEnumerable.
-     */
     @Test
     public void testSkip() {
         System.out.println("skip");
@@ -208,9 +165,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of skipWhile method, of class PipeEnumerable.
-     */
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
@@ -220,9 +174,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of takeWhile method, of class PipeEnumerable.
-     */
     @Test
     public void testTakeWhile() {
         System.out.println("takeWhile");
@@ -232,9 +183,6 @@ public class PipeEnumerableTest {
                                   .count());
     }
 
-    /**
-     * Test of zipAll method, of class PipeEnumerable.
-     */
     @Test
     public void testZipAll() {
         System.out.println("zipAll");

@@ -30,46 +30,36 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class AbstractPipeProcessorTest {
-    
+
     public AbstractPipeProcessorTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
         processor = new AbstractPipeProcessorImpl<>();
     }
     AbstractPipeProcessorImpl<String> processor;
-    
+
     @After
     public void tearDown() {
         processor = null;
     }
 
-    /**
-     * Test of getNext method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testGetNext() {
         System.out.println("getNext");
         assertNull(processor.getNext());
     }
 
-    /**
-     * Test of setNext method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testSetNext() {
         System.out.println("setNext");
@@ -84,18 +74,12 @@ public class AbstractPipeProcessorTest {
         processor.setNext(new AbstractPipeProcessorImpl());
     }
 
-    /**
-     * Test of getSource method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testGetSource() {
         System.out.println("getSource");
         assertNull(processor.getSource());
     }
 
-    /**
-     * Test of setSource method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testSetSource() {
         System.out.println("setSource");
@@ -109,28 +93,19 @@ public class AbstractPipeProcessorTest {
         processor.setSource(new PipeSource(Enumerator.empty()));
         processor.setSource(new PipeSource(Enumerator.empty()));
     }
-    
-    /**
-     * Test of pushFrontMap method, of class AbstractPipeProcessor.
-     */
+
     @Test
     public void testPushFrontMap() {
         System.out.println("pushFrontMap");
         assertFalse(processor.pushFrontMap(x -> x));
     }
 
-    /**
-     * Test of enqueueMap method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testEnqueueMap() {
         System.out.println("enqueueMap");
         assertFalse(processor.enqueueMap(x -> x));
     }
 
-    /**
-     * Test of processInputValue method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testProcessInputValue() {
         System.out.println("processInputValue");
@@ -138,18 +113,12 @@ public class AbstractPipeProcessorTest {
         assertTrue(processor.hasOutputValue());
     }
 
-    /**
-     * Test of hasOutputValue method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testHasOutputValue() {
         System.out.println("hasOutputValue");
         assertFalse(processor.hasOutputValue());
     }
 
-    /**
-     * Test of getOutputValue method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testGetOutputValue() {
         System.out.println("getOutputValue");
@@ -157,9 +126,6 @@ public class AbstractPipeProcessorTest {
         assertEquals("titi", processor.getOutputValue());
     }
 
-    /**
-     * Test of retrieveOutputValue method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testRetrieveOutputValue() {
         System.out.println("retrieveOutputValue");
@@ -167,9 +133,6 @@ public class AbstractPipeProcessorTest {
         assertEquals("titi", processor.retrieveOutputValue());
     }
 
-    /**
-     * Test of clearOutputValue method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testClearOutputValue() {
         System.out.println("clearOutputValue");
@@ -178,9 +141,6 @@ public class AbstractPipeProcessorTest {
         assertFalse(processor.hasOutputValue());
     }
 
-    /**
-     * Test of isInactive method, of class AbstractPipeProcessor.
-     */
     @Test
     public void testIsInactive() {
         System.out.println("isInactive");
@@ -189,7 +149,7 @@ public class AbstractPipeProcessorTest {
 
     public class AbstractPipeProcessorImpl<T>
                  extends AbstractPipeProcessor<T,T> {
-        
+
         private T value;
 
         public AbstractPipeProcessorImpl() {

@@ -52,9 +52,6 @@ public class UtilsTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of ensureNotNull method, of class Checks.
-     */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNotNull() {
         System.out.println("ensureNotNull");
@@ -62,9 +59,6 @@ public class UtilsTest {
         Checks.ensureNotNull(null, "");
     }
 
-    /**
-     * Test of ensureNonNegative method, of class Checks.
-     */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureNonNegative() {
         System.out.println("ensureNonNegative");
@@ -72,9 +66,6 @@ public class UtilsTest {
         Checks.ensureNonNegative(-1, "");
     }
 
-    /**
-     * Test of ensureLessThan method, of class Checks.
-     */
     @Test(expected=IllegalArgumentException.class)
     public void testEnsureLessThan() {
         System.out.println("ensureLessThan");
@@ -82,9 +73,6 @@ public class UtilsTest {
         Checks.ensureLessThan(1, 1, "");
     }
 
-    /**
-     * Test of ensureNonEnumerating method, of class Checks.
-     */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerator() {
         System.out.println("ensureNonEnumerating");
@@ -93,9 +81,6 @@ public class UtilsTest {
         Checks.ensureNonEnumerating(e);
     }
 
-    /**
-     * Test of ensureNonEnumerating method, of class Checks.
-     */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerable() {
         System.out.println("ensureNonEnumerating");
@@ -103,6 +88,5 @@ public class UtilsTest {
         Checks.ensureNonEnumerating(e);
         final Iterator<Integer> it = e.iterator();
         Checks.ensureNonEnumerating(e);
-    }
-    
+    }    
 }

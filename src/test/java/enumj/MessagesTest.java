@@ -30,27 +30,23 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class MessagesTest {
-    
+
     public MessagesTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -58,6 +54,5 @@ public class MessagesTest {
     @Test
     public void testSomeMethod() {
         assertNotNull(new Messages());
-    }
-    
+    }    
 }

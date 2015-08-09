@@ -30,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class AbstractEnumerableTest {
 
     public AbstractEnumerableTest() {
@@ -84,9 +80,6 @@ public class AbstractEnumerableTest {
         assertTrue(instance.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of internalEnumerator method, of class AbstractEnumerable.
-     */
     @Test
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");

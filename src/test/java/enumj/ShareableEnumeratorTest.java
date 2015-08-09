@@ -51,9 +51,6 @@ public class ShareableEnumeratorTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of asShareable method, of class ShareableEnumerator.
-     */
     @Test
     public void testAsShareable() {
         System.out.println("asShareable");
@@ -62,9 +59,6 @@ public class ShareableEnumeratorTest {
         assertSame(en, en.asShareable());
     }
 
-    /**
-     * Test of share method, of class ShareableEnumerator.
-     */
     @Test
     public void testShare_0args() {
         System.out.println("share 0 args");
@@ -73,9 +67,6 @@ public class ShareableEnumeratorTest {
                                 .share());
     }
 
-    /**
-     * Test of share method, of class ShareableEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testShare_int() {
         System.out.println("share");
@@ -85,9 +76,6 @@ public class ShareableEnumeratorTest {
         assertNotNull(sen.share(1));
     }
 
-    /**
-     * Test of internalHasNext method, of class ShareableEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testInternalHasNext() {
         System.out.println("internalHasNext");
@@ -97,9 +85,6 @@ public class ShareableEnumeratorTest {
         assertTrue(sen.hasNext());
     }
 
-    /**
-     * Test of internalNext method, of class ShareableEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testInternalNext() {
         System.out.println("internalNext");
@@ -109,9 +94,6 @@ public class ShareableEnumeratorTest {
         assertNotNull(sen.next());
     }
 
-    /**
-     * Test of cleanup method, of class ShareableEnumerator.
-     */
     @Test
     public void testCleanup() {
         System.out.println("cleanup");
@@ -121,9 +103,6 @@ public class ShareableEnumeratorTest {
         assertFalse(sen.hasNext());
     }
 
-    /**
-     * Test of hasNext method, of class ShareableEnumerator.
-     */
     @Test
     public void testHasNext() {
         System.out.println("hasNext");

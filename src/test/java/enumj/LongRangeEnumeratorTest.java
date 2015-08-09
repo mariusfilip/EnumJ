@@ -32,29 +32,26 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LongRangeEnumeratorTest {
-    
+
     public LongRangeEnumeratorTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of enumerating method, of class LongRangeEnumerator.
-     */
     @Test
     public void testEnumerating() {
         System.out.println("enumerating");
@@ -64,9 +61,6 @@ public class LongRangeEnumeratorTest {
         assertTrue(en.enumerating());
     }
 
-    /**
-     * Test of hasNext method, of class LongRangeEnumerator.
-     */
     @Test
     public void testHasNext() {
         System.out.println("hasNext");
@@ -74,9 +68,6 @@ public class LongRangeEnumeratorTest {
         assertTrue(en.hasNext());
     }
 
-    /**
-     * Test of nextLong method, of class LongRangeEnumerator.
-     */
     @Test(expected = NoSuchElementException.class)
     public void testNextLong() {
         System.out.println("nextLong");
@@ -84,9 +75,6 @@ public class LongRangeEnumeratorTest {
         assertNull(en.next());
     }
 
-    /**
-     * Test of next method, of class LongRangeEnumerator.
-     */
     @Test
     public void testNext() {
         System.out.println("next");

@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2015 Marius Filip.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package enumj;
 
@@ -24,10 +42,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class EnumeratorTest {
 
     public EnumeratorTest() {
@@ -71,9 +85,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Array() {
         System.out.println("of array");
@@ -82,9 +93,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.on(1, 2, 3)));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Iterator() {
         System.out.println("of iterator");
@@ -104,9 +112,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Iterable() {
         System.out.println("of iterable");
@@ -145,9 +150,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Stream() {
         System.out.println("of stream");
@@ -167,9 +169,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Spliterator() {
         System.out.println("of spliterator");
@@ -189,9 +188,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of of method, of class Enumerator.
-     */
     @Test
     public void testOf_Supplier() {
         System.out.println("of supplier");
@@ -211,9 +207,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyIterator method, of class Enumerator.
-     */
     @Test
     public void testOfLazyIterator() {
         System.out.println("ofLazyIterator");
@@ -226,9 +219,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyIterable method, of class Enumerator.
-     */
     @Test
     public void testOfLazyIterable() {
         System.out.println("ofLazyIterable");
@@ -241,9 +231,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyEnumeration method, of class Enumerator.
-     */
     @Test
     public void testOfLazyEnumeration() {
         System.out.println("ofLazyEnumeration");
@@ -256,9 +243,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazyStream method, of class Enumerator.
-     */
     @Test
     public void testOfLazyStream() {
         System.out.println("ofLazyStream");
@@ -271,9 +255,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of ofLazySpliterator method, of class Enumerator.
-     */
     @Test
     public void testOfLazySpliterator() {
         System.out.println("ofLazySpliterator");
@@ -307,9 +288,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of as method, of class Enumerator.
-     */
     @Test
     public void testAs() {
         System.out.println("as");
@@ -324,9 +302,6 @@ public class EnumeratorTest {
                                           .elementsEqual(p.getRight())));
     }
 
-    /**
-     * Test of as method, of class Enumerator.
-     */
     @Test
     public void testAsFiltered() {
         System.out.println("as filtered");
@@ -337,9 +312,6 @@ public class EnumeratorTest {
                 .forEach(e -> e.elementsEqual(Enumerator.empty()));
     }
 
-    /**
-     * Test of asEnumerable method, of class Enumerator.
-     */
     @Test
     public void testAsIterable() {
         System.out.println("asIterable");
@@ -394,9 +366,6 @@ public class EnumeratorTest {
                                .elementsEqual(p.getRight()));
     }
 
-    /**
-     * Test of asSpliterator method, of class Enumerator.
-     */
     @Test
     public void testAsSpliterator() {
         System.out.println("asSpliterator");
@@ -414,9 +383,6 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of asStream method, of class Enumerator.
-     */
     @Test
     public void testAsStream() {
         System.out.println("asStream");
@@ -431,9 +397,6 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of asSupplier method, of class Enumerator.
-     */
     @Test
     public void testAsSupplier() {
         System.out.println("asSupplier");
@@ -524,9 +487,6 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of allMatch method, of class Enumerator.
-     */
     @Test
     public void testAllMatch() {
         System.out.println("allMatch");
@@ -550,9 +510,6 @@ public class EnumeratorTest {
                 .forEach(e -> { assertFalse(e.allMatch(x -> x>1)); });
     }
 
-    /**
-     * Test of anyMatch method, of class Enumerator.
-     */
     @Test
     public void testAnyMatch() {
         System.out.println("anyMatch");
@@ -573,9 +530,6 @@ public class EnumeratorTest {
                 .forEach(e -> { assertFalse(e.anyMatch(x -> x > 0)); });
     }
 
-    /**
-     * Test of append method, of class Enumerator.
-     */
     @Test
     public void testAppend() {
         System.out.println("append");
@@ -593,9 +547,6 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of collect method, of class Enumerator.
-     */
     @Test
     public void testCollect() {
         System.out.println("collect");
@@ -610,9 +561,6 @@ public class EnumeratorTest {
                 });
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testConcat_Iterator() {
         System.out.println("concat iterator");
@@ -637,9 +585,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testConcat_Stream() {
         System.out.println("concat stream");
@@ -648,9 +593,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testConcat_Spliterator() {
         System.out.println("concat spliterator");
@@ -675,9 +617,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of contains method, of class Enumerator.
-     */
     @Test
     public void testContains() {
         System.out.println("contains");
@@ -688,18 +627,12 @@ public class EnumeratorTest {
         }
     }
 
-    /**
-     * Test of count method, of class Enumerator.
-     */
     @Test
     public void testCount() {
         System.out.println("count");
         assertEquals(Enumerator.on(1, 2, 3).count(), 3);
     }
 
-    /**
-     * Test of distinct method, of class Enumerator.
-     */
     @Test
     public void testDistinct() {
         System.out.println("distinct");
@@ -708,9 +641,6 @@ public class EnumeratorTest {
                                                       .distinct()));
     }
 
-    /**
-     * Test of elementAt method, of class Enumerator.
-     */
     @Test
     public void testElementAt() {
         System.out.println("elementAt");
@@ -720,9 +650,6 @@ public class EnumeratorTest {
         }
     }
 
-    /**
-     * Test of elementsEqual method, of class Enumerator.
-     */
     @Test
     public void testElementsEqual() {
         System.out.println("elementsEqual");
@@ -734,18 +661,12 @@ public class EnumeratorTest {
                               .elementsEqual(Enumerator.on(1, 2, 4)));
     }
 
-    /**
-     * Test of empty method, of class Enumerator.
-     */
     @Test
     public void testEmpty() {
         System.out.println("empty");
         assertEquals(Enumerator.empty().count(), 0);
     }
 
-    /**
-     * Test of filter method, of class Enumerator.
-     */
     @Test
     public void testFilter() {
         System.out.println("filter");
@@ -755,9 +676,6 @@ public class EnumeratorTest {
                                                       .takeWhile(i -> i < 10)));
     }
 
-    /**
-     * Test of flatMap method, of class Enumerator.
-     */
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
@@ -769,9 +687,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(10, 40)));
     }
 
-    /**
-     * Test of forEach method, of class Enumerator.
-     */
     @Test
     public void testForEach() {
         System.out.println("forEach");
@@ -789,9 +704,6 @@ public class EnumeratorTest {
                              .allMatch(x -> x == 0));
     }
 
-    /**
-     * Test of iterate method, of class Enumerator.
-     */
     @Test
     public void testIterate() {
         System.out.println("iterate");
@@ -801,9 +713,6 @@ public class EnumeratorTest {
                                                       .filter(i -> 0 == i%2)));
     }
 
-    /**
-     * Test of last method, of class Enumerator.
-     */
     @Test
     public void testLast() {
         System.out.println("last");
@@ -813,9 +722,6 @@ public class EnumeratorTest {
                                .intValue(), 99);
     }
 
-    /**
-     * Test of limit method, of class Enumerator.
-     */
     @Test
     public void testLimit() {
         System.out.println("limit");
@@ -824,9 +730,6 @@ public class EnumeratorTest {
                                .count(), 10);
     }
 
-    /**
-     * Test of takeWhile method, of class Enumerator.
-     */
     @Test
     public void testLimitWhile() {
         System.out.println("limitWhile");
@@ -835,9 +738,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(0, 10)));
     }
 
-    /**
-     * Test of map method, of class Enumerator.
-     */
     @Test
     public void testMap() {
         System.out.println("map");
@@ -847,9 +747,6 @@ public class EnumeratorTest {
                                                       .takeWhile(i -> i<200)));
     }
 
-    /**
-     * Test of max method, of class Enumerator.
-     */
     @Test
     public void testMax() {
         System.out.println("max");
@@ -859,9 +756,6 @@ public class EnumeratorTest {
                                .intValue(), 99);
     }
 
-    /**
-     * Test of min method, of class Enumerator.
-     */
     @Test
     public void testMin() {
         System.out.println("min");
@@ -871,9 +765,6 @@ public class EnumeratorTest {
                                .intValue(), 0);
     }
 
-    /**
-     * Test of noneMatch method, of class Enumerator.
-     */
     @Test
     public void testNoneMatch() {
         System.out.println("noneMatch");
@@ -883,9 +774,6 @@ public class EnumeratorTest {
                               .noneMatch(i -> i<1));
     }
 
-    /**
-     * Test of peek method, of class Enumerator.
-     */
     @Test
     public void testPeek() {
         System.out.println("peek");
@@ -894,9 +782,6 @@ public class EnumeratorTest {
                                .count(), 10);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testPrepend_Iterator() {
         System.out.println("prepend iterator");
@@ -921,9 +806,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testPrepend_Stream() {
         System.out.println("prepend stream");
@@ -932,9 +814,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testPrepend_Spliterator() {
         System.out.println("prepend spliterator");
@@ -959,9 +838,6 @@ public class EnumeratorTest {
                                .count(), 5);
     }
 
-    /**
-     * Test of reduce method, of class Enumerator.
-     */
     @Test
     public void testReduce() {
         System.out.println("reduce");
@@ -974,9 +850,6 @@ public class EnumeratorTest {
                      10*(10+1)/2);
     }
 
-    /**
-     * Test of reduce method, of class Enumerator.
-     */
     @Test
     public void testReduce_Identity() {
         System.out.println("reduce with identity");
@@ -1028,9 +901,6 @@ public class EnumeratorTest {
                                                    Enumerator.repeat(x, 10))));
     }
 
-    /**
-     * Test of reverse method, of class Enumerator.
-     */
     @Test
     public void testReverse() {
         System.out.println("reverse");
@@ -1041,9 +911,6 @@ public class EnumeratorTest {
                                .intValue(), 0);
     }
 
-    /**
-     * Test of single method, of class Enumerator.
-     */
     @Test
     public void testSingle() {
         System.out.println("single");
@@ -1062,9 +929,6 @@ public class EnumeratorTest {
         Enumerator.rangeInt(0, 2).single();
     }
 
-    /**
-     * Test of skip method, of class Enumerator.
-     */
     @Test
     public void testSkip() {
         System.out.println("skip");
@@ -1073,9 +937,6 @@ public class EnumeratorTest {
                                .count(), 90);
     }
 
-    /**
-     * Test of skipWhile method, of class Enumerator.
-     */
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
@@ -1084,9 +945,6 @@ public class EnumeratorTest {
                                .count(), 70);
     }
 
-    /**
-     * Test of sorted method, of class Enumerator.
-     */
     @Test
     public void testSorted() {
         System.out.println("sorted");
@@ -1096,9 +954,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(0, 100)));
     }
 
-    /**
-     * Test of sorted method, of class Enumerator.
-     */
     @Test
     public void testSorted_Comparator() {
         System.out.println("sorted");
@@ -1108,9 +963,6 @@ public class EnumeratorTest {
                                                       .reverse()));
     }
 
-    /**
-     * Test of toArray method, of class Enumerator.
-     */
     @Test
     public void testToArray() {
         System.out.println("toArray");
@@ -1120,9 +972,6 @@ public class EnumeratorTest {
         }
     }
 
-    /**
-     * Test of toList method, of class Enumerator.
-     */
     @Test
     public void testToList() {
         System.out.println("toList");
@@ -1132,9 +981,6 @@ public class EnumeratorTest {
                                                       .iterator()));
     }
 
-    /**
-     * Test of toMap method, of class Enumerator.
-     */
     @Test
     public void testToMap() {
         System.out.println("toMap");
@@ -1145,18 +991,12 @@ public class EnumeratorTest {
         }
     }
 
-    /**
-     * Test of toSet method, of class Enumerator.
-     */
     @Test
     public void testToSet() {
         System.out.println("toSet");
         assertEquals(Enumerator.repeat(100, 5).toSet().size(), 1);
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testUnion_Iterator() {
         System.out.println("union iterator");
@@ -1184,9 +1024,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(1, 6)));
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testUnion_Stream() {
         System.out.println("union stream");
@@ -1196,9 +1033,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(1, 6)));
     }
 
-    /**
-     * Test of concat method, of class Enumerator.
-     */
     @Test
     public void testUnion_Spliterator() {
         System.out.println("union spliterator");
@@ -1226,9 +1060,6 @@ public class EnumeratorTest {
                              .elementsEqual(Enumerator.rangeInt(1, 6)));
     }
 
-    /**
-     * Test of zipBoth method, of class Enumerator.
-     */
     @Test
     public void testZipBoth() {
         System.out.println("zipBoth");
@@ -1237,9 +1068,6 @@ public class EnumeratorTest {
                                .count(), 100);
     }
 
-    /**
-     * Test of zipLeft method, of class Enumerator.
-     */
     @Test
     public void testZipLeft() {
         System.out.println("zipLeft");
@@ -1248,9 +1076,6 @@ public class EnumeratorTest {
                                .count(), 100);
     }
 
-    /**
-     * Test of zipRight method, of class Enumerator.
-     */
     @Test
     public void testZipRight() {
         System.out.println("zipRight");
@@ -1259,9 +1084,6 @@ public class EnumeratorTest {
                                .count(), 150);
     }
 
-    /**
-     * Test of zipAny method, of class Enumerator.
-     */
     @Test
     public void testZipAny() {
         System.out.println("zipAny");

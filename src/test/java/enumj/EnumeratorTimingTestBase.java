@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import org.junit.experimental.categories.Category;
 
 public abstract class EnumeratorTimingTestBase<TArgs,E> {

@@ -23,9 +23,6 @@
  */
 package enumj;
 
-import java.util.Iterator;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -61,27 +58,18 @@ public class PipeEnumeratorTest {
         pipe = null;
     }
 
-    /**
-     * Test of of method, of class PipeEnumerator.
-     */
     @Test
     public void testOf() {
         System.out.println("of");
         assertNotNull(pipe);
     }
 
-    /**
-     * Test of enqueueProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testEnqueueProcessor_AbstractPipeProcessor() {
         System.out.println("enqueueProcessor");
         assertNotNull(pipe.map(x -> x));
     }
 
-    /**
-     * Test of enqueueProcessor method, of class PipeEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testEnqueueProcessor_PipeMultiProcessor() {
         System.out.println("enqueueProcessor");
@@ -91,9 +79,6 @@ public class PipeEnumeratorTest {
         assertNotNull(throwEn.flatMap(x -> Enumerator.on(x)));
     }
 
-    /**
-     * Test of enqueueProcessor method, of class PipeEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testPushFrontProcessor_AbstractPipeProcessor() {
         System.out.println("pushFrontProcessor");
@@ -103,9 +88,6 @@ public class PipeEnumeratorTest {
         assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x)));
     }
 
-    /**
-     * Test of enqueueProcessor method, of class PipeEnumerator.
-     */
     @Test(expected=IllegalStateException.class)
     public void testPushFrontProcessor_PipeMultiProcessor() {
         System.out.println("pushFrontProcessor");
@@ -166,7 +148,7 @@ public class PipeEnumeratorTest {
                        .map(x -> x)
                        .elementsEqual(Enumerator.rangeInt(-2, 3)));
     }
-    
+
     class FailingMultiPipeProcessor<In,Out>
           extends AbstractPipeMultiProcessor<In,Out> {
         private Out value;
@@ -231,184 +213,115 @@ public class PipeEnumeratorTest {
                 Enumerator.on(1,2,3,4,5,6,7,8,9,10,11,12)));
     }
 
-    /**
-     * Test of safePipelineAddLast method, of class PipeEnumerator.
-     */
     @Test
     public void testPipelineAddLast() {
         System.out.println("pipelineAddLast");
     }
 
-    /**
-     * Test of safeMultiPipelineAddLast method, of class PipeEnumerator.
-     */
     @Test
     public void testMultiPipelineAddLast() {
         System.out.println("multiPipelineAddLast");
     }
 
-    /**
-     * Test of internalHasNext method, of class PipeEnumerator.
-     */
     @Test
     public void testInternalHasNext() {
         System.out.println("internalHasNext");
     }
 
-    /**
-     * Test of internalNext method, of class PipeEnumerator.
-     */
     @Test
     public void testInternalNext() {
         System.out.println("internalNext");
     }
 
-    /**
-     * Test of cleanup method, of class PipeEnumerator.
-     */
     @Test
     public void testCleanup() {
         System.out.println("cleanup");
     }
 
-    /**
-     * Test of straightHasNext method, of class PipeEnumerator.
-     */
     @Test
     public void testStraightHasNext() {
         System.out.println("straightHasNext");
     }
 
-    /**
-     * Test of tryGetNext method, of class PipeEnumerator.
-     */
     @Test
     public void testTryGetNext() {
         System.out.println("tryGetNext");
     }
 
-    /**
-     * Test of concat method, of class PipeEnumerator.
-     */
     @Test
     public void testConcat() {
         System.out.println("concat");
     }
 
-    /**
-     * Test of filter method, of class PipeEnumerator.
-     */
     @Test
     public void testFilter() {
         System.out.println("filter");
     }
 
-    /**
-     * Test of flatMap method, of class PipeEnumerator.
-     */
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
     }
 
-    /**
-     * Test of map method, of class PipeEnumerator.
-     */
     @Test
     public void testMap() {
         System.out.println("map");
     }
 
-    /**
-     * Test of takeWhile method, of class PipeEnumerator.
-     */
     @Test
     public void testTakeWhile() {
     }
 
-    /**
-     * Test of zipAll method, of class PipeEnumerator.
-     */
     @Test
     public void testZipAll_Iterator_IteratorArr() {
         System.out.println("zipAll");
     }
 
-    /**
-     * Test of zipAll method, of class PipeEnumerator.
-     */
     @Test
     public void testZipAll_Iterator_List() {
         System.out.println("zipAll");
-    }    
+    }
 
-    /**
-     * Test of dequeueSourceWithProcessors method, of class PipeEnumerator.
-     */
     @Test
     public void testDequeueSourceWithProcessors() {
         System.out.println("dequeueSourceWithProcessors");
     }
 
-    /**
-     * Test of dequeueSourceProcessors method, of class PipeEnumerator.
-     */
     @Test
     public void testDequeueSourceProcessors() {
         System.out.println("dequeueSourceProcessors");
     }
 
-    /**
-     * Test of dequeueProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testDequeueProcessor() {
         System.out.println("dequeueProcessor");
     }
 
-    /**
-     * Test of safePipelineAddFirst method, of class PipeEnumerator.
-     */
     @Test
     public void testPipelineAddFirst() {
         System.out.println("pipelineAddFirst");
     }
 
-    /**
-     * Test of safeMultiPipelineAddFirst method, of class PipeEnumerator.
-     */
     @Test
     public void testMultiPipelineAddFirst() {
         System.out.println("multiPipelineAddFirst");
     }
 
-    /**
-     * Test of setSource method, of class PipeEnumerator.
-     */
     @Test
     public void testSetSource() {
         System.out.println("setSource");
     }
 
-    /**
-     * Test of reversedConcat method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedConcat() {
         System.out.println("reversedConcat");
     }
 
-    /**
-     * Test of reversedFilter method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedFilter() {
         System.out.println("reversedFilter");
     }
 
-    /**
-     * Test of reversedFlatMap method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedFlatMap() {
         System.out.println("reversedFlatMap");
@@ -423,9 +336,6 @@ public class PipeEnumeratorTest {
                 Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
 
-    /**
-     * Test of reversedMap method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedMap() {
         System.out.println("reversedMap");
@@ -443,89 +353,56 @@ public class PipeEnumeratorTest {
                 Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
 
-    /**
-     * Test of reversedTakeWhile method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedTakeWhile() {
         System.out.println("reversedTakeWhile");
     }
 
-    /**
-     * Test of reversedZipAll method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedZipAll() {
         System.out.println("reversedZipAll");
     }
 
-    /**
-     * Test of enqueueProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testEnqueueProcessor_AbstractPipeMultiProcessor() {
         System.out.println("enqueueProcessor");
     }
 
-    /**
-     * Test of pushFrontProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testPushFrontProcessor_AbstractPipeMultiProcessor() {
         System.out.println("pushFrontProcessor");
     }
 
-    /**
-     * Test of enqueueMapProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testEnqueueMapProcessor() {
         System.out.println("enqueueMapProcessor");
     }
 
-    /**
-     * Test of pushFrontMapProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testPushFrontMapProcessor() {
         System.out.println("pushFrontMapProcessor");
     }
 
-    /**
-     * Test of safePipelineAddLast method, of class PipeEnumerator.
-     */
     @Test
     public void testSafePipelineAddLast() {
         System.out.println("safePipelineAddLast");
     }
 
-    /**
-     * Test of safePipelineAddFirst method, of class PipeEnumerator.
-     */
     @Test
     public void testSafePipelineAddFirst() {
         System.out.println("safePipelineAddFirst");
     }
 
-    /**
-     * Test of dequeueSourcesUpToProcessor method, of class PipeEnumerator.
-     */
     @Test
     public void testDequeueSourcesUpToProcessor() {
         System.out.println("dequeueSourcesUpToProcessor");
     }
 
-    /**
-     * Test of limit method, of class PipeEnumerator.
-     */
     @Test
     public void testLimit() {
         System.out.println("limit");
     }
 
-    /**
-     * Test of prepend method, of class PipeEnumerator.
-     */
     @Test
     public void testPrepend() {
         System.out.println("prepend");
@@ -535,41 +412,26 @@ public class PipeEnumeratorTest {
                              .elementsEqual(Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
 
-    /**
-     * Test of skip method, of class PipeEnumerator.
-     */
     @Test
     public void testSkip() {
         System.out.println("skip");
     }
 
-    /**
-     * Test of skipWhile method, of class PipeEnumerator.
-     */
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
     }
 
-    /**
-     * Test of reversedLimit method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedLimit() {
         System.out.println("reversedLimit");
     }
 
-    /**
-     * Test of reversedSkip method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedSkip() {
         System.out.println("reversedSkip");
     }
 
-    /**
-     * Test of reversedSkipWhile method, of class PipeEnumerator.
-     */
     @Test
     public void testReversedSkipWhile() {
         System.out.println("reversedSkipWhile");

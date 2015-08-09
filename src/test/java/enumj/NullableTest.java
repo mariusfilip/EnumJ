@@ -33,34 +33,27 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class NullableTest {
-    
+
     public NullableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of isPresent method, of class Nullable.
-     */
     @Test
     public void testIsPresent() {
         System.out.println("isPresent");
@@ -68,9 +61,6 @@ public class NullableTest {
         assertFalse(Nullable.empty().isPresent());
     }
 
-    /**
-     * Test of get method, of class Nullable.
-     */
     @Test
     public void testGet() {
         System.out.println("get");
@@ -82,9 +72,6 @@ public class NullableTest {
         }
     }
 
-    /**
-     * Test of set method, of class Nullable.
-     */
     @Test
     public void testSet() {
         System.out.println("set");
@@ -93,9 +80,6 @@ public class NullableTest {
         assertEquals("something", n.get());
     }
 
-    /**
-     * Test of clear method, of class Nullable.
-     */
     @Test
     public void testClear() {
         System.out.println("clear");
@@ -104,9 +88,6 @@ public class NullableTest {
         assertFalse(n.isPresent());
     }
 
-    /**
-     * Test of orElse method, of class Nullable.
-     */
     @Test
     public void testOrElse() {
         System.out.println("orElse");
@@ -114,9 +95,6 @@ public class NullableTest {
         assertEquals("something", Nullable.empty().orElse("something"));
     }
 
-    /**
-     * Test of orElseGet method, of class Nullable.
-     */
     @Test
     public void testOrElseGet() {
         System.out.println("orElseGet");
@@ -126,9 +104,6 @@ public class NullableTest {
                                           .orElseGet(() -> "something"));
     }
 
-    /**
-     * Test of orElseThrow method, of class Nullable.
-     */
     @Test(expected = IllegalStateException.class)
     public void testOrElseThrow() throws Exception {
         System.out.println("orElseThrow");
@@ -139,9 +114,6 @@ public class NullableTest {
         assertNotNull(e.orElseThrow(() -> new IllegalStateException()));
     }
 
-    /**
-     * Test of equals method, of class Nullable.
-     */
     @Test
     public void testEquals() {
         System.out.println("equals");
@@ -154,9 +126,6 @@ public class NullableTest {
         assertFalse(n.equals(Nullable.empty()));
     }
 
-    /**
-     * Test of hashCode method, of class Nullable.
-     */
     @Test
     public void testHashCode() {
         System.out.println("hashCode");
@@ -168,36 +137,24 @@ public class NullableTest {
         assertEquals(Nullable.empty(), Nullable.empty());
     }
 
-    /**
-     * Test of toString method, of class Nullable.
-     */
     @Test
     public void testToString() {
         System.out.println("toString");
         assertFalse("something".equals(Nullable.of("something").toString()));
     }
 
-    /**
-     * Test of empty method, of class Nullable.
-     */
     @Test
     public void testEmpty() {
         System.out.println("empty");
         assertFalse(Nullable.empty().isPresent());
     }
 
-    /**
-     * Test of of method, of class Nullable.
-     */
     @Test
     public void testOf_GenericType() {
         System.out.println("of");
         assertTrue(Nullable.of("something").isPresent());
     }
 
-    /**
-     * Test of of method, of class Nullable.
-     */
     @Test
     public void testOf_Optional() {
         System.out.println("of");
@@ -205,9 +162,6 @@ public class NullableTest {
         assertFalse(Nullable.of(Optional.empty()).isPresent());
     }
 
-    /**
-     * Test of filter method, of class Nullable.
-     */
     @Test
     public void testFilter() {
         System.out.println("filter");
@@ -215,9 +169,6 @@ public class NullableTest {
         assertFalse(Nullable.of(-3).filter(i -> i > 0).isPresent());
     }
 
-    /**
-     * Test of flatMap method, of class Nullable.
-     */
     @Test
     public void testFlatMap() {
         System.out.println("flatMap");
@@ -227,9 +178,6 @@ public class NullableTest {
                      "something");
     }
 
-    /**
-     * Test of ifPresent method, of class Nullable.
-     */
     @Test
     public void testIfPresent() {
         System.out.println("ifPresent");
@@ -241,9 +189,6 @@ public class NullableTest {
         assertEquals(1, c.get());
     }
 
-    /**
-     * Test of map method, of class Nullable.
-     */
     @Test
     public void testMap() {
         System.out.println("map");
@@ -251,6 +196,5 @@ public class NullableTest {
                      Nullable.of("something")
                              .map(s -> s + s)
                              .get());
-    }
-    
+    }    
 }

@@ -27,10 +27,6 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-/**
- *
- * @author Marius Filip
- */
 public class EnumeratorSquareFlatMapTimingTest
              extends EnumeratorStringTimingTestBase {
 

@@ -30,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class FlatMapPipeProcessorTest {
 
     public FlatMapPipeProcessorTest() {
@@ -65,18 +61,12 @@ public class FlatMapPipeProcessorTest {
         processor = null;
     }
 
-    /**
-     * Test of needsValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testNeedsValue() {
         System.out.println("needsValue");
         assertTrue(processor.needsValue());
     }
 
-    /**
-     * Test of processInputValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testProcessInputValue() {
         System.out.println("process");
@@ -88,9 +78,6 @@ public class FlatMapPipeProcessorTest {
         assertTrue(processor.hasOutputValue());
     }
 
-    /**
-     * Test of hasOutputValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
@@ -99,9 +86,6 @@ public class FlatMapPipeProcessorTest {
         assertFalse(processor.hasOutputValue());
     }
 
-    /**
-     * Test of getOutputValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
@@ -111,18 +95,12 @@ public class FlatMapPipeProcessorTest {
         assertEquals(3, processor.getOutputValue().intValue());
     }
 
-    /**
-     * Test of nextOnSameSourceOnNoValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
         assertTrue(processor.nextOnSameSourceOnNoValue);
     }
 
-    /**
-     * Test of hasNextNeedsValue method, of class FlatMapPipeProcessor.
-     */
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");

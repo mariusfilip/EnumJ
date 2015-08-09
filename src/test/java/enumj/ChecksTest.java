@@ -30,64 +30,48 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class ChecksTest {
-    
+
     public ChecksTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
         checks = new Checks();
     }
     Checks checks;
-    
+
     @After
     public void tearDown() {
         checks = null;
     }
 
-    /**
-     * Test of ensureNotNull method, of class Checks.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testEnsureNotNull() {
         System.out.println("ensureNotNull");
         Checks.ensureNotNull(null, "null!");
     }
 
-    /**
-     * Test of ensureNonNegative method, of class Checks.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testEnsureNonNegative() {
         System.out.println("ensureNonNegative");
         Checks.ensureNonNegative(-1, "negative!");
     }
 
-    /**
-     * Test of ensureLessThan method, of class Checks.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testEnsureLessThan() {
         System.out.println("ensureLessThan");
         Checks.ensureLessThan(4, 3, "greater!");
     }
 
-    /**
-     * Test of ensureNonEnumerating method, of class Checks.
-     */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerator() {
         System.out.println("ensureNonEnumerating");
@@ -96,15 +80,11 @@ public class ChecksTest {
         Checks.ensureNonEnumerating(en);
     }
 
-    /**
-     * Test of ensureNonEnumerating method, of class Checks.
-     */
     @Test(expected = IllegalStateException.class)
     public void testEnsureNonEnumerating_Enumerable() {
         System.out.println("ensureNonEnumerating");
         final Enumerable<String> en = Enumerable.on("titi", "fifi");
         assertEquals("titi", en.enumerator().next());
         Checks.ensureNonEnumerating(en);
-    }
-    
+    }    
 }

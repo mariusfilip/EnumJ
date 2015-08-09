@@ -30,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class WhilePipeProcessorTest {
 
     public WhilePipeProcessorTest() {
@@ -59,9 +55,6 @@ public class WhilePipeProcessorTest {
         processor = null;
     }
 
-    /**
-     * Test of processInputValue method, of class WhilePipeProcessor.
-     */
     @Test
     public void testProcess() {
         System.out.println("process");
@@ -69,9 +62,6 @@ public class WhilePipeProcessorTest {
         assertTrue(processor.hasOutputValue());
     }
 
-    /**
-     * Test of hasOutputValue method, of class WhilePipeProcessor.
-     */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
@@ -80,9 +70,6 @@ public class WhilePipeProcessorTest {
         assertFalse(processor.hasOutputValue());
     }
 
-    /**
-     * Test of getOutputValue method, of class WhilePipeProcessor.
-     */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
@@ -90,18 +77,12 @@ public class WhilePipeProcessorTest {
         assertEquals(1, processor.getOutputValue().intValue());
     }
 
-    /**
-     * Test of nextOnSameSourceOnNoValue method, of class WhilePipeProcessor.
-     */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
         assertFalse(processor.nextOnSameSourceOnNoValue);
     }
 
-    /**
-     * Test of hasNextNeedsValue method, of class WhilePipeProcessor.
-     */
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");

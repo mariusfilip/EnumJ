@@ -24,7 +24,6 @@
 package enumj;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,53 +31,43 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class OutTest {
     
     public OutTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
         out = Out.empty();
     }
     private Out<String> out;
-    
+
     @After
     public void tearDown() {
         out = null;
     }
 
-    /**
-     * Test of get method, of class Out.
-     */
     @Test
     public void testGet() {
         System.out.println("get");
         out.set("titi");
         assertEquals("titi", out.get());
     }
-    
+
     @Test(expected=NoSuchElementException.class)
     public void testGetNoValue() {
         System.out.println("getNoValue");
         assertNotNull(out.get());
     }
 
-    /**
-     * Test of set method, of class Out.
-     */
     @Test
     public void testSet() {
         System.out.println("set");
@@ -88,9 +77,6 @@ public class OutTest {
         assertEquals("fifi", out.get());
     }
 
-    /**
-     * Test of hasValue method, of class Out.
-     */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
@@ -99,9 +85,6 @@ public class OutTest {
         assertTrue(out.hasValue());
     }
 
-    /**
-     * Test of clear method, of class Out.
-     */
     @Test
     public void testClear() {
         System.out.println("clear");
@@ -111,18 +94,12 @@ public class OutTest {
         assertFalse(out.hasValue());
     }
 
-    /**
-     * Test of empty method, of class Out.
-     */
     @Test
     public void testEmpty() {
         System.out.println("empty");
         assertEquals(out, Out.empty());
     }
 
-    /**
-     * Test of equals method, of class Out.
-     */
     @Test
     public void testEquals() {
         System.out.println("equals");
@@ -136,9 +113,6 @@ public class OutTest {
         assertFalse(out.equals("titi"));
     }
 
-    /**
-     * Test of hashCode method, of class Out.
-     */
     @Test
     public void testHashCode() {
         System.out.println("hashCode");
@@ -151,9 +125,6 @@ public class OutTest {
         assertFalse(code0 == code1);
     }
 
-    /**
-     * Test of toString method, of class Out.
-     */
     @Test
     public void testToString() {
         System.out.println("toString");

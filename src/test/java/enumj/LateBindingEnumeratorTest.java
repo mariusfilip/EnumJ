@@ -31,34 +31,27 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class LateBindingEnumeratorTest {
-    
+
     public LateBindingEnumeratorTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of internalHasNext method, of class LateBindingEnumerator.
-     */
     @Test
     public void testInternalHasNext() {
         System.out.println("internalHasNext");
@@ -68,9 +61,6 @@ public class LateBindingEnumeratorTest {
         assertTrue(lben.hasNext());
     }
 
-    /**
-     * Test of internalNext method, of class LateBindingEnumerator.
-     */
     @Test
     public void testInternalNext() {
         System.out.println("internalNext");
@@ -80,9 +70,6 @@ public class LateBindingEnumeratorTest {
         assertTrue(lben.elementsEqual(Enumerator.on(1, 2, 3)));
     }
 
-    /**
-     * Test of cleanup method, of class LateBindingEnumerator.
-     */
     @Test
     public void testCleanup() {
         System.out.println("cleanup");
@@ -92,9 +79,6 @@ public class LateBindingEnumeratorTest {
         assertEquals(3, lben.count());
     }
 
-    /**
-     * Test of bind method, of class LateBindingEnumerator.
-     */
     @Test
     public void testBind() {
         System.out.println("bind");
@@ -104,9 +88,6 @@ public class LateBindingEnumeratorTest {
         assertTrue(lben.binding().isPresent());
     }
 
-    /**
-     * Test of binding method, of class LateBindingEnumerator.
-     */
     @Test
     public void testBinding() {
         System.out.println("binding");

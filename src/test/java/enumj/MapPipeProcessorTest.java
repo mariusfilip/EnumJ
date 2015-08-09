@@ -30,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class MapPipeProcessorTest {
 
     public MapPipeProcessorTest() {
@@ -59,9 +55,6 @@ public class MapPipeProcessorTest {
         processor = null;
     }
 
-    /**
-     * Test of processInputValue method, of class MapPipeProcessor.
-     */
     @Test
     public void testProcess() {
         System.out.println("process");
@@ -69,9 +62,6 @@ public class MapPipeProcessorTest {
         assertTrue(processor.hasOutputValue());
     }
 
-    /**
-     * Test of hasOutputValue method, of class MapPipeProcessor.
-     */
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
@@ -79,9 +69,6 @@ public class MapPipeProcessorTest {
         assertTrue(processor.hasOutputValue());
     }
 
-    /**
-     * Test of getOutputValue method, of class MapPipeProcessor.
-     */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
@@ -89,18 +76,12 @@ public class MapPipeProcessorTest {
         assertEquals(2, processor.getOutputValue().intValue());
     }
 
-    /**
-     * Test of nextOnSameSourceOnNoValue method, of class MapPipeProcessor.
-     */
     @Test
     public void testNextOnNoValue() {
         System.out.println("nextOnNoValue");
         assertFalse(processor.nextOnSameSourceOnNoValue);
     }
 
-    /**
-     * Test of hasNextNeedsValue method, of class MapPipeProcessor.
-     */
     @Test
     public void testHasNextNeedsValue() {
         System.out.println("hasNextNeedsValue");

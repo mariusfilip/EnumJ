@@ -47,7 +47,7 @@ public abstract class EnumeratorStringTimingTestBase
     // ---------------------------------------------------------------------- //
 
     protected final Map<Long, String[]> buffers = new HashMap<Long, String[]>();
-    
+
     protected void buildBuffers(long[] sizes) {
         buffers.clear();
         for(long size: sizes) {

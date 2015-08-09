@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2015 Marius Filip.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package enumj;
 
@@ -12,10 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius
- */
 public class CachedEnumerableTest {
 
     public CachedEnumerableTest() {
@@ -37,18 +51,12 @@ public class CachedEnumerableTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of state method, of class CachedEnumerable.
-     */
     @Test
     public void testState() {
         System.out.println("state");
         assertNotNull(new CachedEnumerable(Enumerable.on(1, 2, 3)).state());
     }
 
-    /**
-     * Test of disable method, of class CachedEnumerable.
-     */
     @Test
     public void testDisable() {
         System.out.println("disable");
@@ -57,9 +65,6 @@ public class CachedEnumerableTest {
                 .isDisabled());
     }
 
-    /**
-     * Test of enable method, of class CachedEnumerable.
-     */
     @Test
     public void testEnable() {
         System.out.println("enable");
@@ -69,9 +74,6 @@ public class CachedEnumerableTest {
         assertFalse(cen.enable().isDisabled());
     }
 
-    /**
-     * Test of reset method, of class CachedEnumerable.
-     */
     @Test
     public void testReset() {
         System.out.println("reset");
@@ -79,9 +81,6 @@ public class CachedEnumerableTest {
                               .reset());
     }
 
-    /**
-     * Test of resize method, of class CachedEnumerable.
-     */
     @Test
     public void testResize() {
         System.out.println("resize");
@@ -92,9 +91,6 @@ public class CachedEnumerableTest {
         assertEquals(5, cen.resize(5).limit);
     }
 
-    /**
-     * Test of internalEnumerator method, of class CachedEnumerable.
-     */
     @Test
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
@@ -103,6 +99,5 @@ public class CachedEnumerableTest {
                                      3,
                                      self -> {});
         assertTrue(cen.elementsEqual(Enumerable.on(1, 2, 3, 4, 5)));
-    }
-    
+    }    
 }

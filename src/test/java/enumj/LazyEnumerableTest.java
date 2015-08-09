@@ -23,7 +23,6 @@
  */
 package enumj;
 
-import java.util.function.Supplier;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,29 +31,26 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LazyEnumerableTest {
-    
+
     public LazyEnumerableTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of internalEnumerator method, of class LazyEnumerable.
-     */
     @Test
     public void testInternalEnumerator() {
         System.out.println("internalEnumerator");
@@ -63,9 +59,6 @@ public class LazyEnumerableTest {
         assertTrue(lazy.elementsEqual(Enumerable.on(1, 2, 3)));
     }
 
-    /**
-     * Test of of method, of class LazyEnumerable.
-     */
     @Test
     public void testOf() {
         System.out.println("of");

@@ -25,7 +25,6 @@ package enumj;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class EnumeratorWidePeekTimingTest

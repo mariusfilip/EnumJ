@@ -32,10 +32,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author Marius Filip
- */
 public class LazyTest {
 
     public LazyTest() {
@@ -57,9 +53,6 @@ public class LazyTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of get method, of class Lazy.
-     */
     @Test
     public void testGet() {
         System.out.println("get");
