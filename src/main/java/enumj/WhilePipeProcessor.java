@@ -34,10 +34,10 @@ import java.util.function.Predicate;
  * @see SkipPipeProcessor
  * @see LimitPipeProcessor
  */
-class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+final class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    protected E            value;
-    protected Predicate<E> filter;
+    private E            value;
+    private Predicate<E> filter;
 
     /**
      * Creates a {@code WhilePipeProcessor} that enumerates elements while

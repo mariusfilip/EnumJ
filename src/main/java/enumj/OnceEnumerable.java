@@ -52,8 +52,8 @@ public final class OnceEnumerable<E> extends EnumeratorEnumerable<E> {
     }
     @Override
     protected Enumerator<E> internalEnumerator() {
-        final Enumerator<E> result = source;
-        source = null;
+        final Enumerator<E> result = getSource();
+        clearSource();
         return result;
     }
 }

@@ -31,9 +31,9 @@ package enumj;
  * @see SkipPipeProcessor
  */
 final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
-    
-    protected E    value;
-    protected long size;
+
+    private E    value;
+    private long size;
 
     /**
      * Constructs a {@code LimitPipeProcessor} instance.

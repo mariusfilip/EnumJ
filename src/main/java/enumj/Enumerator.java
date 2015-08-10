@@ -510,8 +510,8 @@ public interface Enumerator<E> extends Iterator<E> {
      * @return the infinite enumerator of {@link Optional} instances.
      */
     public default Enumerator<Optional<E>> asOptional() {
-        return Enumerator.this.map(e -> Optional.of(e))
-                .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
+        return this.map(Optional::of)
+                   .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
     }
 
     /**

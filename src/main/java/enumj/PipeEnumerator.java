@@ -42,38 +42,18 @@ import java.util.function.Predicate;
  */
 class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
-    /**
-     * {@link LinkedList} of {@link AbstractPipeProcessor} instances
-     * holding the transformers operating upon the enumerated elements.
-     */
-    protected LinkedList<AbstractPipeProcessor> pipeline;
-    /**
-     * {@link LinkedList} of {@link AbstractPipeMultiProcessor} instances
-     * holding the transformers operating upon the enumerated elements that
-     * produce more then one output per single input.
-     */
-    protected LinkedList<AbstractPipeMultiProcessor> multiPipeline;
-    /**
-     * {@link LinkedList} of {@link PipeSource} instance that provide the
-     * elements that the processors in {@link #pipeline} work upon.
-     */
-    protected LinkedList<PipeSource> sources;
-    /**
-     * Value to return during enumeration, if any.
-     */
-    protected Nullable<E> value;
-    /**
-     * Number of elements in {@code pipeline} that need a value in order to
-     * participate to the calculation of {@code hasNext()}.
-     */
-    protected long needValueForHasNext;
+    private LinkedList<AbstractPipeProcessor>      pipeline;
+    private LinkedList<AbstractPipeMultiProcessor> multiPipeline;
+    private LinkedList<PipeSource>                 sources;
+    private Nullable<E>                            value;
+    private long                                   needValueForHasNext;
 
     /**
      * Creates a new {@code PipeEnumerator} instance based on the given
      * {@code source} {@code Enumerator}.
      *
-     * @param source {@link Enumerator} providing the elements that the pipeline
-     * works upon.
+     * @param source {@link Enumerator} providing the elements that the
+     * pipeline works upon.
      */
     public PipeEnumerator(Enumerator<E> source) {
         this();

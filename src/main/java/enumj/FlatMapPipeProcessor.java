@@ -38,9 +38,9 @@ import java.util.function.Function;
 final class FlatMapPipeProcessor<In,Out>
             extends AbstractPipeMultiProcessor<In,Out> {
 
-    protected final Function<In,Iterator<Out>> mapper;
-    protected final Nullable<Out>              value;    
-    protected       Iterator<Out>              iterator;
+    private final Function<In,Iterator<Out>> mapper;
+    private final Nullable<Out>              value;    
+    private       Iterator<Out>              iterator;
 
     /**
      * Constructs a {@code FlatMapPipeProcessor} instances.

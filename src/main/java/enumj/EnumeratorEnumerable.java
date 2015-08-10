@@ -37,7 +37,7 @@ import java.util.Iterator;
  */
 class EnumeratorEnumerable<E> extends AbstractEnumerable<E> {
 
-    protected Enumerator<E> source;
+    private Enumerator<E> source;
 
     /**
      * Creates a {@code EnumeratorEnumerable} instance.
@@ -59,5 +59,19 @@ class EnumeratorEnumerable<E> extends AbstractEnumerable<E> {
     @Override
     protected Enumerator<E> internalEnumerator() {
         return source;
+    }
+
+    /**
+     * Gets the the internal {@code source}.
+     * @return internal {@link Enumerator} source;
+     */
+    protected final Enumerator<E> getSource() {
+        return source;
+    }
+    /**
+     * Clears the internal {@code source}.
+     */
+    protected final void clearSource() {
+        source = null;
     }
 }
