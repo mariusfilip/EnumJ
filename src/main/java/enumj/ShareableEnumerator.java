@@ -69,13 +69,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @see SharingEnumerator
  */
 public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
-    
+
     private CachedEnumerable<E> source;
     private Enumerator<E>       direct;
     private boolean             isSharing;
     private AtomicBoolean       isEnumerating;
     private AtomicBoolean       isSharedEnumerating;
-    
+
     /**
      * Creates a {@code ShareableEnumerator} instance that will share the
      * elements of the given {@code source}.

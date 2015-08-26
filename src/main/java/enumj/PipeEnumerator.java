@@ -34,8 +34,10 @@ import java.util.function.Predicate;
 /**
  * Implementation of highly composable enumerators.
  * <p>
- * This class is not {@code final} for testing purposes.
+ * <strong>Important:</strong> this class is not {@code final} for testing
+ * purposes.
  * </p>
+ *
  * @param <E> type of enumerated elements.
  * @see Enumerator
  * @see AbstractEnumerator

@@ -30,11 +30,11 @@ package enumj;
  * @see RuntimeException
  * @see Lazy
  */
-public class LazyException extends RuntimeException {
+public final class LazyException extends RuntimeException {
 
     /**
      * Creates an empty {@code LazyException} instance.
-     * 
+     *
      * @see LazyException
      */
     public LazyException() {

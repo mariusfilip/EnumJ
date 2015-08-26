@@ -30,7 +30,7 @@ package enumj;
  * @see SkipWhilePipeProcessor
  * @see WhilePipeProcessor
  */
-class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
+final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
     private E    value;
     private long n;

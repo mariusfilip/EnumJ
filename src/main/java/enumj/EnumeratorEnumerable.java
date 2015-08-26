@@ -32,6 +32,10 @@ import java.util.Iterator;
  * stating this. It is the responsibility of the user to call its
  * {@link #enumerator()} only once.
  * </p>
+ * <p>
+ * <strong>Important:</strong> this class may not be {@code final} because
+ * {@code OnceEnumerable} extends it.
+ * </p>
  *
  * @see OnceEnumerable
  */

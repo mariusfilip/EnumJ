@@ -29,7 +29,7 @@ import java.util.PrimitiveIterator;
 /**
  * {@code Enumerator} and {@code PrimitiveIterator.OfLong} enumerating
  * over a range of long integers.
- * 
+ *
  * @see Enumerator
  * @see PrimitiveIterator
  */

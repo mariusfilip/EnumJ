@@ -96,7 +96,7 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
     protected void cleanup() {
         source = null;
         handler = null;
-        
+
         element.clear();
     }
 

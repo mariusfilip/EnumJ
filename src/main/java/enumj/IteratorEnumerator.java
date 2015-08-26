@@ -27,11 +27,16 @@ import java.util.Iterator;
 
 /**
  * {@code Enumerator} encapsulating an {@code Iterator}.
- * 
+ * <p>
+ * <strong>Important:</strong> this class may not be {@code final} because
+ * {@code PipeSource} extends it.
+ * </p>
+ *
  * @param <E> type of enumerated elements.
  * @see Enumerator
  * @see AbstractEnumerator
  * @see Iterator
+ * @see PipeSource
  */
 class IteratorEnumerator<E> extends AbstractEnumerator<E> {
 

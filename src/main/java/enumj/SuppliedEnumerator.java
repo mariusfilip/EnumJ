@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Optional<E>> source;
-    private Optional<E> value;
+    private Optional<E>           value;
 
     /**
      * Creates a {@code SuppliedEnumerator} that enumerated over the optional

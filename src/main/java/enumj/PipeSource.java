@@ -36,7 +36,7 @@ import java.util.Iterator;
  * @see PipeEnumerator#pipeline
  * @see AbstractPipeProcessor
  */
-class PipeSource<E> extends IteratorEnumerator<E> {
+final class PipeSource<E> extends IteratorEnumerator<E> {
 
     private AbstractPipeProcessor<?,?> firstProcessor;
 
