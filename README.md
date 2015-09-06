@@ -2,16 +2,20 @@
 
 Composable enumerators with LINQ-style operators and full compatibility with Java 8 lambda expressions, streams and spliterators.
 
+__EnumJ__ contains two main data types: _enumerators_ and _enumerables_. Enumerators are are powerful iterators enhanced with massive scalability and LINQ-style operators. Enumerables are powerful iterables that have also the scalability and compositionality of enumerators.
+
+For the JavaDoc documentation of __EnumJ__ click [here](http://mariusfilip.bitbucket.org/apidocs/index.html).
+
 ## Enumerators
 
 Enumerators are Iterator objects with the following characteristics:
 
- * High composability: some operations can be composed iteratively
- * Shareability: shareable enumerators may participate in multiple pipelines, processed independently
- * Fault tolerance: fault-tolerant enumerators allow for exceptions in the middle of the pipeline without stopping the whole computation
- * Lazy evaluations: enumerators allow for lazy evaluation in both returned values and input sequences
- * Choice composition and zipping: construction of enumerators from multiple sub-sequences by choosing or zipping
- * Compatibility and fluent syntax: enumerators support fluent syntax like Stream classes and are compatible with most major collection and sequence constructions: Iterator, Iterable, Enumeration, Stream, Spliterator and Supplier of elements.
+ * __High composability:__ some operations can be composed iteratively
+ * __Shareability:__ shareable enumerators may participate in multiple pipelines, processed independently
+ * __Fault tolerance:__ fault-tolerant enumerators allow for exceptions in the middle of the pipeline without stopping the whole computation
+ * __Lazy evaluations:__ enumerators allow for lazy evaluation in both returned values and input sequences
+ * __Choice composition and zipping:__ construction of enumerators from multiple sub-sequences by choosing or zipping
+ * __Compatibility and fluent syntax:__ enumerators support fluent syntax like Stream classes and are compatible with most major collection and sequence constructions: Iterator, Iterable, Enumeration, Stream, Spliterator and Supplier of elements.
 
 ### High composability
 
