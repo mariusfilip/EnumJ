@@ -2,7 +2,7 @@
 
 Composable enumerators with LINQ-style operators and full compatibility with Java 8 lambda expressions, streams and spliterators.
 
-__EnumJ__ contains two main data types: _enumerators_ and _enumerables_. Enumerators are are powerful iterators enhanced with massive scalability and LINQ-style operators. Enumerables are powerful iterables that have also the scalability and compositionality of enumerators.
+__EnumJ__ contains two main data types: _enumerators_ and _enumerables_. Enumerators are powerful iterators enhanced with massive scalability and LINQ-style operators. Enumerables are powerful iterables that have also the scalability and compositionality of enumerators.
 
 For the JavaDoc documentation of __EnumJ__ click [here](http://mariusfilip.bitbucket.org/apidocs/index.html).
 
