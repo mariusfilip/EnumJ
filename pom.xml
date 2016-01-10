@@ -12,6 +12,16 @@
     <description>Library for Java 8 enumerators and enumerables</description>
     <url>https://github.com/mariusfilip/enumj/</url>
     
+    <developers>
+        <developer>
+            <name>Marius Filip</name>
+            <email>marius.filip.dev@gmail.com</email>
+            <url>http://mariusfilip.bitbucket.org/</url>
+            <organization>London Java Community</organization>
+            <organizationUrl>https://londonjavacommunity.wordpress.com/</organizationUrl>
+        </developer>
+    </developers>
+    
     <licenses>
         <license>
             <name>MIT License</name>
@@ -76,7 +86,7 @@
                     <detectLinks>true</detectLinks>
                     <show>package</show>
                     <validateLinks>true</validateLinks>
-                    <windowtitle>${groupId} ${version}</windowtitle>
+                    <windowtitle>${project.groupId} ${project.version}</windowtitle>
                 </configuration>
                 <executions>
                     <execution>
