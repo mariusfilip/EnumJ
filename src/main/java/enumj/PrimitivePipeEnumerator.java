@@ -23,24 +23,34 @@
  */
 package enumj;
 
-import java.util.Iterator;
+import java.util.PrimitiveIterator;
 
-abstract class PipeSource<E> extends IteratorEnumerator<E> {
-
-    private AbstractPipeProcessor<?,?> firstProcessor;
-
-    protected PipeSource(Iterator<E> source) { super(source); }
-
-    public final AbstractPipeProcessor<?,?> getFirstProcessor() {
-        return firstProcessor;
-    }
-    public final void setFirstProcessorIfNone(
-            AbstractPipeProcessor<?,?> processor) {
-        if (firstProcessor == null) { firstProcessor = processor; }
+final class PrimitivePipeEnumerator {
+    
+    final static class OfInt extends    PipeEnumerator<Integer>
+                             implements PrimitiveEnumerator.OfInt {
+        
+        public OfInt(PrimitiveEnumerator.OfInt source) {
+            super(source);
+        }
+        public OfInt() { super(); }
+        
+        @Override
+        public int nextInt() { return super.next(); }
+        @Override
+        public PrimitiveEnumerator.OfInt concat(
+                PrimitiveIterator.OfInt elements) {
+            super.addSourceLast(PrimitivePipeSource.of(elements));
+            return this;
+        }
     }
     
-    public final void yieldNext(Value<? super E> value) {
-        internalYieldNext(value);
+    public static PrimitivePipeEnumerator.OfInt of(
+            PrimitiveIterator.OfInt source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return (source instanceof PrimitivePipeEnumerator.OfInt)
+               ? (PrimitivePipeEnumerator.OfInt)source
+               : new PrimitivePipeEnumerator.OfInt(
+                         PrimitiveEnumerator.of(source));
     }
-    protected abstract void internalYieldNext(Value<? super E> value);
 }

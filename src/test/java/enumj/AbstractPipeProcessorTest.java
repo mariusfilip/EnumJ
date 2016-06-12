@@ -83,15 +83,15 @@ public class AbstractPipeProcessorTest {
     @Test
     public void testSetSource() {
         System.out.println("setSource");
-        processor.setSource(new PipeSource(Enumerator.empty()));
+        processor.setSource(new GenericPipeSource(Enumerator.empty()));
         assertNotNull(processor.getSource());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testSetSourceTwice() {
         System.out.println("setSourceTwice");
-        processor.setSource(new PipeSource(Enumerator.empty()));
-        processor.setSource(new PipeSource(Enumerator.empty()));
+        processor.setSource(new GenericPipeSource(Enumerator.empty()));
+        processor.setSource(new GenericPipeSource(Enumerator.empty()));
     }
 
     @Test

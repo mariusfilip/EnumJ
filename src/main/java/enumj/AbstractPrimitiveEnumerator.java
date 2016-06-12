@@ -29,7 +29,7 @@ import java.util.PrimitiveIterator;
 final class AbstractPrimitiveEnumerator {
     static abstract class OfInt
            extends AbstractNumericEnumerator<Integer>
-           implements PrimitiveIterator.OfInt {
+           implements PrimitiveEnumerator.OfInt {
         private int value;
         protected OfInt() {
             super(INT_TYPE);

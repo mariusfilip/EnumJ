@@ -23,24 +23,28 @@
  */
 package enumj;
 
-import java.util.Iterator;
+import java.util.PrimitiveIterator;
 
-abstract class PipeSource<E> extends IteratorEnumerator<E> {
-
-    private AbstractPipeProcessor<?,?> firstProcessor;
-
-    protected PipeSource(Iterator<E> source) { super(source); }
-
-    public final AbstractPipeProcessor<?,?> getFirstProcessor() {
-        return firstProcessor;
+final class PrimitivePipeSource {
+    final static class OfInt extends PipeSource<Integer>
+                             implements PrimitiveIterator.OfInt {
+        final private AbstractPrimitiveEnumerator.OfInt intSource;
+        protected OfInt(PrimitiveIterator.OfInt source) {
+            this(PrimitiveIteratorEnumerator.of(source));
+        }
+        private OfInt(AbstractPrimitiveEnumerator.OfInt source) {
+            super(source);
+            this.intSource = source;
+        }
+        @Override
+        protected void internalYieldNext(Value<? super Integer> value) {
+            value.setInt(intSource.nextInt());
+        }
+        @Override
+        public int nextInt() { return intSource.nextInt(); }
     }
-    public final void setFirstProcessorIfNone(
-            AbstractPipeProcessor<?,?> processor) {
-        if (firstProcessor == null) { firstProcessor = processor; }
+    public static PrimitivePipeSource.OfInt of(
+            PrimitiveIterator.OfInt source) {
+        return new OfInt(source);
     }
-    
-    public final void yieldNext(Value<? super E> value) {
-        internalYieldNext(value);
-    }
-    protected abstract void internalYieldNext(Value<? super E> value);
 }

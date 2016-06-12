@@ -25,7 +25,6 @@ package enumj;
 
 import java.util.Iterator;
 import java.util.PrimitiveIterator;
-import java.util.function.IntConsumer;
 
 final class PrimitiveIteratorEnumerator {
     static class OfInt

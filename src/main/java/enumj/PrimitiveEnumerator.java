@@ -28,8 +28,6 @@ import java.util.PrimitiveIterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.IntPredicate;
-import java.util.function.IntSupplier;
-import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
@@ -37,44 +35,6 @@ import java.util.stream.StreamSupport;
 public final class PrimitiveEnumerator {
     public interface OfInt extends Enumerator<Integer>,
                                    PrimitiveIterator.OfInt {
-        @SafeVarargs
-        public static OfInt on(int... elements) {
-            return new PrimitiveArrayEnumerator.OfInt(elements);
-        }
-        public static OfInt of(int[] elements) {
-            return new PrimitiveArrayEnumerator.OfInt(elements);
-        }
-        public static OfInt of(Iterator<Integer> source) {
-            return PrimitiveIteratorEnumerator.ofGenericInt(source);
-        }
-        public static OfInt of(PrimitiveIterator.OfInt source) {
-            return PrimitiveIteratorEnumerator.of(source);
-        }
-        public static OfInt of(IntStream source) {
-            Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-            return of(source.iterator());
-        }
-        public static OfInt of(Spliterator.OfInt source) {
-            Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-            return of(Spliterators.iterator(source));
-        }
-        public static OfInt ofLazyIterator(
-                Supplier<? extends PrimitiveIterator.OfInt> source) {
-            return LazyPrimitiveEnumerator.of(source);
-        }
-        public static OfInt ofLazyStream(
-                Supplier<? extends IntStream> source) {
-            Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-            return LazyPrimitiveEnumerator.of(() -> of(source.get()));
-        }
-        public static OfInt ofLazySpliterator(
-                Supplier<? extends Spliterator.OfInt> source) {
-            Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-            return LazyPrimitiveEnumerator.of(() -> of(source.get()));
-        }
-        public static LateBindingPrimitiveEnumerator.OfInt ofLateBinding() {
-            return new LateBindingPrimitiveEnumerator.OfInt();
-        }
 
         // ------------------------------------------------------------------ //
         
@@ -113,7 +73,48 @@ public final class PrimitiveEnumerator {
             return concat(on(elements));
         }
         public default OfInt concat(PrimitiveIterator.OfInt elements) {
-            return of(new PipeEnumerator(this).concat(elements));
+            return new PrimitivePipeEnumerator.OfInt(this)
+                                              .concat(elements);
         }
+    }
+    @SafeVarargs
+    public static PrimitiveEnumerator.OfInt on(int... elements) {
+        return new PrimitiveArrayEnumerator.OfInt(elements);
+    }
+    public static PrimitiveEnumerator.OfInt of(int[] elements) {
+        return new PrimitiveArrayEnumerator.OfInt(elements);
+    }
+    public static PrimitiveEnumerator.OfInt ofInteger(
+            Iterator<Integer> source) {
+        return PrimitiveIteratorEnumerator.ofGenericInt(source);
+    }
+    public static PrimitiveEnumerator.OfInt of(
+            PrimitiveIterator.OfInt source) {
+        return PrimitiveIteratorEnumerator.of(source);
+    }
+    public static PrimitiveEnumerator.OfInt of(IntStream source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return of(source.iterator());
+    }
+    public static PrimitiveEnumerator.OfInt of(Spliterator.OfInt source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return of(Spliterators.iterator(source));
+    }
+    public static PrimitiveEnumerator.OfInt ofLazyIntIterator(
+            Supplier<? extends PrimitiveIterator.OfInt> source) {
+        return LazyPrimitiveEnumerator.of(source);
+    }
+    public static PrimitiveEnumerator.OfInt ofLazyIntStream(
+            Supplier<? extends IntStream> source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return LazyPrimitiveEnumerator.of(() -> of(source.get()));
+    }
+    public static PrimitiveEnumerator.OfInt ofLazyIntSpliterator(
+            Supplier<? extends Spliterator.OfInt> source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return LazyPrimitiveEnumerator.of(() -> of(source.get()));
+    }
+    public static LateBindingPrimitiveEnumerator.OfInt ofLateBindingInt() {
+        return new LateBindingPrimitiveEnumerator.OfInt();
     }
 }

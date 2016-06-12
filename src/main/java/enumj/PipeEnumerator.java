@@ -61,7 +61,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         this();
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         Checks.ensureNonEnumerating(source);
-        PipeSource<?> src = PipeSource.of(source);
+        GenericPipeSource<?> src = GenericPipeSource.of(source);
         this.sources.add(src);
     }
     /**
@@ -102,7 +102,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * This method also maintains the consistency of
      * {@link #needValueForHasNext}, {@link AbstractPipeProcessor#next} of
      * the last element in {@link #pipeline} as well as
-     * {@link PipeSource#firstProcessor} of the last element in
+     * {@link GenericPipeSource#firstProcessor} of the last element in
      * {@link #sources}.
      * </p>
      * @param <X> type of processed enumerated elements.
@@ -159,7 +159,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * This method also maintains the consistency of
      * {@link #needValueForHasNext}, {@link AbstractPipeProcessor#next} of
      * the last element in {@link pipeline} as well as
-     * {@link PipeSource#firstProcessor} of the last element in
+     * {@link GenericPipeSource#firstProcessor} of the last element in
      * {@link #sources}.
      * </p>
      *
@@ -417,10 +417,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * Removes the processors of the given {@code PipeSource} from
      * the {@code pipeline}.
      *
-     * @param removed {@link PipeSource} that has just been removed and need
+     * @param removed {@link GenericPipeSource} that has just been removed and need
      * its processors to be removed as well.
      */
-    protected void dequeueSourceProcessors(PipeSource removed) {
+    protected void dequeueSourceProcessors(PipeSource<?> removed) {
         if (sources.isEmpty()) {
             pipeline.clear();
             multiPipeline.clear();
@@ -633,8 +633,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     public Enumerator<E> concat(Iterator<? extends E> elements) {
-        sources.addLast(PipeSource.of(elements));
+        addSourceLast(GenericPipeSource.of((Iterator<E>)elements));
         return this;
+    }
+    protected final void addSourceLast(PipeSource<E> source) {
+        sources.addLast(source);
     }
     @Override
     public Enumerator<E> filter(Predicate<? super E> predicate) {
@@ -712,7 +715,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the current {@code PipeEnumerator}.
      */
     public PipeEnumerator<E> setSource(Iterator<?> elements) {
-        final PipeSource<?> source = PipeSource.of(elements);
+        final GenericPipeSource<?> source = GenericPipeSource.of(elements);
         sources.addFirst(source);
         final Iterator<AbstractPipeProcessor<?,?>> pipelineIterator =
                 pipeline.iterator();

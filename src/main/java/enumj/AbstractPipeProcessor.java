@@ -137,8 +137,8 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #getSource()
      */
     public final void setSource(PipeSource reference) {
-        if (this.source == null) {
-            this.source = reference;
+        if (source == null) {
+            source = reference;
         } else {
             throw new UnsupportedOperationException();
         }
