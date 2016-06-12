@@ -61,10 +61,11 @@ final class ZipPipeProcessor<E>
     }
 
     @Override
-    public void processInputValue(Optional<E> value) {
+    public void processInputValue(Value<Optional<E>> value) {
         final Optional[] tuple = new Optional[1+iterators.length];
-        tuple[0] = value;
-        hasAny = value.isPresent();
+        final Optional<E> val = value.get();
+        tuple[0] = val;
+        hasAny = val.isPresent();
         for(int i=0; i<iterators.length; ++i) {
             if (iterators[i].hasNext()) {
                 hasAny = true;

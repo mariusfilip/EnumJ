@@ -63,8 +63,8 @@ final class FlatMapPipeProcessor<In,Out>
         return !value.isPresent();
     }
     @Override
-    public void processInputValue(In value) {
-        this.iterator = this.mapper.apply(value);
+    public void processInputValue(Value<In> value) {
+        this.iterator = this.mapper.apply(value.get());
         if (this.iterator != null) {
             if (this.iterator.hasNext()) {
                 this.value.set(this.iterator.next());

@@ -23,8 +23,6 @@
  */
 package enumj;
 
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -41,61 +39,14 @@ import java.util.function.Supplier;
  * @param <T> type of contained value.
  * @see Optional
  */
-public final class Nullable<T> {
+public final class Nullable<T> extends Value<T> {
 
-    private T value;
-    private boolean isPresent;
-
-    private Nullable() {}
-    private Nullable(T value) {
-        this.value = value;
-        this.isPresent = true;
-    }
-
-    /**
-     * Return true if there is a value present, otherwise false.
-     *
-     * @return true if value is present, otherwise false.
-     */
-    public boolean isPresent() {
-        return isPresent;
-    }
-
-    /**
-     * If a value is present in this {@code Nullable}, returns the value,
-     * otherwise throws {@code NoSuchElementException}.
-     *
-     * @return the value help by this {@code Nullable}.
-     * @throws NoSuchElementException if there is no value present.
-     * @see Nullable
-     */
-    public T get() {
-        if (!isPresent) {
-            throw new NoSuchElementException();
-        }
-        return value;
-    }
-
-    /**
-     * Set a value to this {@code Nullable}.
-     *
-     * @param elem value to set.
-     * @see Nullable
-     */
-    public void set(T elem) {
-        this.value = elem;
-        this.isPresent = true;
-    }
-
-    /**
-     * Clear the value contained by this {@code Nullable}.
-     *
-     * @see Nullable
-     */
-    public void clear() {
-        value = null;
-        isPresent = false;
-    }
+    private Nullable() { super(); }
+    private Nullable(T value) { super(value); }
+    private Nullable(int value) { super(value); }
+    private Nullable(long value) { super(value); }
+    private Nullable(double value) { super(value); }
+    private Nullable(Nullable<? extends T> value) { super(value); }
 
     /**
      * Return the value if present, otherwise return {@code other}.
@@ -104,7 +55,7 @@ public final class Nullable<T> {
      * @return the value, if present, otherwise {@code other}.
      */
     public T orElse(T other) {
-        return isPresent ? value : other;
+        return super.isPresent() ? super.get() : other;
     }
 
     /**
@@ -118,7 +69,7 @@ public final class Nullable<T> {
      * is null.
      */
     public T orElseGet(Supplier<? extends T> other) {
-        return isPresent ? value : other.get();
+        return super.isPresent() ? super.get() : other.get();
     }
 
     /**
@@ -133,36 +84,16 @@ public final class Nullable<T> {
      */
     public <X extends Throwable> T orElseThrow(
             Supplier<? extends X> exceptionSupplier) throws X {
-        if (isPresent) {
-            return value;
-        }
+        if (super.isPresent()) { return super.get(); }
         throw exceptionSupplier.get();
     }
 
     // ---------------------------------------------------------------------- //
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (!(other instanceof Nullable)) {
-            return false;
-        }
-        if (isPresent != ((Nullable)other).isPresent) {
-            return false;
-        }
-        return Objects.equals(value, ((Nullable)other).value);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(value, isPresent);
-    }
     @Override
     public String toString() {
-        return isPresent 
-                ? (value != null
-                   ? String.format("Facultative[%s]", value)
+        return super.isPresent()
+                ? (super.get() != null
+                   ? String.format("Facultative[%s]", super.get())
                    : "Facultative[null]")
                 : "Facultative.empty";
     }
@@ -216,7 +147,9 @@ public final class Nullable<T> {
      * empty {@code Nullable}.
      */
     public Nullable<T> filter(Predicate<? super T> predicate) {
-        return !isPresent || predicate.test(value) ? this : empty();
+        return !super.isPresent() || predicate.test(super.get())
+                ? this
+                : empty();
     }
 
     /**
@@ -232,7 +165,7 @@ public final class Nullable<T> {
      */
     public <U> Nullable<U> flatMap(
             Function<? super T, Nullable<U>> mapper) {
-        return isPresent ? mapper.apply(value) : empty();
+        return super.isPresent() ? mapper.apply(super.get()) : empty();
     }
 
     /**
@@ -241,9 +174,7 @@ public final class Nullable<T> {
      * @param consumer block to be executed if a value is present.
      */
     public void ifPresent(Consumer<? super T> consumer) {
-        if (isPresent) {
-            consumer.accept(value);
-        }
+        if (super.isPresent()) { consumer.accept(super.get()); }
     }
 
     /**
@@ -259,6 +190,8 @@ public final class Nullable<T> {
      * otherwise an empty {@code Nullable}.
      */
     public <U> Nullable<U> map(Function<? super T, ? extends U> mapper) {
-        return isPresent ? of(mapper.apply(value)) : empty();
+        return super.isPresent()
+                ? of(mapper.apply(super.get()))
+                : empty();
     }
 }

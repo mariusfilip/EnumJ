@@ -427,7 +427,7 @@ public interface Enumerator<E> extends Iterator<E> {
      * @see LateBindingEnumerator
      */
     public static <E> LateBindingEnumerator<E> ofLateBinding(Class<E> clazz) {
-        return new LateBindingEnumerator<E>();
+        return new LateBindingEnumerator<>();
     }
 
     // ---------------------------------------------------------------------- //
@@ -515,18 +515,6 @@ public interface Enumerator<E> extends Iterator<E> {
     }
 
     /**
-     * Returns a sequential {@code Spliterator} iterating over the current
-     * enumerator.
-     *
-     * @return the new {@link Spliterator}.
-     * @see #asStream()
-     */
-    public default Spliterator<E> asSpliterator() {
-        Checks.ensureNonEnumerating(this);
-        return Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED);
-    }
-
-    /**
      * Returns a sequential {@code Stream} streaming over the current
      * enumerator.
      *
@@ -537,6 +525,18 @@ public interface Enumerator<E> extends Iterator<E> {
     public default Stream<E> asStream() {
         Checks.ensureNonEnumerating(this);
         return StreamSupport.stream(asSpliterator(), false);
+    }
+
+    /**
+     * Returns a sequential {@code Spliterator} iterating over the current
+     * enumerator.
+     *
+     * @return the new {@link Spliterator}.
+     * @see #asStream()
+     */
+    public default Spliterator<E> asSpliterator() {
+        Checks.ensureNonEnumerating(this);
+        return Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED);
     }
 
     /**

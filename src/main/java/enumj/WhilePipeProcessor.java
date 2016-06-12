@@ -55,9 +55,9 @@ final class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    public void processInputValue(E value) {
-        if (this.filter != null && this.filter.test(value)) {
-            this.value = value;
+    public void processInputValue(Value<E> value) {
+        if (this.filter != null && this.filter.test(value.get())) {
+            this.value = value.get();
         } else {
             this.filter = null;
         }

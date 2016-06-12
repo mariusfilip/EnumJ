@@ -163,8 +163,8 @@ public class PipeEnumeratorTest {
             return value == null;
         }
         @Override
-        public void processInputValue(In value) {
-            this.value = (Out)value;
+        public void processInputValue(Value<In> value) {
+            this.value = (Out)value.get();
         }
         @Override
         public boolean hasOutputValue() {

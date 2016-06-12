@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Marius Filip.
+ * Copyright 2016 Marius Filip.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,35 @@
  */
 package enumj;
 
-/**
- * Encapsulates output method parameters.
- *
- * @param <T> Type of output parameter.
- */
-public final class Out<T> extends Value<T> {
-    
-    public Out() { super(); }
-    public Out(T value) { super(value); }
-    public Out(int value) { super(value); }
-    public Out(long value) { super(value); }
-    public Out(double value) { super(value); }
-    public Out(Out<? extends T> value) { super(value); }
-    
-    public boolean hasValue() { return super.isPresent(); }
+import java.util.PrimitiveIterator;
+import java.util.function.Supplier;
 
-    @Override
-    public String toString() {
-        return super.isPresent() ? super.get().toString() : "<none>";
+final class LazyPrimitiveEnumerator {
+    final static class OfInt extends AbstractPrimitiveEnumerator.OfInt {
+        private Supplier<? extends PrimitiveIterator.OfInt> source;
+        private PrimitiveIterator.OfInt                     enumerator;
+        
+        private OfInt(Supplier<? extends PrimitiveIterator.OfInt> source) {
+            this.source = source;
+        }
+        @Override
+        protected boolean internalHasNext() {
+            if (enumerator == null) { enumerator = source.get(); }
+            return enumerator.hasNext();
+        }
+        @Override
+        protected int safeNextInt() {
+            return enumerator.nextInt();
+        }
+        @Override
+        protected void cleanup() {
+            source = null;
+            enumerator = null;
+        }
     }
-
-    /**
-     * Creates a new, empty output parameter.
-     *
-     * @param <T> Type of output parameter.
-     * @return new {@link Out} instance.
-     */
-    public static <T> Out<T> empty() { return new Out<>(); }
+    public static AbstractPrimitiveEnumerator.OfInt of(
+            Supplier<? extends PrimitiveIterator.OfInt> source) {
+        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
+        return new OfInt(source);
+    }
 }

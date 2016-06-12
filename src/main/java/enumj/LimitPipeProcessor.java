@@ -50,9 +50,9 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    public void processInputValue(E value) {
+    public void processInputValue(Value<E> value) {
         if (size > 0) {
-            this.value = value;
+            this.value = value.get();
         }
     }
     @Override

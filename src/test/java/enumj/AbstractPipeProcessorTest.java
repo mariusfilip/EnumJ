@@ -97,7 +97,7 @@ public class AbstractPipeProcessorTest {
     @Test
     public void testPushFrontMap() {
         System.out.println("pushFrontMap");
-        assertFalse(processor.pushFrontMap(x -> x));
+        assertFalse(processor.pushFrontMap((Object x) -> (String)x));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class AbstractPipeProcessorTest {
     @Test
     public void testProcessInputValue() {
         System.out.println("processInputValue");
-        processor.processInputValue("titi");
+        processor.processInputValue(new Out("titi"));
         assertTrue(processor.hasOutputValue());
     }
 
@@ -122,21 +122,21 @@ public class AbstractPipeProcessorTest {
     @Test
     public void testGetOutputValue() {
         System.out.println("getOutputValue");
-        processor.processInputValue("titi");
+        processor.processInputValue(new Out("titi"));
         assertEquals("titi", processor.getOutputValue());
     }
 
     @Test
     public void testRetrieveOutputValue() {
         System.out.println("retrieveOutputValue");
-        processor.processInputValue("titi");
+        processor.processInputValue(new Out("titi"));
         assertEquals("titi", processor.retrieveOutputValue());
     }
 
     @Test
     public void testClearOutputValue() {
         System.out.println("clearOutputValue");
-        processor.processInputValue("titi");
+        processor.processInputValue(new Out("titi"));
         processor.clearOutputValue();
         assertFalse(processor.hasOutputValue());
     }
@@ -156,8 +156,8 @@ public class AbstractPipeProcessorTest {
             super(false, false);
         }
 
-        public void processInputValue(T value) {
-            this.value = value;
+        public void processInputValue(Value<T> value) {
+            this.value = value.get();
         }
 
         public boolean hasOutputValue() {

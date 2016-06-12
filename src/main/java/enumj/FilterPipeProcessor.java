@@ -34,9 +34,9 @@ import java.util.function.Predicate;
  */
 final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    private Predicate<E>             filter;
-    private LinkedList<Predicate<E>> filters;
-    private E                        value;
+    private Predicate<? super E>             filter;
+    private LinkedList<Predicate<? super E>> filters;
+    private E                                value;
 
     /**
      * Constructs a {@code FilterPipeProcessor} instance.
@@ -54,15 +54,15 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    public boolean pushFrontFilter(Predicate<E> predicate) {
+    public <U> boolean pushFrontFilter(Predicate<U> predicate) {
         ensureFilters();
-        this.filters.addFirst((Predicate<E>)predicate);
+        this.filters.addFirst((Predicate)predicate);
         return true;
     }
     @Override
-    public boolean enqueueFilter(Predicate<E> predicate) {
+    public boolean enqueueFilter(Predicate<? super E> predicate) {
         ensureFilters();
-        this.filters.addLast((Predicate<E>)predicate);
+        this.filters.addLast(predicate);
         return true;
     }
     private void ensureFilters() {
@@ -76,8 +76,8 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    public void processInputValue(E value) {
-        this.value = value;
+    public void processInputValue(Value<E> value) {
+        this.value = value.get();
     }
     @Override
     public boolean hasOutputValue() {
@@ -104,7 +104,7 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         if (filter != null) {
             return filter.test(value);
         }
-        for(Predicate<E> pred : filters) {
+        for(Predicate<? super E> pred : filters) {
             if (!pred.test(value)) {
                 return false;
             }

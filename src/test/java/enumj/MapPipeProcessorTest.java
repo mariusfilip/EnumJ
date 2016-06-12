@@ -58,21 +58,21 @@ public class MapPipeProcessorTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertEquals(2, processor.getOutputValue().intValue());
     }
 

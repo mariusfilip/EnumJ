@@ -70,11 +70,11 @@ public class FlatMapPipeProcessorTest {
     @Test
     public void testProcessInputValue() {
         System.out.println("process");
-        processor0.processInputValue(0);
+        processor0.processInputValue(new Out(0));
         assertFalse(processor0.hasOutputValue());
-        processor1.processInputValue(1);
+        processor1.processInputValue(new Out(1));
         assertFalse(processor1.hasOutputValue());
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertTrue(processor.hasOutputValue());
     }
 
@@ -89,7 +89,7 @@ public class FlatMapPipeProcessorTest {
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertEquals(1, processor.getOutputValue().intValue());
         assertEquals(2, processor.getOutputValue().intValue());
         assertEquals(3, processor.getOutputValue().intValue());

@@ -59,15 +59,15 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     @Override
-    protected boolean internalHasNext() {
+    protected final boolean internalHasNext() {
         return source.hasNext();
     }
     @Override
-    protected E internalNext() {
+    protected final E internalNext() {
         return source.next();
     }
     @Override
-    protected void cleanup() {
+    protected final void cleanup() {
         source = null;
     }
 

@@ -58,14 +58,14 @@ public class WhilePipeProcessorTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.processInputValue(-1);
+        processor.processInputValue(new Out(-1));
         assertFalse(processor.hasOutputValue());
         assertFalse(processor.hasOutputValue());
     }
@@ -73,7 +73,7 @@ public class WhilePipeProcessorTest {
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(1);
+        processor.processInputValue(new Out(1));
         assertEquals(1, processor.getOutputValue().intValue());
     }
 

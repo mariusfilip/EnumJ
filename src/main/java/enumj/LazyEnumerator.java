@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Iterator<E>> source;
-    private Enumerator<E> iterator;
+    private Enumerator<E>         iterator;
 
     /**
      * Constructs a {@code LazyEnumerator} instance.

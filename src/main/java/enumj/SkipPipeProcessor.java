@@ -51,9 +51,9 @@ final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    public void processInputValue(E value) {
+    public void processInputValue(Value<E> value) {
         if (n == 0) {
-            this.value = value;
+            this.value = value.get();
         }
     }
     @Override

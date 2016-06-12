@@ -54,12 +54,12 @@ class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     }
 
     @Override
-    public void processInputValue(E value) {
+    public void processInputValue(Value<E> value) {
         if (this.filter == null) {
-            this.value = value;
+            this.value = value.get();
         }
-        else if(!this.filter.test(value)) {
-            this.value = value;
+        else if(!this.filter.test(value.get())) {
+            this.value = value.get();
             this.filter = null;
         }
     }

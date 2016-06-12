@@ -71,6 +71,10 @@ final class PipeSource<E> extends IteratorEnumerator<E> {
             this.firstProcessor = processor;
         }
     }
+    
+    public void yieldNext(Value<? super E> value) {
+        value.set(super.next());
+    }
 
     /**
      * Creates a new instance of {@code PipeSource} with the given

@@ -41,7 +41,7 @@ public final class CachedEnumerable<E> extends AbstractEnumerable<E> {
      * Constructs a {@code CachedEnumerable} instance that caches the elements
      * of the given source {@code Enumerable}.
      * <p>
-     * The resulted {@link CachedEnumerable} has no size limit and it's internal
+     * The resulted {@link CachedEnumerable} has no size limit and its internal
      * cache does not get replaced.
      * </p>
      *

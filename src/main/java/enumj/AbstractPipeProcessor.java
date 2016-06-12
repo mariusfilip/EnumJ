@@ -74,7 +74,8 @@ abstract class AbstractPipeProcessor<T,R> {
      *
      * @see AbstractPipeProcessor
      */
-    private AbstractPipeProcessor<? extends R,?> next;
+    private AbstractPipeProcessor<? super R,?> next;
+    private boolean                            nextReset;
     /**
      * The {@code PipeSource} instance whose elements this processor processes.
      *
@@ -89,7 +90,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return Value of {@link #next}.
      * @see #setNext(enumj.AbstractPipeProcessor)
      */
-    public AbstractPipeProcessor<? extends R,?> getNext() {
+    public final AbstractPipeProcessor<? super R,?> getNext() {
         return next;
     }
     /**
@@ -102,13 +103,20 @@ abstract class AbstractPipeProcessor<T,R> {
      * @throws UnsupportedOperationException {@code next} is being set twice.
      * @see #getNext()
      */
-    public void setNext(AbstractPipeProcessor<? extends R,?> next) {
-        if (this.next == null) {
+    public final void setNext(AbstractPipeProcessor<? super R,?> next) {
+        if (this.next == null && !nextReset) {
             this.next = next;
         } else {
             throw new UnsupportedOperationException();
         }
     }
+    public final void detachNext() {
+        if (next != null) {
+            next.detachPrevious();
+            next = null;
+        }
+    }
+    protected void detachPrevious() {};
 
     /**
      * Gets the value of {@code AbstractPipeProcessor.source}.
@@ -116,7 +124,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return Value of {@link #source}.
      * @see #setSource(enumj.PipeSource)
      */
-    public PipeSource getSource() {
+    public final PipeSource getSource() {
         return source;
     }
     /**
@@ -128,7 +136,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @param reference Value for {@link #source}.
      * @see #getSource()
      */
-    public void setSource(PipeSource reference) {
+    public final void setSource(PipeSource reference) {
         if (this.source == null) {
             this.source = reference;
         } else {
@@ -152,7 +160,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of mappers, false
      * otherwise.
      */
-    public <U> boolean pushFrontMap(Function<R,U> mapper) {
+    public <U> boolean pushFrontMap(Function<U,? extends T> mapper) {
         return false;
     }
     /**
@@ -168,7 +176,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of mappers, false
      * otherwise.
      */
-    public <U> boolean enqueueMap(Function<R,U> mapper) {
+    public <U> boolean enqueueMap(Function<? super R,U> mapper) {
         return false;
     }
     /**
@@ -184,7 +192,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of predicates, false
      * otherwise.
      */
-    public boolean pushFrontFilter(Predicate<R> predicate) {
+    public <U> boolean pushFrontFilter(Predicate<U> predicate) {
         return false;
     }
     /**
@@ -199,7 +207,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of predicates, false
      * otherwise.
      */
-    public boolean enqueueFilter(Predicate<R> predicate) {
+    public boolean enqueueFilter(Predicate<? super R> predicate) {
         return false;
     }
 
@@ -215,7 +223,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #hasOutputValue()
      * @see #getOutputValue()
      */
-    public abstract void    processInputValue(T value);
+    public abstract void    processInputValue(Value<T> value);
     /**
      * Gets whether processing was successful and the processor has a value
      * to yield.
@@ -246,6 +254,11 @@ abstract class AbstractPipeProcessor<T,R> {
         clearOutputValue();
         return result;
     }
+    public final void yieldOutputValue(Value<? super R> value) {
+        value.set(retrieveOutputValue());
+        clearOutputValue();
+    }
+    
     /**
      * Retrieves the processed result produced by
      * {@code AbstractPipeProcessor.processInputValue(Object)}.
