@@ -24,6 +24,9 @@
 package enumj;
 
 import java.util.LinkedList;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -34,9 +37,9 @@ import java.util.function.Predicate;
  */
 final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    private Predicate<? super E>             filter;
-    private LinkedList<Predicate<? super E>> filters;
-    private E                                value;
+    private ValuePredicate<E>             filter;
+    private LinkedList<ValuePredicate<E>> filters;
+    private InOut<E>                      value;
 
     /**
      * Constructs a {@code FilterPipeProcessor} instance.
@@ -48,21 +51,33 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
      */
     public FilterPipeProcessor(Predicate<E> filter) {
         super(true, true);
-        this.filter = filter;
+        this.filter = new ValuePredicate(filter);
+    }
+    public FilterPipeProcessor(IntPredicate filter) {
+        super(true, true);
+        this.filter = new ValuePredicate(filter);
+    }
+    public FilterPipeProcessor(LongPredicate filter) {
+        super(true, true);
+        this.filter = new ValuePredicate(filter);
+    }
+    public FilterPipeProcessor(DoublePredicate filter) {
+        super(true, true);
+        this.filter = new ValuePredicate(filter);
     }
 
     // ---------------------------------------------------------------------- //
 
     @Override
-    public <U> boolean pushFrontFilter(Predicate<U> predicate) {
+    public boolean pushFrontFilter(ValuePredicate<? super E> predicate) {
         ensureFilters();
-        this.filters.addFirst((Predicate)predicate);
+        this.filters.addFirst(filter);
         return true;
     }
     @Override
-    public boolean enqueueFilter(Predicate<? super E> predicate) {
+    public boolean enqueueFilter(ValuePredicate<? super E> predicate) {
         ensureFilters();
-        this.filters.addLast(predicate);
+        this.filters.addLast(filter);
         return true;
     }
     private void ensureFilters() {
@@ -76,24 +91,20 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    public void processInputValue(Value<E> value) {
-        this.value = value.get();
+    public void processInputValue(In<E> value) {
+        this.value.setValue(value);
     }
     @Override
     public boolean hasOutputValue() {
         if (testOutputValue()) {
             return true;
         }
-        value = null;
+        value.clear();
         return false;
     }
     @Override
-    protected E retrieveOutputValue() {
-        return value;
-    }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
+    public void getOutputValue(Out<E> value) {
+        value.setValue(value);
     }
     @Override
     public boolean isInactive() {
@@ -104,7 +115,7 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         if (filter != null) {
             return filter.test(value);
         }
-        for(Predicate<? super E> pred : filters) {
+        for(ValuePredicate<E> pred : filters) {
             if (!pred.test(value)) {
                 return false;
             }

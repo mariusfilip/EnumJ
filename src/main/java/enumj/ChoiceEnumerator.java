@@ -105,10 +105,9 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         return false;
     }
     @Override
-    protected E internalNext() {
-        final E result = value.get();
+    protected void internalNext(Out<E> value) {
+        value.setValue(this.value);
         value.clear();
-        return result;
     }
     @Override
     protected void cleanup() {

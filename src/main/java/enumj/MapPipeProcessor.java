@@ -37,9 +37,9 @@ import java.util.function.Function;
  */
 final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
 
-    private Function<? super T,? extends R> mapper;
-    private LinkedList<Function<?,?>>       mappers;
-    private R                               value;
+    private ValueFunction<T,R>             mapper;
+    private LinkedList<ValueFunction<?,?>> mappers;
+    private InOut<R>                       value;
 
     /**
      * Constructs a {@code MapPipeProcessor} instance.
@@ -51,7 +51,7 @@ final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
      * @param functor {@link Function} mapping input elements to
      * output elements.
      */
-    public MapPipeProcessor(Function<T,R> functor) {
+    public MapPipeProcessor(ValueFunction<T,R> functor) {
         super(false, false);
         mapper = functor;
     }
@@ -59,15 +59,15 @@ final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
     // ---------------------------------------------------------------------- //
 
     @Override
-    public <U> boolean pushFrontMap(Function<U,? extends T> mapper) {
+    public <U> boolean pushFrontMap(ValueFunction<U,? extends T> mapper) {
         ensureMappers();
-        this.mappers.addFirst((Function)mapper);
+        this.mappers.addFirst(mapper);
         return true;
     }
     @Override
-    public <U> boolean enqueueMap(Function<? super R,U> mapper) {
+    public <U> boolean enqueueMap(ValueFunction<? super R,U> mapper) {
         ensureMappers();
-        this.mappers.addLast((Function)mapper);
+        this.mappers.addLast(mapper);
         return true;
     }
     private void ensureMappers() {
@@ -80,39 +80,24 @@ final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
 
     // ---------------------------------------------------------------------- //
 
-    @Override
-    public void processInputValue(Value<T> value) {
-        final Out<R> val = new Out<>();
+    @Override public void processInputValue(In<T> value) {
         if (mapper != null) {
-            final T in = value.get();
-            final R out = mapper.apply(in);
-            val.set(out);
+            this.value.setValue(this.mapper.apply(value));
         }
         else {
-            for(Function fun : mappers) {
-                final T in = value.get();
-                final R out = (R)fun.apply(in);
-                value.set((T)out);
+            this.value.setValue(value.castOut());
+            for(ValueFunction fun : mappers) {
+                this.value.setValue(fun.apply(this.value));
             }
-            final T v = value.get();
-            val.set((R)v);
         }
-        this.value = val.get();
     }
-    @Override
-    public boolean hasOutputValue() {
+    @Override public boolean hasOutputValue() {
         return true;
     }
-    @Override
-    protected R retrieveOutputValue() {
-        return value;
+    @Override public void getOutputValue(Out<R> value) {
+        value.setValue(this.value);
     }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
-    }
-    @Override
-    public boolean isInactive() {
+    @Override public boolean isInactive() {
         return false;
     }
 }

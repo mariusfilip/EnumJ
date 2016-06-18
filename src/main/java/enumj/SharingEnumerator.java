@@ -79,14 +79,13 @@ final class SharingEnumerator<E> extends AbstractEnumerator<E> {
         return value.isPresent();
     }
     @Override
-    protected E internalNext() {
-        final E result = value.get();
+    protected void internalNext(Out<E> value) {
+        value.setValue(this.value);
         if (cachedSource.hasNext()) {
-            value.set(cachedSource.next());
+            this.value.set(cachedSource.next());
         } else {
-            value.clear();
+            this.value.clear();
         }
-        return result;
     }
     @Override
     protected void cleanup() {

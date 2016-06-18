@@ -32,8 +32,8 @@ package enumj;
  */
 final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    private E    value;
-    private long size;
+    private final InOut<E> value;
+    private       long     size;
 
     /**
      * Constructs a {@code LimitPipeProcessor} instance.
@@ -46,13 +46,14 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     public LimitPipeProcessor(long maxSize) {
         super(false, true);
         Checks.ensureNonNegative(maxSize, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        this.value = new InOut<>();
         this.size = maxSize;
     }
 
     @Override
-    public void processInputValue(Value<E> value) {
+    public void processInputValue(In<E> value) {
         if (size > 0) {
-            this.value = value.get();
+            this.value.setValue(value);
         }
     }
     @Override
@@ -60,13 +61,10 @@ final class LimitPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         return size > 0;
     }
     @Override
-    protected E retrieveOutputValue() {
+    public void getOutputValue(Out<E> value) {
         --size;
-        return value;
-    }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
+        value.setValue(this.value);
+        this.value.clear();
     }
     @Override
     public boolean isInactive() {

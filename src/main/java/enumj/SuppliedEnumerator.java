@@ -59,10 +59,9 @@ final class SuppliedEnumerator<E> extends AbstractEnumerator<E> {
         return value.isPresent();
     }
     @Override
-    protected E internalNext() {
-        final E val = value.get();
-        value = null;
-        return val;
+    protected void internalNext(Out<E> value) {
+        value.set(this.value.get());
+        this.value = null;
     }
     @Override
     protected void cleanup() {

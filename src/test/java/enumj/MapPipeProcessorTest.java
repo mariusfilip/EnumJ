@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.Function;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,7 +46,8 @@ public class MapPipeProcessorTest {
 
     @Before
     public void setUp() {
-        processor = new MapPipeProcessor<>(x -> x+1);
+        final Function<Integer,Integer> inc = x -> x+1;
+        processor = new MapPipeProcessor<>(new ValueFunction(inc));
     }
 
     MapPipeProcessor<Integer,Integer> processor;
@@ -58,22 +60,24 @@ public class MapPipeProcessorTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.processInputValue(new Out(1));
+        processor.processInputValue(new InOut(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.processInputValue(new Out(1));
+        processor.processInputValue(new InOut(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(new Out(1));
-        assertEquals(2, processor.getOutputValue().intValue());
+        processor.processInputValue(new InOut(1));
+        final Out<Integer> out = new InOut();
+        processor.getOutputValue(out);
+        assertEquals(2, out.getInt());
     }
 
     @Test

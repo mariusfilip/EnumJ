@@ -50,7 +50,7 @@ final class GenericPipeSource<E> extends PipeSource<E> {
     }
     
     @Override
-    protected final void internalYieldNext(Value<? super E> value) {
+    protected final void internalYieldNext(Out<? super E> value) {
         value.set(super.next());
     }
 

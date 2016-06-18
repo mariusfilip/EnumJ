@@ -48,7 +48,7 @@ final class PrimitiveArrayEnumerator {
             return index < source.length;
         }
         @Override
-        protected int safeNextInt() {
+        protected int internalNextInt() {
             return source[index++];
         }
         @Override
@@ -80,7 +80,7 @@ final class PrimitiveArrayEnumerator {
             return index < source.length;
         }
         @Override
-        protected long safeNextLong() {
+        protected long internalNextLong() {
             return source[index++];
         }
         @Override
@@ -112,7 +112,7 @@ final class PrimitiveArrayEnumerator {
             return index < source.length;
         }
         @Override
-        protected double safeNextDouble() {
+        protected double internalNextDouble() {
             return source[index++];
         }
         @Override

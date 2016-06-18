@@ -26,141 +26,149 @@ package enumj;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class Value<T> {
-
-    private T       value;
-    private boolean isPresent;    
-    private int     intValue;    private boolean intIsPresent;
-    private long    longValue;   private boolean longIsPresent;
-    private double  doubleValue; private boolean doubleIsPresent;
-
-    protected Value() {}
-    protected Value(T value) {
-        this.value = value;
-        this.isPresent = true;
-    }
-    protected Value(int value) {
-        this.intValue = value;
-        this.isPresent = this.intIsPresent = true;
-    }
-    protected Value(long value) {
-        this.longValue = value;
-        this.isPresent = this.longIsPresent = true;
-    }
-    protected Value(double value) {
-        this.doubleValue = value;
-        this.isPresent = this.doubleIsPresent = true;
-    }
-    protected Value(Value<? extends T> value) {
-        if (value.intIsPresent()) {
-            setInt(value.getInt());
-        } else if (value.longIsPresent()) {
-            setLong(value.getLong());
-        } else if (value.doubleIsPresent()) {
-            setDouble(value.getDouble());
-        } else if (value.isPresent()) {
-            set(value.get());
-        }
+interface Value<T> {
+    
+    public enum Type {
+        GENERIC,
+        INT,
+        LONG,
+        DOUBLE,
+        NONE
     }
     
-    public boolean isPresent() { return isPresent; }
-    public boolean intIsPresent() { return intIsPresent; }
-    public boolean longIsPresent() { return longIsPresent; }
-    public boolean doubleIsPresent() { return doubleIsPresent; }
+    public boolean isPresent();
+    public boolean intIsPresent();
+    public boolean longIsPresent();
+    public boolean doubleIsPresent();
 
-    public final T get() {
-        if (!isPresent) {
+    public T get() throws NoSuchElementException;
+    public int getInt() throws NoSuchElementException;
+    public long getLong() throws NoSuchElementException;
+    public double getDouble() throws NoSuchElementException;
+    
+    public void set(T value);
+    public void setInt(int value);
+    public void setLong(long value);
+    public void setDouble(double value);
+    public void setValue(Value<? extends T> value);
+    
+    public Type getType();
+    public void clear();
+}
+
+final class SingleValue<T> implements Value<T> {
+
+    private T       value;
+    private int     intValue;
+    private long    longValue;
+    private double  doubleValue;
+    private Type    type;
+
+    public SingleValue() { clear(); }
+    public SingleValue(T value) { set(value); }
+    public SingleValue(int value) { setInt(value); }
+    public SingleValue(long value) { setLong(value); }
+    public SingleValue(double value) { setDouble(value); }
+    public SingleValue(SingleValue<? extends T> value) { setValue(value); }
+    
+    @Override public boolean isPresent() { return type != Type.NONE; }
+    @Override public boolean intIsPresent() { return type == Type.INT; }
+    @Override public boolean longIsPresent() { return type == Type.LONG; }
+    @Override public boolean doubleIsPresent() { return type == Type.DOUBLE; }
+
+    @Override public T get() throws NoSuchElementException {
+        if (type == Type.NONE) {
             throw new NoSuchElementException();
         }
         return value = castIf();
     }
-    private T castIf() {
-        if (value != null) { return value; }
-        if (intIsPresent && value == null) {
-            final Integer i = intValue;
-            return (T)(Object)i;
-        }
-        if (longIsPresent && value == null) {
-            final Long l = longValue;
-            return (T)(Object)l;
-        }
-        if (doubleIsPresent && value == null) {
-            final Double d = doubleValue;
-            return (T)(Object)d;
-        }
-        return value;
-    }
-    public final int getInt() {
-        if (!intIsPresent) {
+    @Override public int getInt()  throws NoSuchElementException {
+        if (type != Type.INT) {
             throw new NoSuchElementException();
         }
         return intValue;
     }
-    public final long getLong() {
-        if (!longIsPresent) {
+    @Override public long getLong()  throws NoSuchElementException {
+        if (type != Type.LONG) {
             throw new NoSuchElementException();
         }
         return longValue;
     }
-    public final double getDouble() {
-        if (!doubleIsPresent) {
+    @Override public double getDouble()  throws NoSuchElementException {
+        if (type != Type.DOUBLE) {
             throw new NoSuchElementException();
         }
         return doubleValue;
     }
 
-    public final void set(T elem) {
+    @Override public void set(T elem) {
         this.value = elem;
-        this.isPresent = true;
-        this.intIsPresent = false;
-        this.longIsPresent = false;
-        this.doubleIsPresent = false;
+        this.type = Type.GENERIC;
     }
-    public final void setInt(int elem) {
+    @Override public void setInt(int elem) {
         this.intValue = elem;
-        this.isPresent = this.intIsPresent = true;
+        this.type = Type.INT;
         this.value = null;
-        this.longIsPresent = false;
-        this.doubleIsPresent = false;
     }
-    public final void setLong(long elem) {
+    @Override public void setLong(long elem) {
         this.longValue = elem;
-        this.isPresent = this.longIsPresent = true;
+        this.type = Type.LONG;
         this.value = null;
-        this.intIsPresent = false;
-        this.doubleIsPresent = false;
     }
-    public final void setDouble(double elem) {
+    @Override public void setDouble(double elem) {
         this.doubleValue = elem;
-        this.isPresent = this.doubleIsPresent = true;
+        this.type = Type.DOUBLE;
         this.value = null;
-        this.intIsPresent = false;
-        this.longIsPresent = false;
+    }
+    @Override public void setValue(Value<? extends T> elem) {
+        switch(elem.getType()) {
+            case GENERIC: set(elem.get()); break;
+            case INT: setInt(elem.getInt()); break;
+            case LONG: setLong(elem.getLong()); break;
+            case DOUBLE: setDouble(elem.getDouble()); break;
+            case NONE: clear();
+            default:
+                throw new IllegalArgumentException(
+                        "Illegal value type: " + elem.getType());
+        }
     }
 
-    public final void clear() {
+    @Override public Type getType() { return type; }
+    @Override public void clear() {
         value = null;
-        isPresent = false;
-        intIsPresent = false;
-        longIsPresent = false;
-        doubleIsPresent = false;
+        type = Type.NONE;
     }
     
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return Objects.hash(isPresent(), isPresent() ? get(): null);
     }
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
         if (this == obj) { return true; }
-        if (!(obj instanceof Value)) { return false; }
+        if (!(obj instanceof SingleValue)) { return false; }
 
-        Value other = (Value)obj;
+        SingleValue other = (SingleValue)obj;
         if (this.isPresent() != other.isPresent()) { return false; }
-        if (this.isPresent() &&
-            !Objects.equals(this.get(), other.get())) { return false; }
-        return this.intIsPresent == other.intIsPresent
-               && this.longIsPresent == other.longIsPresent
-               && this.doubleIsPresent == other.doubleIsPresent;
+        return !this.isPresent() && Objects.equals(this.get(), other.get());
+    }
+
+    private T castIf() {
+        if (value != null) { return value; }
+        switch(type) {
+            case GENERIC: return value;
+            case INT:
+                final Integer i = intValue;
+                return (T)(Object)i;
+            case LONG:
+                final Long l = longValue;
+                return (T)(Object)l;
+            case DOUBLE:
+                final Double d = doubleValue;
+                return (T)(Object)d;
+            case NONE:
+                throw new UnsupportedOperationException("Logic error");
+            default:
+                throw new UnsupportedOperationException(
+                        "Unsupported value type: " + type);
+        }
     }
 }

@@ -32,8 +32,8 @@ package enumj;
  */
 final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    private E    value;
-    private long n;
+    private final InOut<E> value;
+    private       long     n;
 
     /**
      * Constructs a {@code SkipPipeProcessor} that skips over {@code n}
@@ -47,13 +47,14 @@ final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     public SkipPipeProcessor(long n) {
         super(true, true);
         Checks.ensureNonNegative(n, Messages.NEGATIVE_ENUMERATOR_SIZE);
+        this.value = new InOut<>();
         this.n = n;
     }
 
     @Override
-    public void processInputValue(Value<E> value) {
+    public void processInputValue(In<E> value) {
         if (n == 0) {
-            this.value = value.get();
+            this.value.setValue(value);
         }
     }
     @Override
@@ -65,12 +66,9 @@ final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
         return false;
     }
     @Override
-    protected E retrieveOutputValue() {
-        return value;
-    }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
+    public void getOutputValue(Out<E> value) {
+        value.setValue(this.value);
+        this.value.clear();
     }
     @Override
     public boolean isInactive() {

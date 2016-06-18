@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.mutable.MutableLong;
 
 /**
@@ -49,10 +50,11 @@ final class Reversible {
      */
     public static <E> Enumerator<E> distinct(Enumerator<E> source,
                                              boolean       reversed) {
-        final Set<E> existing = new HashSet<E>(256);
+        final Set<E> existing = new HashSet<>(256);
         if (reversed) {
             final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedFilter(e -> existing.add((E)e));
+            final Predicate<E> pred = existing::add;
+            return pipe.reversedFilter(new ValuePredicate(pred));
         }
         return source.filter(existing::add);
     }
@@ -82,7 +84,7 @@ final class Reversible {
         };
         if (reversed) {
             final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(fun);
+            return pipe.reversedMap(new ValueFunction(fun));
         }
         return source.map(fun);
     }
@@ -109,7 +111,7 @@ final class Reversible {
         };
         if (reversed) {
             final PipeEnumerator pipe = (PipeEnumerator)source;
-            return pipe.reversedMap(actionMapper);
+            return pipe.reversedMap(new ValueFunction(actionMapper));
         }
         return source.map(actionMapper);
     }

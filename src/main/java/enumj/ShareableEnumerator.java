@@ -102,8 +102,8 @@ public class ShareableEnumerator<E> extends AbstractEnumerator<E> {
         return direct.hasNext();
     }
     @Override
-    protected E internalNext() {
-        return direct.next();
+    protected void internalNext(Out<E> value) {
+        value.set(direct.next());
     }
     @Override
     protected void cleanup() {

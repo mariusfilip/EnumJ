@@ -200,7 +200,8 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             Predicate<? super E> predicate) {
         return of(enumerable,
-                  in -> ((PipeEnumerator)in).reversedFilter(predicate),
+                  in -> ((PipeEnumerator)in).reversedFilter(
+                          new ValuePredicate(predicate)),
                   () -> false);
     }
 
@@ -217,11 +218,12 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
      * @see Iterable
      */
     public static <E,R> Enumerable<R> flatMap(
-            Enumerable<E> enumerable,
+            Enumerable<E>                                        enumerable,
             Function<? super E, ? extends Iterable<? extends R>> mapper) {
         return of(enumerable,
                   in -> ((PipeEnumerator)in).reversedFlatMap(
-                          e -> mapper.apply((E)e).iterator()),
+                          e -> mapper.apply((E)e).iterator(),
+                          Value.Type.GENERIC),
                   () -> false);
     }
 
@@ -276,7 +278,8 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
             Enumerable<E> enumerable,
             Function<? super E, ? extends R> mapper) {
         return of(enumerable,
-                  in -> ((PipeEnumerator)in).reversedMap(mapper),
+                  in -> ((PipeEnumerator)in).reversedMap(
+                                                 new ValueFunction(mapper)),
                   () -> false);
     }
 

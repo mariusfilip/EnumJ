@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.IntPredicate;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,7 +46,8 @@ public class WhilePipeProcessorTest {
 
     @Before
     public void setUp() {
-        processor = new WhilePipeProcessor<>(i -> i > 0);
+        final IntPredicate pred = i -> i > 0;
+        processor = new WhilePipeProcessor<>(new ValuePredicate(pred));
     }
 
     WhilePipeProcessor<Integer> processor;
@@ -58,14 +60,14 @@ public class WhilePipeProcessorTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        processor.processInputValue(new Out(1));
+        processor.processInputValue(new InOut(1));
         assertTrue(processor.hasOutputValue());
     }
 
     @Test
     public void testHasValue() {
         System.out.println("hasValue");
-        processor.processInputValue(new Out(-1));
+        processor.processInputValue(new InOut(-1));
         assertFalse(processor.hasOutputValue());
         assertFalse(processor.hasOutputValue());
     }
@@ -73,8 +75,10 @@ public class WhilePipeProcessorTest {
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(new Out(1));
-        assertEquals(1, processor.getOutputValue().intValue());
+        processor.processInputValue(new InOut(1));
+        final Out<Integer> out = new InOut();
+        processor.getOutputValue(out);
+        assertEquals(1, out.getInt());
     }
 
     @Test

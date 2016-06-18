@@ -87,10 +87,9 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
         return false;
     }
     @Override
-    protected E internalNext() {
-        final E result = element.get();
+    protected void internalNext(Out<E> value) {
+        value.setValue(element);
         element.clear();
-        return result;
     }
     @Override
     protected void cleanup() {

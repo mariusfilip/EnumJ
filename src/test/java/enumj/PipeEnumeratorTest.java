@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.IntUnaryOperator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -85,7 +86,8 @@ public class PipeEnumeratorTest {
         assertNotNull(pipe.flatMap(x -> Enumerator.on(x)));
         final ThrowingFirstPipeEnumerator<Integer> throwEn =
                 new ThrowingFirstPipeEnumerator<>(pipe);
-        assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x)));
+        assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x),
+                                              Value.Type.GENERIC));
     }
 
     @Test(expected=IllegalStateException.class)
@@ -94,7 +96,8 @@ public class PipeEnumeratorTest {
         assertNotNull(pipe.flatMap(x -> Enumerator.on(x)));
         final ThrowingMultiFirstPipeEnumerator<Integer> throwEn =
                 new ThrowingMultiFirstPipeEnumerator<>(pipe);
-        assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x)));
+        assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x),
+                                              Value.Type.GENERIC));
     }
 
     class ThrowingMultiLastPipeEnumerator<E> extends PipeEnumerator<E> {
@@ -149,10 +152,10 @@ public class PipeEnumeratorTest {
                        .elementsEqual(Enumerator.rangeInt(-2, 3)));
     }
 
-    class FailingMultiPipeProcessor<In,Out>
-          extends AbstractPipeMultiProcessor<In,Out> {
-        private Out value;
-        private boolean inactive;
+    class FailingMultiPipeProcessor<TIn,TOut>
+          extends AbstractPipeMultiProcessor<TIn,TOut> {
+        private Out<TOut> value;
+        private boolean   inactive;
 
         FailingMultiPipeProcessor() {
             super(true,true);
@@ -163,21 +166,16 @@ public class PipeEnumeratorTest {
             return value == null;
         }
         @Override
-        public void processInputValue(Value<In> value) {
-            this.value = (Out)value.get();
+        public void processInputValue(In<TIn> value) {
+            this.value.setValue(value.castOut());
         }
         @Override
         public boolean hasOutputValue() {
-            return value != null;
+            return this.value.isPresent();
         }
         @Override
-        protected Out retrieveOutputValue() {
-            return value;
-        }
-        @Override
-        protected void clearOutputValue() {
-            value = null;
-            inactive = true;
+        public void getOutputValue(Out<TOut> value) {
+            value.setValue(this.value);
         }
         @Override
         public boolean isInactive() {
@@ -330,8 +328,8 @@ public class PipeEnumeratorTest {
                 .reversedFlatMap(x -> {
                     final Integer y = (Integer)x;
                     return Enumerator.on(y, y+1);
-                })
-                .reversedFlatMap(x -> Enumerator.on(x));
+                }, Value.Type.GENERIC)
+                .reversedFlatMap(x -> Enumerator.on(x), Value.Type.GENERIC);
         assertTrue(pipe.elementsEqual(
                 Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
@@ -341,14 +339,14 @@ public class PipeEnumeratorTest {
         System.out.println("reversedMap");
         source = Enumerator.on(1, 3, 5);
         pipe = PipeEnumerator.of(source)
-                .reversedMap(x -> x)
+                .reversedMap(new ValueFunction(IntUnaryOperator.identity()))
                 .reversedFlatMap(x -> {
                     final Integer y = (Integer)x;
                     return Enumerator.on(y, y+1);
-                })
-                .reversedMap(x -> x)
-                .reversedFlatMap(x -> Enumerator.on(x))
-                .reversedMap(x -> x);
+                }, Value.Type.GENERIC)
+                .reversedMap(new ValueFunction(IntUnaryOperator.identity()))
+                .reversedFlatMap(x -> Enumerator.on(x), Value.Type.GENERIC)
+                .reversedMap(new ValueFunction(IntUnaryOperator.identity()));
         assertTrue(pipe.elementsEqual(
                 Enumerator.on(1, 2, 3, 4, 5, 6)));
     }

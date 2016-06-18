@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.Function;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,10 +46,12 @@ public class FlatMapPipeProcessorTest {
 
     @Before
     public void setUp() {
-        processor0 = new FlatMapPipeProcessor<>(x -> Enumerator.empty());
-        processor1 = new FlatMapPipeProcessor<>(x -> null);
-        processor = new FlatMapPipeProcessor<>(x -> 
-                Enumerator.on(x, x+1, x+2));
+        processor0 = new FlatMapPipeProcessor<>(
+                x -> Enumerator.empty(), Value.Type.GENERIC);
+        processor1 = new FlatMapPipeProcessor<>(x -> null, Value.Type.GENERIC);
+        processor = new FlatMapPipeProcessor<>(
+                x -> Enumerator.on(x, x+1, x+2),
+                Value.Type.GENERIC);
     }
 
     FlatMapPipeProcessor<Integer,Integer> processor0;
@@ -70,11 +73,11 @@ public class FlatMapPipeProcessorTest {
     @Test
     public void testProcessInputValue() {
         System.out.println("process");
-        processor0.processInputValue(new Out(0));
+        processor0.processInputValue(new InOut(0));
         assertFalse(processor0.hasOutputValue());
-        processor1.processInputValue(new Out(1));
+        processor1.processInputValue(new InOut(1));
         assertFalse(processor1.hasOutputValue());
-        processor.processInputValue(new Out(1));
+        processor.processInputValue(new InOut(1));
         assertTrue(processor.hasOutputValue());
     }
 
@@ -89,10 +92,14 @@ public class FlatMapPipeProcessorTest {
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        processor.processInputValue(new Out(1));
-        assertEquals(1, processor.getOutputValue().intValue());
-        assertEquals(2, processor.getOutputValue().intValue());
-        assertEquals(3, processor.getOutputValue().intValue());
+        processor.processInputValue(new InOut(1));
+        final Out<Integer> out = new InOut();
+        processor.getOutputValue(out);
+        assertEquals(1, out.getInt());
+        processor.getOutputValue(out);
+        assertEquals(2, out.getInt());
+        processor.getOutputValue(out);
+        assertEquals(3, out.getInt());
     }
 
     @Test

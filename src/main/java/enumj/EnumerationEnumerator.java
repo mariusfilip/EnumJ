@@ -56,8 +56,8 @@ final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
         return source.hasMoreElements();
     }
     @Override
-    protected E internalNext() {
-        return source.nextElement();
+    protected void internalNext(Out<E> value) {
+        value.set(source.nextElement());
     }
     @Override
     protected void cleanup() {

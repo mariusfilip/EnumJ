@@ -58,8 +58,8 @@ final class LazyEnumerator<E> extends AbstractEnumerator<E> {
         return iterator.hasNext();
     }
     @Override
-    protected E internalNext() {
-        return iterator.next();
+    protected void internalNext(Out<E> value) {
+        value.set(iterator.next());
     }
     @Override
     protected void cleanup() {

@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.IntUnaryOperator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -97,19 +98,21 @@ public class AbstractPipeProcessorTest {
     @Test
     public void testPushFrontMap() {
         System.out.println("pushFrontMap");
-        assertFalse(processor.pushFrontMap((Object x) -> (String)x));
+        assertFalse(processor.pushFrontMap(
+                new ValueFunction((Object x) -> (String)x)));
     }
 
     @Test
     public void testEnqueueMap() {
         System.out.println("enqueueMap");
-        assertFalse(processor.enqueueMap(x -> x));
+        assertFalse(processor.enqueueMap(
+                new ValueFunction(IntUnaryOperator.identity())));
     }
 
     @Test
     public void testProcessInputValue() {
         System.out.println("processInputValue");
-        processor.processInputValue(new Out("titi"));
+        processor.processInputValue(new InOut("titi"));
         assertTrue(processor.hasOutputValue());
     }
 
@@ -121,24 +124,11 @@ public class AbstractPipeProcessorTest {
 
     @Test
     public void testGetOutputValue() {
-        System.out.println("getOutputValue");
-        processor.processInputValue(new Out("titi"));
-        assertEquals("titi", processor.getOutputValue());
-    }
-
-    @Test
-    public void testRetrieveOutputValue() {
         System.out.println("retrieveOutputValue");
-        processor.processInputValue(new Out("titi"));
-        assertEquals("titi", processor.retrieveOutputValue());
-    }
-
-    @Test
-    public void testClearOutputValue() {
-        System.out.println("clearOutputValue");
-        processor.processInputValue(new Out("titi"));
-        processor.clearOutputValue();
-        assertFalse(processor.hasOutputValue());
+        processor.processInputValue(new InOut("titi"));
+        final Out<String> out = new InOut();
+        processor.getOutputValue(out);
+        assertEquals("titi", out.get());
     }
 
     @Test
@@ -147,8 +137,7 @@ public class AbstractPipeProcessorTest {
         assertFalse(processor.isInactive());
     }
 
-    public class AbstractPipeProcessorImpl<T>
-                 extends AbstractPipeProcessor<T,T> {
+    class AbstractPipeProcessorImpl<T> extends AbstractPipeProcessor<T,T> {
 
         private T value;
 
@@ -156,20 +145,16 @@ public class AbstractPipeProcessorTest {
             super(false, false);
         }
 
-        public void processInputValue(Value<T> value) {
+        @Override public void processInputValue(In<T> value) {
             this.value = value.get();
         }
 
-        public boolean hasOutputValue() {
+        @Override public boolean hasOutputValue() {
             return value != null;
         }
 
-        public T retrieveOutputValue() {
-            return value;
-        }
-
-        public void clearOutputValue() {
-            value = null;
+        @Override public void getOutputValue(Out<T> out) {
+            out.set(value);
         }
 
         public boolean isInactive() {

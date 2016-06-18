@@ -23,6 +23,10 @@
  */
 package enumj;
 
+import java.util.function.DoublePredicate;
+import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -35,45 +39,53 @@ import java.util.function.Predicate;
  */
 class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
-    private E            value;
-    private Predicate<E> filter;
-
-    /**
-     * Constructs a {@code SkipWhilePipeProcessor} that skips enumerated
-     * elements as long as the given {@code filter} holds {@code true}.
-     * <p>
-     * The new {@link SkipWhilePipeProcessor} stores its {@code filter}
-     * internally.
-     * </p>
-     * @param filter {@link Predicate} filtering skipped elements.
-     */
+    private final InOut<E>          value;
+    private final ValuePredicate<E> filter;
+    
+    private static final Function<Predicate,ValuePredicate>
+            GENERIC_MAPPER = dp -> new ValuePredicate(dp);
+    private static final Function<IntPredicate,ValuePredicate>
+            INT_MAPPER     = dp -> new ValuePredicate(dp);
+    private static final Function<LongPredicate,ValuePredicate>
+            LONG_MAPPER    = dp -> new ValuePredicate(dp);
+    private static final Function<DoublePredicate,ValuePredicate>
+            DOUBLE_MAPPER  = dp -> new ValuePredicate(dp);
     public SkipWhilePipeProcessor(Predicate<E> filter) {
-        super(true, true);
+        this(filter, GENERIC_MAPPER);
+    }
+    public SkipWhilePipeProcessor(IntPredicate filter) {
+        this(filter, INT_MAPPER);
+    }
+    public SkipWhilePipeProcessor(LongPredicate filter) {
+        this(filter, LONG_MAPPER);
+    }
+    public SkipWhilePipeProcessor(DoublePredicate filter) {
+        this(filter, DOUBLE_MAPPER);
+    }
+    private <U> SkipWhilePipeProcessor(U                          filter,
+                                       Function<U,ValuePredicate> getter) {
+        super(false, true);
         Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
-        this.filter = filter;
+        this.value = new InOut<>();
+        this.filter = getter.apply(filter);
     }
 
     @Override
-    public void processInputValue(Value<E> value) {
-        if (this.filter == null) {
-            this.value = value.get();
-        }
-        else if(!this.filter.test(value.get())) {
-            this.value = value.get();
-            this.filter = null;
+    public void processInputValue(In<E> value) {
+        if (this.filter.cleared()) {
+            this.value.setValue(value);
+        } else if(!this.filter.test(value)) {
+            this.value.setValue(value);
+            this.filter.clear();
         }
     }
     @Override
     public boolean hasOutputValue() {
-        return filter == null;
+        return filter.cleared();
     }
     @Override
-    protected E retrieveOutputValue() {
-        return value;
-    }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
+    public void getOutputValue(Out<E> value) {
+        value.setValue(this.value);
     }
     @Override
     public boolean isInactive() {

@@ -61,7 +61,7 @@ final class ZipPipeProcessor<E>
     }
 
     @Override
-    public void processInputValue(Value<Optional<E>> value) {
+    public void processInputValue(In<Optional<E>> value) {
         final Optional[] tuple = new Optional[1+iterators.length];
         final Optional<E> val = value.get();
         tuple[0] = val;
@@ -84,12 +84,9 @@ final class ZipPipeProcessor<E>
         return value != null;
     }
     @Override
-    protected Optional<E>[] retrieveOutputValue() {
-        return value;
-    }
-    @Override
-    protected void clearOutputValue() {
-        value = null;
+    public void getOutputValue(Out<Optional<E>[]> value) {
+        value.set(this.value);
+        this.value = null;
     }
     @Override
     public boolean isInactive() {

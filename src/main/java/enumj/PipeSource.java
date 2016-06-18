@@ -39,8 +39,8 @@ abstract class PipeSource<E> extends IteratorEnumerator<E> {
         if (firstProcessor == null) { firstProcessor = processor; }
     }
     
-    public final void yieldNext(Value<? super E> value) {
+    public final void yieldNext(Out<? super E> value) {
         internalYieldNext(value);
     }
-    protected abstract void internalYieldNext(Value<? super E> value);
+    protected abstract void internalYieldNext(Out<? super E> value);
 }

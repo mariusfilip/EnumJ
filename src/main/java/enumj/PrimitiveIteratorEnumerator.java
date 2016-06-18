@@ -41,7 +41,7 @@ final class PrimitiveIteratorEnumerator {
         @Override
         protected final boolean internalHasNext() { return source.hasNext(); }
         @Override
-        protected final int     safeNextInt() { return source.nextInt(); }
+        protected final int     internalNextInt() { return source.nextInt(); }
         @Override
         protected final void    cleanup() { source = null; }
     }
@@ -59,7 +59,7 @@ final class PrimitiveIteratorEnumerator {
         @Override
         protected boolean internalHasNext() { return source.hasNext(); }
         @Override
-        protected int     safeNextInt() { return source.next(); }
+        protected int     internalNextInt() { return source.next(); }
         @Override
         protected void    cleanup() { source = null; }
     }
@@ -79,7 +79,7 @@ final class PrimitiveIteratorEnumerator {
             return source.hasNext();
         }
         @Override
-        protected long safeNextLong() {
+        protected long internalNextLong() {
             return source.nextLong();
         }
         @Override
@@ -103,7 +103,7 @@ final class PrimitiveIteratorEnumerator {
             return source.hasNext();
         }
         @Override
-        protected double safeNextDouble() {
+        protected double internalNextDouble() {
             return source.nextDouble();
         }
         @Override

@@ -63,8 +63,8 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
         return source.hasNext();
     }
     @Override
-    protected final E internalNext() {
-        return source.next();
+    protected final void internalNext(Out<E> value) {
+        value.set(source.next());
     }
     @Override
     protected final void cleanup() {

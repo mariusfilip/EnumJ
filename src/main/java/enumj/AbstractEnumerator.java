@@ -43,6 +43,8 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     private boolean hasNextHasBeenCalled;
     private boolean hasNextHasThrown;
     private boolean done;
+    
+    private final InOut<E> value;
 
     /**
      * Constructs a new {@code AbstractEnumerator} instance.
@@ -54,7 +56,7 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
      * @see #enumerating
      */
     protected AbstractEnumerator() {
-        // do nothing
+        this.value = new InOut<>();
     }
 
     @Override
@@ -86,7 +88,8 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
             throw new NoSuchElementException();
         }
         try {
-            return internalNext();
+            internalNext(value);
+            return value.get();
         } finally {
             hasNextHasBeenCalled = false;
         }
@@ -103,6 +106,7 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
     }
     private void safeCleanup() {
         try {
+            value.clear();
             cleanup();
         } catch(Throwable err) {
             hasNextHasThrown = true;
@@ -127,9 +131,9 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
      * <p>
      * This method is the internal counterpart of {@link #hasNext()}
      * </p>
-     * @return next enumerated element.
+     * @param value instance of {@link Out} storing the next value.
      */
-    protected abstract E internalNext();
+    protected abstract void internalNext(Out<E> value);
     /**
      * Cleans up the internals of the current enumerator when enumeration
      * ends.

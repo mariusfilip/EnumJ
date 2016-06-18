@@ -56,10 +56,9 @@ final class CacheEnumerator<E> extends AbstractEnumerator<E> {
         return cached.isPresent();
     }
     @Override
-    protected E internalNext() {
-        final E result = cached.get().getElement();
+    protected void internalNext(Out<E> value) {
+        value.set(cached.get().getElement());
         cached = cached.get().getNextWrapper();
-        return result;
     }
     @Override
     protected void cleanup() {

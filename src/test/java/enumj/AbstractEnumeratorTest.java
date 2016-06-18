@@ -77,7 +77,9 @@ public class AbstractEnumeratorTest {
         enumerator.value = "value";
         assertTrue(enumerator.hasNext());
         assertNotNull(enumerator.next());
-        assertSame(enumerator.next(), enumerator.internalNext());
+        final Out<String> out = new InOut<>();
+        enumerator.internalNext(out);
+        assertSame(enumerator.next(), out.get());
     }
 
     @Test
@@ -99,7 +101,9 @@ public class AbstractEnumeratorTest {
         System.out.println("internalNext");
         enumerator.hasNext = true;
         enumerator.value = "value";
-        assertEquals("value", enumerator.internalNext());
+        final Out<String> out = new InOut();
+        enumerator.internalNext(out);
+        assertEquals("value", out.get());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -109,10 +113,10 @@ public class AbstractEnumeratorTest {
         assertFalse(enumerator.hasNext());
     }
 
-    public class AbstractEnumeratorImpl<E> extends AbstractEnumerator {
+    public class AbstractEnumeratorImpl<E> extends AbstractEnumerator<E> {
 
         public boolean hasNext;
-        public E value;
+        public E       value;
         public boolean cleanupThrow;
 
         @Override
@@ -121,8 +125,8 @@ public class AbstractEnumeratorTest {
         }
 
         @Override
-        protected E internalNext() {
-            return value;
+        protected void internalNext(Out<E> value) {
+            value.set(this.value);
         }
         
         @Override

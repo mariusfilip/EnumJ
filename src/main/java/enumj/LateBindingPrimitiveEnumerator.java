@@ -36,7 +36,7 @@ public final class LateBindingPrimitiveEnumerator {
             return source.hasNext();
         }
         @Override
-        protected int safeNextInt() {
+        protected int internalNextInt() {
             Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
             return source.nextInt();
         }

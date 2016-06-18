@@ -23,7 +23,10 @@
  */
 package enumj;
 
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
 import java.util.function.Predicate;
 
 /**
@@ -75,7 +78,6 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see AbstractPipeProcessor
      */
     private AbstractPipeProcessor<? super R,?> next;
-    private boolean                            nextReset;
     /**
      * The {@code PipeSource} instance whose elements this processor processes.
      *
@@ -104,19 +106,12 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #getNext()
      */
     public final void setNext(AbstractPipeProcessor<? super R,?> next) {
-        if (this.next == null && !nextReset) {
+        if (this.next == null) {
             this.next = next;
         } else {
             throw new UnsupportedOperationException();
         }
     }
-    public final void detachNext() {
-        if (next != null) {
-            next.detachPrevious();
-            next = null;
-        }
-    }
-    protected void detachPrevious() {};
 
     /**
      * Gets the value of {@code AbstractPipeProcessor.source}.
@@ -160,7 +155,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of mappers, false
      * otherwise.
      */
-    public <U> boolean pushFrontMap(Function<U,? extends T> mapper) {
+    public <U> boolean pushFrontMap(ValueFunction<U,? extends T> mapper) {
         return false;
     }
     /**
@@ -176,7 +171,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of mappers, false
      * otherwise.
      */
-    public <U> boolean enqueueMap(Function<? super R,U> mapper) {
+    public <U> boolean enqueueMap(ValueFunction<? super R,U> mapper) {
         return false;
     }
     /**
@@ -192,7 +187,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of predicates, false
      * otherwise.
      */
-    public <U> boolean pushFrontFilter(Predicate<U> predicate) {
+    public boolean pushFrontFilter(ValuePredicate<? super T> predicate) {
         return false;
     }
     /**
@@ -207,7 +202,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @return true on successful aggregation of predicates, false
      * otherwise.
      */
-    public boolean enqueueFilter(Predicate<? super R> predicate) {
+    public boolean enqueueFilter(ValuePredicate<? super R> predicate) {
         return false;
     }
 
@@ -223,7 +218,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #hasOutputValue()
      * @see #getOutputValue()
      */
-    public abstract void    processInputValue(Value<T> value);
+    public abstract void    processInputValue(In<T> value);
     /**
      * Gets whether processing was successful and the processor has a value
      * to yield.
@@ -249,33 +244,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #retrieveOutputValue()
      * @see #clearOutputValue()
      */
-    public final R getOutputValue() {
-        final R result = retrieveOutputValue();
-        clearOutputValue();
-        return result;
-    }
-    public final void yieldOutputValue(Value<? super R> value) {
-        value.set(retrieveOutputValue());
-        clearOutputValue();
-    }
-    
-    /**
-     * Retrieves the processed result produced by
-     * {@code AbstractPipeProcessor.processInputValue(Object)}.
-     *
-     * @return Processed result.
-     * @see #getOutputValue()
-     * @see #clearOutputValue()
-     */
-    protected abstract R retrieveOutputValue();
-    /**
-     * Clears the processed result after being returned by
-     * {@code AbstractPipeProcessor.retrieveOutputValue()}.
-     *
-     * @see #getOutputValue()
-     * @see #retrieveOutputValue()
-     */
-    protected abstract void clearOutputValue();
+    public abstract void    getOutputValue(Out<R> value);    
     /**
      * Gets whether the processor does not process any more and the pipeline
      * up to it should be discarded.

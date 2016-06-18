@@ -40,7 +40,7 @@ final class LazyPrimitiveEnumerator {
             return enumerator.hasNext();
         }
         @Override
-        protected int safeNextInt() {
+        protected int internalNextInt() {
             return enumerator.nextInt();
         }
         @Override

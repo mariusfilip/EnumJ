@@ -54,8 +54,8 @@ final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
         return index < source.length;
     }
     @Override
-    protected E internalNext() {
-        return source[index++];
+    protected void internalNext(Out<E> value) {
+        value.set(source[index++]);
     }
     @Override
     protected void cleanup() {

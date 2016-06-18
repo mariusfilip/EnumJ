@@ -37,7 +37,7 @@ final class PrimitivePipeSource {
             this.intSource = source;
         }
         @Override
-        protected void internalYieldNext(Value<? super Integer> value) {
+        protected void internalYieldNext(Out<? super Integer> value) {
             value.setInt(intSource.nextInt());
         }
         @Override

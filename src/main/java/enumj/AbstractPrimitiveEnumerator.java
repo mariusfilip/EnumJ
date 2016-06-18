@@ -23,75 +23,79 @@
  */
 package enumj;
 
-import static enumj.AbstractNumericEnumerator.INT_TYPE;
 import java.util.PrimitiveIterator;
 
 final class AbstractPrimitiveEnumerator {
     static abstract class OfInt
-           extends AbstractNumericEnumerator<Integer>
+           extends AbstractEnumerator<Integer>
            implements PrimitiveEnumerator.OfInt {
-        private int value;
-        protected OfInt() {
-            super(INT_TYPE);
+        private int     value;
+        private boolean boxIt = true;
+        @Override protected final void internalNext(Out<Integer> value) {
+            this.value = internalNextInt();
+            if (boxIt) {
+                value.setInt(this.value);
+            } else {
+                value.clear();
+            }
         }
-        @Override
-        protected final int internalNextInt() { return value = safeNextInt(); }
-        @Override
-        public final int nextInt() {
+        @Override public final int nextInt() {
             boxIt = false;
             try {
                 super.next();
-                return value;
             } finally {
                 boxIt = true;
             }
+            return this.value;
         }
-        protected abstract int safeNextInt();
+        protected abstract int internalNextInt();
     }
     static abstract class OfLong
-           extends AbstractNumericEnumerator<Long>
+           extends AbstractEnumerator<Long>
            implements PrimitiveIterator.OfLong {
-        private long value;
-        protected OfLong() {
-            super(LONG_TYPE);
+        private long    value;
+        private boolean boxIt = true;
+        @Override protected final void internalNext(Out<Long> value) {
+            this.value = internalNextLong();
+            if (boxIt) {
+                value.setLong(this.value);
+            } else {
+                value.clear();
+            }
         }
-        @Override
-        protected final long internalNextLong() {
-            return value = safeNextLong();
-        }
-        @Override
-        public final long nextLong() {
+        @Override public final long nextLong() {
             boxIt = false;
             try {
                 super.next();
-                return value;
             } finally {
                 boxIt = true;
             }
+            return this.value;
         }
-        protected abstract long safeNextLong();
+        protected abstract long internalNextLong();
     }
     static abstract class OfDouble
-           extends AbstractNumericEnumerator<Double>
+           extends AbstractEnumerator<Double>
            implements PrimitiveIterator.OfDouble {
-        private double value;
-        protected OfDouble() {
-            super(DOUBLE_TYPE);
+        private double  value;
+        private boolean boxIt = true;
+        @Override protected final void internalNext(Out<Double> value) {
+            this.value = internalNextDouble();
+            if (boxIt) {
+                value.setDouble(this.value);
+            } else {
+                value.clear();
+            }
         }
-        @Override
-        protected final double internalNextDouble() {
-            return value = nextDouble();
-        }
-        @Override
-        public final double nextDouble() {
+        @Override public final double nextDouble() {
             boxIt = false;
             try {
                 super.next();
-                return value;
             } finally {
                 boxIt = true;
             }
+            return this.value;
         }
-        protected abstract double safeNextDouble();
+        protected abstract double internalNextDouble();
     }
 }

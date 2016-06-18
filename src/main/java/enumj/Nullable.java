@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,14 +40,73 @@ import java.util.function.Supplier;
  * @param <T> type of contained value.
  * @see Optional
  */
-public final class Nullable<T> extends Value<T> {
+public final class Nullable<T> implements Value<T> {
 
-    private Nullable() { super(); }
-    private Nullable(T value) { super(value); }
-    private Nullable(int value) { super(value); }
-    private Nullable(long value) { super(value); }
-    private Nullable(double value) { super(value); }
-    private Nullable(Nullable<? extends T> value) { super(value); }
+    private final SingleValue<T> value;
+
+    private Nullable() {
+        this.value = new SingleValue();
+    }
+    private Nullable(T value) {
+        this.value = new SingleValue(value);
+    }
+    private Nullable(int value) {
+        this.value = new SingleValue(value);
+    }
+    private Nullable(long value) {
+        this.value = new SingleValue(value);
+    }
+    private Nullable(double value) {
+        this.value = new SingleValue(value);
+    }
+    private Nullable(Nullable<? extends T> value) {
+        this.value = new SingleValue(value.value);
+    }
+
+    @Override public boolean isPresent() {
+        return value.isPresent();
+    }
+    @Override public boolean intIsPresent() {
+        return value.intIsPresent();
+    }
+    @Override public boolean longIsPresent() {
+        return value.longIsPresent();
+    }
+    @Override public boolean doubleIsPresent() {
+        return value.doubleIsPresent();
+    }
+
+    @Override public T get() throws NoSuchElementException {
+        return value.get();
+    }
+    @Override public int getInt() throws NoSuchElementException {
+        return value.getInt();
+    }
+    @Override public long getLong() throws NoSuchElementException {
+        return value.getLong();
+    }
+    @Override public double getDouble() throws NoSuchElementException {
+        return value.getDouble();
+    }
+
+    @Override public void set(T value) {
+        this.value.set(value);
+    }
+    @Override public void setInt(int value) {
+        this.value.setInt(value);
+    }
+    @Override public void setLong(long value) {
+        this.value.setLong(value);
+    }
+    @Override public void setDouble(double value) {
+        this.value.setDouble(value);
+    }
+    @Override public void setValue(Value<? extends T> value) {
+        this.value.setValue(value);
+    }
+
+    @Override public Type getType() { return value.getType(); }
+    @Override public void clear() { value.clear(); }
 
     /**
      * Return the value if present, otherwise return {@code other}.
@@ -55,7 +115,7 @@ public final class Nullable<T> extends Value<T> {
      * @return the value, if present, otherwise {@code other}.
      */
     public T orElse(T other) {
-        return super.isPresent() ? super.get() : other;
+        return isPresent() ? get() : other;
     }
 
     /**
@@ -69,7 +129,7 @@ public final class Nullable<T> extends Value<T> {
      * is null.
      */
     public T orElseGet(Supplier<? extends T> other) {
-        return super.isPresent() ? super.get() : other.get();
+        return isPresent() ? get() : other.get();
     }
 
     /**
@@ -84,16 +144,16 @@ public final class Nullable<T> extends Value<T> {
      */
     public <X extends Throwable> T orElseThrow(
             Supplier<? extends X> exceptionSupplier) throws X {
-        if (super.isPresent()) { return super.get(); }
+        if (isPresent()) { return get(); }
         throw exceptionSupplier.get();
     }
 
     // ---------------------------------------------------------------------- //
     @Override
     public String toString() {
-        return super.isPresent()
-                ? (super.get() != null
-                   ? String.format("Facultative[%s]", super.get())
+        return isPresent()
+                ? (get() != null
+                   ? String.format("Facultative[%s]", get())
                    : "Facultative[null]")
                 : "Facultative.empty";
     }
@@ -147,9 +207,7 @@ public final class Nullable<T> extends Value<T> {
      * empty {@code Nullable}.
      */
     public Nullable<T> filter(Predicate<? super T> predicate) {
-        return !super.isPresent() || predicate.test(super.get())
-                ? this
-                : empty();
+        return !isPresent() || predicate.test(get()) ? this : empty();
     }
 
     /**
@@ -165,7 +223,7 @@ public final class Nullable<T> extends Value<T> {
      */
     public <U> Nullable<U> flatMap(
             Function<? super T, Nullable<U>> mapper) {
-        return super.isPresent() ? mapper.apply(super.get()) : empty();
+        return isPresent() ? mapper.apply(get()) : empty();
     }
 
     /**
@@ -174,7 +232,7 @@ public final class Nullable<T> extends Value<T> {
      * @param consumer block to be executed if a value is present.
      */
     public void ifPresent(Consumer<? super T> consumer) {
-        if (super.isPresent()) { consumer.accept(super.get()); }
+        if (isPresent()) { consumer.accept(get()); }
     }
 
     /**
@@ -190,8 +248,6 @@ public final class Nullable<T> extends Value<T> {
      * otherwise an empty {@code Nullable}.
      */
     public <U> Nullable<U> map(Function<? super T, ? extends U> mapper) {
-        return super.isPresent()
-                ? of(mapper.apply(super.get()))
-                : empty();
+        return isPresent() ? of(mapper.apply(get())) : empty();
     }
 }

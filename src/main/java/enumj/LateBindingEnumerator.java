@@ -44,9 +44,9 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
         return source.hasNext();
     }
     @Override
-    protected E internalNext() {
+    protected void internalNext(Out<E> value) {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return source.next();
+        value.set(source.next());
     }
     @Override
     protected void cleanup() {
