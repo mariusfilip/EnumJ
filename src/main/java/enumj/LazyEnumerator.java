@@ -37,6 +37,7 @@ final class LazyEnumerator<E> extends AbstractEnumerator<E> {
 
     private Supplier<Iterator<E>> source;
     private Enumerator<E>         iterator;
+    private Recoverable           iteratorAsRecoverable;
 
     /**
      * Constructs a {@code LazyEnumerator} instance.
@@ -50,19 +51,28 @@ final class LazyEnumerator<E> extends AbstractEnumerator<E> {
         this.source = source;
     }
 
-    @Override
-    protected boolean internalHasNext() {
+    @Override protected boolean internalHasNext() {
         if (iterator == null) {
+            if (source == null) { return false; }
             iterator = Enumerator.of(source.get());
+            if (iterator instanceof Recoverable) {
+                iteratorAsRecoverable = (Recoverable)iterator;
+            }
         }
         return iterator.hasNext();
     }
-    @Override
-    protected void internalNext(Out<E> value) {
+    @Override protected void internalNext(Out<E> value) {
         value.set(iterator.next());
     }
-    @Override
-    protected void cleanup() {
+    @Override protected void internalRecovery(Throwable error) {
+        if (iteratorAsRecoverable != null) {
+            iteratorAsRecoverable.recover();
+        } else {
+            source = null;
+            iterator = null;
+        }
+    }
+    @Override protected void cleanup() {
         source = null;
         iterator = null;
     }

@@ -34,17 +34,21 @@ final class LazyPrimitiveEnumerator {
         private OfInt(Supplier<? extends PrimitiveIterator.OfInt> source) {
             this.source = source;
         }
-        @Override
-        protected boolean internalHasNext() {
-            if (enumerator == null) { enumerator = source.get(); }
+        @Override protected boolean internalHasNext() {
+            if (enumerator == null) {
+                if (source == null) { return false; }
+                enumerator = source.get();
+            }
             return enumerator.hasNext();
         }
-        @Override
-        protected int internalNextInt() {
+        @Override protected int internalNextInt() {
             return enumerator.nextInt();
         }
-        @Override
-        protected void cleanup() {
+        @Override protected void internalRecovery(Throwable error) {
+            source = null;
+            enumerator = null;
+        }
+        @Override protected void cleanup() {
             source = null;
             enumerator = null;
         }

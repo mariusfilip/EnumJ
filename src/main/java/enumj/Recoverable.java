@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Marius Filip.
+ * Copyright 2016 Marius Filip.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,40 +23,16 @@
  */
 package enumj;
 
+import java.util.Optional;
+
 /**
- * {@code Enumerator} implementation for arrays.
- *
- * @param <E> Type of enumerated elements.
- * @see Enumerator
+ * Marker for objects that can recover from errors.
+ * <p>Any object implementing this interface must provide an implementation
+ * of a recovery method which, when called, it will place the enumerator into
+ * a stable state where its normal functioning may proceed, if any left.
+ * </p>
  */
-final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
-
-    private E[] source;
-    private int index;
-
-    /**
-     * Constructs an {@code ArrayEnumerator} that enumerates over the given
-     * array.
-     * <p>
-     * The new {@link ArrayEnumerator} stores the {@code source} array
-     * internally.
-     * </p>
-     * 
-     * @param source Array to enumerate.
-     */
-    public ArrayEnumerator(E[] source) {
-        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        this.source = source;
-    }
-
-    @Override protected boolean internalHasNext() {
-        return index < source.length;
-    }
-    @Override protected void internalNext(Out<E> value) {
-        value.set(source[index++]);
-    }
-    @Override protected void internalRecovery(Throwable error) {}
-    @Override protected void cleanup() {
-        source = null;
-    }
+public interface Recoverable {
+    public Optional<Throwable> getLastError();
+    public void                recover();
 }

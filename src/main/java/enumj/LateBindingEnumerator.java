@@ -37,19 +37,25 @@ import java.util.Optional;
 public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
+    private Recoverable sourceAsRecoverable;
 
-    @Override
-    protected boolean internalHasNext() {
+    @Override protected boolean internalHasNext() {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        return source.hasNext();
+        return source != null && source.hasNext();
     }
-    @Override
-    protected void internalNext(Out<E> value) {
+    @Override protected void internalNext(Out<E> value) {
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         value.set(source.next());
     }
-    @Override
-    protected void cleanup() {
+    @Override protected void internalRecovery(Throwable error) {
+        if (sourceAsRecoverable != null) {
+            sourceAsRecoverable.recover();
+        } else {
+            source = null;
+            sourceAsRecoverable = null;
+        }
+    }
+    @Override protected void cleanup() {
         source = null;
     }
 
@@ -66,6 +72,9 @@ public final class LateBindingEnumerator<E> extends AbstractEnumerator<E> {
         Checks.ensureNonEnumerating(this);
         Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
         this.source = (Iterator<E>)source;
+        if (source instanceof Recoverable) {
+            this.sourceAsRecoverable = (Recoverable)source;
+        }
     }
 
     /**

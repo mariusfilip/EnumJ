@@ -51,17 +51,17 @@ final class CacheEnumerator<E> extends AbstractEnumerator<E> {
         this.cached = cached;
     }
 
-    @Override
-    protected boolean internalHasNext() {
+    @Override protected boolean internalHasNext() {
         return cached.isPresent();
     }
-    @Override
-    protected void internalNext(Out<E> value) {
+    @Override protected void internalNext(Out<E> value) {
         value.set(cached.get().getElement());
         cached = cached.get().getNextWrapper();
     }
-    @Override
-    protected void cleanup() {
+    @Override protected void internalRecovery(Throwable error) {
+        cached = Optional.empty();
+    }
+    @Override protected void cleanup() {
         cached = null;
     }
 }

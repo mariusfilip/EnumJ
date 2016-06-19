@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Marius Filip.
+ * Copyright 2016 Marius Filip.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,44 +23,19 @@
  */
 package enumj;
 
-import java.util.Enumeration;
-
 /**
- * {@code Enumerator} encapsulating an {@code Enumeration}.
- *
- * @param <E> type of enumerated elements.
- * @see EnumerableEnumeration
- * @see Enumerator
- * @see Enumeration
+ * Represents an exception that occurs during the enumerating process.
  */
-final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
-
-    private Enumeration<E> source;
-
-    /**
-     * Constructs an {@code EnumerationEnumerator} instance.
-     * <p>
-     * The new {@link EnumerationEnumerator} stores its {@code source}
-     * internally.
-     * </p>
-     *
-     * @param source {@link Enumeration} instance to get elements from.
-     */
-    public EnumerationEnumerator(Enumeration<E> source) {
-        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        this.source = source;
+public class RecoverableError extends Exception {
+    private RecoverableError(String message, Throwable cause) {
+        super(message, cause);
     }
-
-    @Override protected boolean internalHasNext() {
-        return source != null && source.hasMoreElements();
+    public static boolean is(Throwable error) {
+        return error instanceof RecoverableError;
     }
-    @Override protected void internalNext(Out<E> value) {
-        value.set(source.nextElement());
-    }
-    @Override protected void internalRecovery(Throwable error) {
-        source = null;
-    }
-    @Override protected void cleanup() {
-        source = null;
+    public static RecoverableError of(Throwable error) {
+        return is(error)
+                ? (RecoverableError)error
+                : new RecoverableError("Error while enumerating", error);
     }
 }

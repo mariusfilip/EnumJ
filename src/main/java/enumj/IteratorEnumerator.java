@@ -41,6 +41,7 @@ import java.util.Iterator;
 class IteratorEnumerator<E> extends AbstractEnumerator<E> {
 
     private Iterator<E> source;
+    private Recoverable sourceAsRecoverable;
 
     /**
      * Creates an {@code IteratorEnumerator} instance.
@@ -55,20 +56,30 @@ class IteratorEnumerator<E> extends AbstractEnumerator<E> {
         if (source instanceof Enumerator) {
             Checks.ensureNonEnumerating((Enumerator<E>)source);
         }
+        if (source instanceof Recoverable) {
+            sourceAsRecoverable = (Recoverable)source;
+        }
         this.source = source;
     }
 
-    @Override
-    protected final boolean internalHasNext() {
-        return source.hasNext();
+    @Override protected final boolean internalHasNext() {
+        return source != null && source.hasNext();
     }
-    @Override
-    protected final void internalNext(Out<E> value) {
+    @Override protected final void internalNext(Out<E> value) {
         value.set(source.next());
+    }
+    @Override protected final void internalRecovery(Throwable error) {
+        if (sourceAsRecoverable != null) {
+            sourceAsRecoverable.recover();
+        } else {
+            source = null;
+            sourceAsRecoverable = null;
+        }
     }
     @Override
     protected final void cleanup() {
         source = null;
+        sourceAsRecoverable = null;
     }
 
     // ---------------------------------------------------------------------- //

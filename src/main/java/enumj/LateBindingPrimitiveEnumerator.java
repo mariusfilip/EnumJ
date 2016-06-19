@@ -28,20 +28,21 @@ import java.util.PrimitiveIterator;
 
 public final class LateBindingPrimitiveEnumerator {
     public final static class OfInt extends AbstractPrimitiveEnumerator.OfInt {
+
         private PrimitiveIterator.OfInt source;
 
-        @Override
-        protected boolean internalHasNext() {
+        @Override protected boolean internalHasNext() {
             Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-            return source.hasNext();
+            return source != null && source.hasNext();
         }
-        @Override
-        protected int internalNextInt() {
+        @Override protected int internalNextInt() {
             Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
             return source.nextInt();
         }
-        @Override
-        protected void cleanup() {
+        @Override protected void internalRecovery(Throwable error) {
+            source = null;
+        }
+        @Override protected void cleanup() {
             source = null;
         }
 

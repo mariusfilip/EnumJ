@@ -82,8 +82,7 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         this.value = Nullable.empty();
     }
 
-    @Override
-    protected boolean internalHasNext() {
+    @Override protected boolean internalHasNext() {
         if (this.value.isPresent()) {
             return true;
         }
@@ -104,13 +103,15 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         }
         return false;
     }
-    @Override
-    protected void internalNext(Out<E> value) {
+    @Override protected void internalNext(Out<E> value) {
         value.setValue(this.value);
         this.value.clear();
     }
-    @Override
-    protected void cleanup() {
+    @Override protected void internalRecovery(Throwable error) {
+        this.value.clear();
+        this.sources.clear();
+    }
+    @Override protected void cleanup() {
         this.indexSupplier = null;
         this.nextIndexSupplier = null;
         this.sources.clear();

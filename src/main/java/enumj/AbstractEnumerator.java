@@ -24,6 +24,7 @@
 package enumj;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Abstract implementation of the {@code Enumerator} interface.
@@ -37,12 +38,12 @@ import java.util.NoSuchElementException;
  * @see Enumerable
  * @see Enumerator
  */
-abstract class AbstractEnumerator<E> implements Enumerator<E> {
+abstract class AbstractEnumerator<E> implements Enumerator<E>, Recoverable {
 
-    private boolean started;
-    private boolean hasNextHasBeenCalled;
-    private boolean hasNextHasThrown;
-    private boolean done;
+    private boolean   started;
+    private boolean   hasNextHasBeenCalled;
+    private Throwable error;
+    private boolean   done;
     
     private final InOut<E> value;
 
@@ -59,12 +60,14 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         this.value = new InOut<>();
     }
 
-    @Override
-    public final boolean enumerating() {
+    @Override public final boolean enumerating() {
         return started;
     }
-    @Override
-    public final boolean hasNext() {
+    @Override public final boolean hasNext() {
+        if (error != null) {
+            throw new UnsupportedOperationException(
+                    "Enumerator in error state", error);
+        }
         if (done) {
             return false;
         }
@@ -74,44 +77,61 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
         if (done) {
             safeCleanup();
         }
-
-        hasNextHasThrown = false;
-        hasNextHasBeenCalled = true;
         return !done;
     }
-    @Override
-    public final E next() {
+    @Override public final E next() {
         if (!hasNextHasBeenCalled) {
             hasNext();
         }
-        if (done || hasNextHasThrown) {
+        if (done) {
             throw new NoSuchElementException();
+        }
+        if (error != null) {
+            throw new UnsupportedOperationException(
+                    "Enumerator in error state", error);
         }
         try {
             internalNext(value);
             return value.get();
+        } catch(Throwable exception) {
+            error = exception;
+            throw exception;
         } finally {
             hasNextHasBeenCalled = false;
+            value.clear();
+        }
+    }
+    @Override public final Optional<Throwable> getLastError() {
+        return Optional.ofNullable(error);
+    }
+    @Override public final void recover() {
+        if (error != null) {
+            try {
+                internalRecovery(error);
+            } finally {
+                error = null;
+            }
         }
     }
 
     private boolean safeHasNext() {
         try {
             return internalHasNext();
-        } catch(Throwable err) {
-            hasNextHasThrown = true;
+        } catch(Throwable exception) {
+            error = exception;
+            throw exception;
+        } finally {
             hasNextHasBeenCalled = true;
-            throw err;
         }
     }
     private void safeCleanup() {
         try {
             value.clear();
+            error = null;
             cleanup();
-        } catch(Throwable err) {
-            hasNextHasThrown = true;
-            hasNextHasBeenCalled = true;
-            throw err;
+        } catch(Throwable exception) {
+            error = exception;
+            throw exception;
         }
     }
 
@@ -134,6 +154,7 @@ abstract class AbstractEnumerator<E> implements Enumerator<E> {
      * @param value instance of {@link Out} storing the next value.
      */
     protected abstract void internalNext(Out<E> value);
+    protected abstract void internalRecovery(Throwable error);
     /**
      * Cleans up the internals of the current enumerator when enumeration
      * ends.
