@@ -95,11 +95,11 @@ public class FlatMapPipeProcessorTest {
         processor.processInputValue(new InOut(1));
         final Out<Integer> out = new InOut();
         processor.getOutputValue(out);
-        assertEquals(1, out.getInt());
+        assertEquals(1, out.get().longValue());
         processor.getOutputValue(out);
-        assertEquals(2, out.getInt());
+        assertEquals(2, out.get().longValue());
         processor.getOutputValue(out);
-        assertEquals(3, out.getInt());
+        assertEquals(3, out.get().longValue());
     }
 
     @Test

@@ -70,7 +70,6 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
         if (element.isPresent()) {
             return true;
         }
-
         while(safeHasNext()) {
             try {
                 element.set(source.next());
@@ -83,7 +82,6 @@ final class TolerantEnumerator<E> extends AbstractEnumerator<E> {
                 }
             }
         }
-
         return false;
     }
     @Override

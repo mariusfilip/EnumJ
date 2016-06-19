@@ -77,7 +77,7 @@ public class MapPipeProcessorTest {
         processor.processInputValue(new InOut(1));
         final Out<Integer> out = new InOut();
         processor.getOutputValue(out);
-        assertEquals(2, out.getInt());
+        assertEquals(2, out.get().longValue());
     }
 
     @Test

@@ -30,21 +30,21 @@ import java.util.function.Consumer;
 
 interface Value<T> {
 
-    public static final int NONE    = -1;    
-    public static final int GENERIC = 0;
-    public static final int INT     = 1;
-    public static final int LONG    = 2;
-    public static final int DOUBLE  = 3;
+    static final int NONE    = -1;    
+    static final int GENERIC = 0;
+    static final int INT     = 1;
+    static final int LONG    = 2;
+    static final int DOUBLE  = 3;
     
-    public boolean isPresent();
-    public boolean intIsPresent();
-    public boolean longIsPresent();
-    public boolean doubleIsPresent();
+    boolean isPresent();
+    boolean intIsPresent();
+    boolean longIsPresent();
+    boolean doubleIsPresent();
 
-    public T get() throws NoSuchElementException;
-    public int getInt() throws NoSuchElementException;
-    public long getLong() throws NoSuchElementException;
-    public double getDouble() throws NoSuchElementException;
+    T get() throws NoSuchElementException;
+    int getInt() throws NoSuchElementException;
+    long getLong() throws NoSuchElementException;
+    double getDouble() throws NoSuchElementException;
     
     public void set(T value);
     public void setInt(int value);
@@ -160,7 +160,7 @@ final class SingleValue<T> implements Value<T> {
     }
     
     @Override public int     hashCode() {
-        return Objects.hash(isPresent(), isPresent() ? get(): null);
+        return isPresent() ? get().hashCode() : 0;
     }
     @Override public boolean equals(Object obj) {
         if (this == obj) { return true; }
@@ -168,7 +168,7 @@ final class SingleValue<T> implements Value<T> {
 
         SingleValue other = (SingleValue)obj;
         if (this.isPresent() != other.isPresent()) { return false; }
-        return !this.isPresent() && Objects.equals(this.get(), other.get());
+        return this.isPresent() && Objects.equals(this.get(), other.get());
     }
     
     static void convert(SingleValue value) {}

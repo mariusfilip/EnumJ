@@ -129,12 +129,11 @@ public class NullableTest {
     @Test
     public void testHashCode() {
         System.out.println("hashCode");
-        assertFalse("something".hashCode()
-                    ==
+        assertEquals("something".hashCode(),
                     Nullable.of("something").hashCode());
         assertEquals(Nullable.of("something").hashCode(),
                      Nullable.of("something").hashCode());
-        assertEquals(Nullable.empty(), Nullable.empty());
+        assertFalse(Nullable.empty().equals(Nullable.empty()));
     }
 
     @Test

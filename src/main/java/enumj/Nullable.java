@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  * @param <T> type of contained value.
  * @see Optional
  */
-public final class Nullable<T> implements Value<T> {
+final class Nullable<T> implements Value<T> {
 
     private final SingleValue<T> value;
 
@@ -149,6 +149,16 @@ public final class Nullable<T> implements Value<T> {
     }
 
     // ---------------------------------------------------------------------- //
+    @Override
+    public int hashCode() { return value.hashCode(); }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) { return true; }
+        if (!(obj instanceof Nullable)) { return false; }
+        final Nullable<?> other = (Nullable<?>)obj;
+        return value.equals(other.value);
+        
+    }
     @Override
     public String toString() {
         return isPresent()

@@ -23,7 +23,8 @@
  */
 package enumj;
 
-import java.util.function.IntUnaryOperator;
+import java.util.Iterator;
+import java.util.function.Function;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -150,54 +151,6 @@ public class PipeEnumeratorTest {
         assertTrue(pipe.filter(x -> true)
                        .map(x -> x)
                        .elementsEqual(Enumerator.rangeInt(-2, 3)));
-    }
-
-    class FailingMultiPipeProcessor<TIn,TOut>
-          extends AbstractPipeMultiProcessor<TIn,TOut> {
-        private Out<TOut> value;
-        private boolean   inactive;
-
-        FailingMultiPipeProcessor() {
-            super(true,true);
-            this.value = new InOut<>();
-        }
-
-        @Override
-        public boolean needsValue() {
-            return !this.value.isPresent();
-        }
-        @Override
-        public void processInputValue(In<TIn> value) {
-            this.value.setValue(value.castOut());
-        }
-        @Override
-        public boolean hasOutputValue() {
-            return this.value.isPresent();
-        }
-        @Override
-        public void getOutputValue(Out<TOut> value) {
-            value.setValue(this.value);
-        }
-        @Override
-        public boolean isInactive() {
-            return inactive;
-        }
-    }
-
-    class PipeEnumeratorWithFailingMulti extends PipeEnumerator<Integer> {
-
-        public PipeEnumeratorWithFailingMulti() {
-            super(Enumerator.on(1, 2, 3));
-            this.enqueueProcessor(new FailingMultiPipeProcessor());
-        }
-    }
-
-    @Test
-    public void testTryPipelineInWithFailingMulti() {
-        System.out.println("testTryPipelineInWithFailingMulti");
-        final PipeEnumeratorWithFailingMulti pipe =
-                new PipeEnumeratorWithFailingMulti();
-        assertTrue(pipe.elementsEqual(Enumerator.on(1)));
     }
 
     @Test
@@ -339,17 +292,19 @@ public class PipeEnumeratorTest {
     public void testReversedMap() {
         System.out.println("reversedMap");
         source = Enumerator.on(1, 3, 5);
+        final Function<Integer,Integer> identity = Function.identity();
+        final Function<Integer,Iterator<Integer>> incFlatMapper =
+                x -> Enumerator.on(x, x+1);
+        final Function<Integer,Iterator<Integer>> identFlatMapper =
+                x -> Enumerator.on(x);
         pipe = PipeEnumerator.of(source)
-                .reversedMap(new ValueFunction(IntUnaryOperator.identity()))
-                .reversedFlatMap(x -> {
-                    final Integer y = (Integer)x;
-                    return Enumerator.on(y, y+1);
-                }, Value.GENERIC)
-                .reversedMap(new ValueFunction(IntUnaryOperator.identity()))
-                .reversedFlatMap(x -> Enumerator.on(x), Value.GENERIC)
-                .reversedMap(new ValueFunction(IntUnaryOperator.identity()));
+                .reversedMap(new ValueFunction(identity))
+                .reversedFlatMap(incFlatMapper, Value.GENERIC)
+                .reversedMap(new ValueFunction(identity))
+                .reversedFlatMap(identFlatMapper, Value.GENERIC)
+                .reversedMap(new ValueFunction(identity));
         assertTrue(pipe.elementsEqual(
-                Enumerator.on(1, 2, 3, 4, 5, 6)));
+                   Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
 
     @Test
