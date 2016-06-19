@@ -42,15 +42,6 @@ final class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
     private final InOut<E>          value;
     private final ValuePredicate<E> filter;
-    
-    private static final Function<Predicate,ValuePredicate>
-            GENERIC_MAPPER = dp -> new ValuePredicate(dp);
-    private static final Function<IntPredicate,ValuePredicate>
-            INT_MAPPER     = dp -> new ValuePredicate(dp);
-    private static final Function<LongPredicate,ValuePredicate>
-            LONG_MAPPER    = dp -> new ValuePredicate(dp);
-    private static final Function<DoublePredicate,ValuePredicate>
-            DOUBLE_MAPPER  = dp -> new ValuePredicate(dp);
 
     /**
      * Creates a {@code WhilePipeProcessor} that enumerates elements while
@@ -61,29 +52,16 @@ final class WhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
      *
      * @param filter {@link Predicate} to filter enumerated elements.
      */
-    public WhilePipeProcessor(Predicate<E> filter) {
-        this(filter, GENERIC_MAPPER);
-    }
-    public WhilePipeProcessor(IntPredicate filter) {
-        this(filter, INT_MAPPER);
-    }
-    public WhilePipeProcessor(LongPredicate filter) {
-        this(filter, LONG_MAPPER);
-    }
-    public WhilePipeProcessor(DoublePredicate filter) {
-        this(filter, DOUBLE_MAPPER);
-    }
-    private <U> WhilePipeProcessor(U                          filter,
-                                   Function<U,ValuePredicate> getter) {
+    public WhilePipeProcessor(ValuePredicate<E> filter) {
         super(false, true);
         Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.value = new InOut<>();
-        this.filter = getter.apply(filter);
+        this.filter = filter;
     }
 
     @Override
     public void processInputValue(In<E> value) {
-        if (this.filter != null && this.filter.test(value)) {
+        if (!this.filter.cleared() && this.filter.test(value)) {
             this.value.setValue(value);
         } else {
             this.filter.clear();

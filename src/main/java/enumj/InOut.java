@@ -97,6 +97,6 @@ final class InOut<T> implements In<T>, Out<T> {
         this.value.setValue(value);
     }
 
-    @Override public Type getType() { return value.getType(); }
+    @Override public int getType() { return value.getType(); }
     @Override public void clear() { value.clear(); }
 }

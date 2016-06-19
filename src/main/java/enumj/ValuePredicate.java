@@ -25,68 +25,73 @@
 package enumj;
 
 
+import java.util.function.Consumer;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 final class ValuePredicate<E> implements Predicate<In<E>> {
-    
+
+    private int             type;    
     private Predicate<E>    predicate;
     private IntPredicate    intPredicate;
     private LongPredicate   longPredicate;
     private DoublePredicate doublePredicate;
+    private boolean         checked;
+    
+    private final Consumer<In<E>> checker = this::check;
+    private final Consumer<In<E>> intChecker = this::checkInt;
+    private final Consumer<In<E>> longChecker = this::checkLong;
+    private final Consumer<In<E>> doubleChecker = this::checkDouble;
+    private final Consumer[] checkers = {
+        checker,
+        intChecker,
+        longChecker,
+        doubleChecker
+    };
     
     public ValuePredicate(Predicate<E> predicate) {
+        this.type = Value.GENERIC;
         this.predicate = predicate;
-        this.intPredicate = null;
-        this.longPredicate = null;
-        this.doublePredicate = null;
     }
     public ValuePredicate(IntPredicate intPredicate) {
+        this.type = Value.INT;
         this.intPredicate = intPredicate;
-        this.predicate = (Predicate<E>)this.intPredicate;
-        this.longPredicate = null;
-        this.doublePredicate = null;
     }
     public ValuePredicate(LongPredicate longPredicate) {
+        this.type = Value.LONG;
         this.longPredicate = longPredicate;
-        this.predicate = (Predicate<E>)this.longPredicate;
-        this.intPredicate = null;
-        this.doublePredicate = null;
     }
     public ValuePredicate(DoublePredicate doublePredicate) {
+        this.type = Value.DOUBLE;
         this.doublePredicate = doublePredicate;
-        this.predicate = (Predicate<E>)this.doublePredicate;
-        this.intPredicate = null;
-        this.longPredicate = null;
     }
     
     @Override public boolean test(In<E> value) {
-        switch(value.getType()) {
-            case INT:
-                if (intPredicate != null) {
-                    return intPredicate.test(value.getInt());
-                }
-                break;
-            case LONG:
-                if (longPredicate != null) {
-                    return longPredicate.test(value.getLong());
-                }
-                break;
-            case DOUBLE:
-                if (doublePredicate != null) {
-                    return doublePredicate.test(value.getDouble());
-                }
-        }
-        return predicate.test(value.get());
+        checkers[type].accept(value);
+        return checked;
     }
     
-    public boolean cleared() { return predicate == null; }
+    public boolean cleared() { return this.type == Value.NONE; }
     public void    clear() {
         this.predicate = null;
         this.intPredicate = null;
         this.longPredicate = null;
         this.doublePredicate = null;
+        this.type = Value.NONE;
+    }
+    
+    private void check(In<E> value) {
+        checked = predicate.test(value.get());
+    }
+    private void checkInt(In<E> value) {
+        checked = intPredicate.test(value.getInt());
+    }
+    private void checkLong(In<E> value) {
+        checked = longPredicate.test(value.getLong());
+    }
+    private void checkDouble(In<E> value) {
+        checked = doublePredicate.test(value.getDouble());
     }
 }

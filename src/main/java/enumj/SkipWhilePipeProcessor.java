@@ -42,50 +42,33 @@ class SkipWhilePipeProcessor<E> extends AbstractPipeProcessor<E,E> {
     private final InOut<E>          value;
     private final ValuePredicate<E> filter;
     
-    private static final Function<Predicate,ValuePredicate>
-            GENERIC_MAPPER = dp -> new ValuePredicate(dp);
-    private static final Function<IntPredicate,ValuePredicate>
-            INT_MAPPER     = dp -> new ValuePredicate(dp);
-    private static final Function<LongPredicate,ValuePredicate>
-            LONG_MAPPER    = dp -> new ValuePredicate(dp);
-    private static final Function<DoublePredicate,ValuePredicate>
-            DOUBLE_MAPPER  = dp -> new ValuePredicate(dp);
-    public SkipWhilePipeProcessor(Predicate<E> filter) {
-        this(filter, GENERIC_MAPPER);
-    }
-    public SkipWhilePipeProcessor(IntPredicate filter) {
-        this(filter, INT_MAPPER);
-    }
-    public SkipWhilePipeProcessor(LongPredicate filter) {
-        this(filter, LONG_MAPPER);
-    }
-    public SkipWhilePipeProcessor(DoublePredicate filter) {
-        this(filter, DOUBLE_MAPPER);
-    }
-    private <U> SkipWhilePipeProcessor(U                          filter,
-                                       Function<U,ValuePredicate> getter) {
-        super(false, true);
+    public SkipWhilePipeProcessor(ValuePredicate<E> filter) {
+        super(true, true);
         Checks.ensureNotNull(filter, Messages.NULL_ENUMERATOR_PREDICATE);
         this.value = new InOut<>();
-        this.filter = getter.apply(filter);
+        this.filter = filter;
     }
 
     @Override
     public void processInputValue(In<E> value) {
         if (this.filter.cleared()) {
             this.value.setValue(value);
-        } else if(!this.filter.test(value)) {
+            return;
+        }
+        if (!this.filter.test(value)) {
             this.value.setValue(value);
             this.filter.clear();
+            return;
         }
     }
     @Override
     public boolean hasOutputValue() {
-        return filter.cleared();
+        return this.value.isPresent();
     }
     @Override
     public void getOutputValue(Out<E> value) {
         value.setValue(this.value);
+        this.value.clear();
     }
     @Override
     public boolean isInactive() {

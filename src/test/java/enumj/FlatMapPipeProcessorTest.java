@@ -47,11 +47,11 @@ public class FlatMapPipeProcessorTest {
     @Before
     public void setUp() {
         processor0 = new FlatMapPipeProcessor<>(
-                x -> Enumerator.empty(), Value.Type.GENERIC);
-        processor1 = new FlatMapPipeProcessor<>(x -> null, Value.Type.GENERIC);
+                x -> Enumerator.empty(), Value.GENERIC);
+        processor1 = new FlatMapPipeProcessor<>(x -> null, Value.GENERIC);
         processor = new FlatMapPipeProcessor<>(
                 x -> Enumerator.on(x, x+1, x+2),
-                Value.Type.GENERIC);
+                Value.GENERIC);
     }
 
     FlatMapPipeProcessor<Integer,Integer> processor0;

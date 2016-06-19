@@ -932,17 +932,19 @@ public class EnumeratorTest {
     @Test
     public void testSkip() {
         System.out.println("skip");
-        assertEquals(Enumerator.rangeInt(0, 100)
+        assertEquals(90,
+                     Enumerator.rangeInt(0, 100)
                                .skip(10)
-                               .count(), 90);
+                               .count());
     }
 
     @Test
     public void testSkipWhile() {
         System.out.println("skipWhile");
-        assertEquals(Enumerator.rangeInt(0, 100)
+        assertEquals(70,
+                     Enumerator.rangeInt(0, 100)
                                .skipWhile(i -> i<30)
-                               .count(), 70);
+                               .count());
     }
 
     @Test

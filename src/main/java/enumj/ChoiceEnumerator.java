@@ -84,21 +84,21 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
 
     @Override
     protected boolean internalHasNext() {
-        if (value.isPresent()) {
+        if (this.value.isPresent()) {
             return true;
         }
-        if (sources.size() > 0) {
-            int index = indexSupplier.getAsInt();
-            int count = sources.size()-1;
+        if (this.sources.size() > 0) {
+            int index = this.indexSupplier.getAsInt();
+            int count = this.sources.size()-1;
             while (count >= 0) {
-                if (sources.get(index) != null) {
-                    if (sources.get(index).hasNext()) {
-                        value.set(sources.get(index).next());
+                if (this.sources.get(index) != null) {
+                    if (this.sources.get(index).hasNext()) {
+                        this.value.set(this.sources.get(index).next());
                         return true;
                     }
-                    sources.set(index, null);
+                    this.sources.set(index, null);
                 }
-                index = nextIndexSupplier.applyAsInt(index);
+                index = this.nextIndexSupplier.applyAsInt(index);
                 --count;
             }
         }
@@ -107,13 +107,13 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
     @Override
     protected void internalNext(Out<E> value) {
         value.setValue(this.value);
-        value.clear();
+        this.value.clear();
     }
     @Override
     protected void cleanup() {
-        indexSupplier = null;
-        nextIndexSupplier = null;
-        sources.clear();
-        value.clear();
+        this.indexSupplier = null;
+        this.nextIndexSupplier = null;
+        this.sources.clear();
+        this.value.clear();
     }
 }

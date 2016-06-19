@@ -25,16 +25,16 @@ package enumj;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 interface Value<T> {
-    
-    public enum Type {
-        GENERIC,
-        INT,
-        LONG,
-        DOUBLE,
-        NONE
-    }
+
+    public static final int NONE    = -1;    
+    public static final int GENERIC = 0;
+    public static final int INT     = 1;
+    public static final int LONG    = 2;
+    public static final int DOUBLE  = 3;
     
     public boolean isPresent();
     public boolean intIsPresent();
@@ -52,7 +52,7 @@ interface Value<T> {
     public void setDouble(double value);
     public void setValue(Value<? extends T> value);
     
-    public Type getType();
+    public int  getType();
     public void clear();
 }
 
@@ -62,40 +62,69 @@ final class SingleValue<T> implements Value<T> {
     private int     intValue;
     private long    longValue;
     private double  doubleValue;
-    private Type    type;
+    private int     type;
+    
+    static final Consumer<SingleValue> C        = SingleValue::convert;
+    static final Consumer<SingleValue> C_INT    = SingleValue::convertInt;
+    static final Consumer<SingleValue> C_LONG   = SingleValue::convertLong;
+    static final Consumer<SingleValue> C_DOUBLE = SingleValue::convertDouble;
+    static final Consumer[] Cs = {
+        C,
+        C_INT,
+        C_LONG,
+        C_DOUBLE
+    };    
+    static final BiConsumer<Value,Value> T
+            = SingleValue::transfer;
+    static final BiConsumer<Value,Value> T_INT
+            = SingleValue::transferInt;
+    static final BiConsumer<Value,Value> T_LONG
+            = SingleValue::transferLong;
+    static final BiConsumer<Value,Value> T_DOUBLE
+            = SingleValue::transferDouble;
+    static final BiConsumer[] Ts = {
+        T,
+        T_INT,
+        T_LONG,
+        T_DOUBLE
+    };
 
     public SingleValue() { clear(); }
     public SingleValue(T value) { set(value); }
     public SingleValue(int value) { setInt(value); }
     public SingleValue(long value) { setLong(value); }
     public SingleValue(double value) { setDouble(value); }
-    public SingleValue(SingleValue<? extends T> value) { setValue(value); }
+    public SingleValue(Value<? extends T> value) { setValue(value); }
     
-    @Override public boolean isPresent() { return type != Type.NONE; }
-    @Override public boolean intIsPresent() { return type == Type.INT; }
-    @Override public boolean longIsPresent() { return type == Type.LONG; }
-    @Override public boolean doubleIsPresent() { return type == Type.DOUBLE; }
+    @Override public boolean isPresent() { return type != NONE; }
+    @Override public boolean intIsPresent() { return type == INT; }
+    @Override public boolean longIsPresent() { return type == LONG; }
+    @Override public boolean doubleIsPresent() { return type == DOUBLE; }
 
     @Override public T get() throws NoSuchElementException {
-        if (type == Type.NONE) {
+        if (type == NONE) {
             throw new NoSuchElementException();
         }
-        return value = castIf();
+        if (value != null) {
+            return value;
+        }
+        Cs[type].accept(this);
+        return value;
     }
     @Override public int getInt()  throws NoSuchElementException {
-        if (type != Type.INT) {
+        if (type != INT) {
             throw new NoSuchElementException();
         }
         return intValue;
     }
     @Override public long getLong()  throws NoSuchElementException {
-        if (type != Type.LONG) {
+        if (type != LONG) {
             throw new NoSuchElementException();
         }
         return longValue;
     }
     @Override public double getDouble()  throws NoSuchElementException {
-        if (type != Type.DOUBLE) {
+        if (type != DOUBLE) {
             throw new NoSuchElementException();
         }
         return doubleValue;
@@ -103,43 +132,34 @@ final class SingleValue<T> implements Value<T> {
 
     @Override public void set(T elem) {
         this.value = elem;
-        this.type = Type.GENERIC;
+        this.type = GENERIC;
     }
     @Override public void setInt(int elem) {
         this.intValue = elem;
-        this.type = Type.INT;
+        this.type = INT;
         this.value = null;
     }
     @Override public void setLong(long elem) {
         this.longValue = elem;
-        this.type = Type.LONG;
+        this.type = LONG;
         this.value = null;
     }
     @Override public void setDouble(double elem) {
         this.doubleValue = elem;
-        this.type = Type.DOUBLE;
+        this.type = DOUBLE;
         this.value = null;
     }
     @Override public void setValue(Value<? extends T> elem) {
-        switch(elem.getType()) {
-            case GENERIC: set(elem.get()); break;
-            case INT: setInt(elem.getInt()); break;
-            case LONG: setLong(elem.getLong()); break;
-            case DOUBLE: setDouble(elem.getDouble()); break;
-            case NONE: clear();
-            default:
-                throw new IllegalArgumentException(
-                        "Illegal value type: " + elem.getType());
-        }
+        Ts[elem.getType()].accept(elem, this);
     }
 
-    @Override public Type getType() { return type; }
+    @Override public int  getType() { return type; }
     @Override public void clear() {
         value = null;
-        type = Type.NONE;
+        type = NONE;
     }
     
-    @Override public int hashCode() {
+    @Override public int     hashCode() {
         return Objects.hash(isPresent(), isPresent() ? get(): null);
     }
     @Override public boolean equals(Object obj) {
@@ -150,25 +170,27 @@ final class SingleValue<T> implements Value<T> {
         if (this.isPresent() != other.isPresent()) { return false; }
         return !this.isPresent() && Objects.equals(this.get(), other.get());
     }
-
-    private T castIf() {
-        if (value != null) { return value; }
-        switch(type) {
-            case GENERIC: return value;
-            case INT:
-                final Integer i = intValue;
-                return (T)(Object)i;
-            case LONG:
-                final Long l = longValue;
-                return (T)(Object)l;
-            case DOUBLE:
-                final Double d = doubleValue;
-                return (T)(Object)d;
-            case NONE:
-                throw new UnsupportedOperationException("Logic error");
-            default:
-                throw new UnsupportedOperationException(
-                        "Unsupported value type: " + type);
-        }
+    
+    static void convert(SingleValue value) {}
+    static void convertInt(SingleValue value) {
+        value.value = value.intValue;
     }
+    static void convertLong(SingleValue value) {
+        value.value = value.longValue;
+    }
+    static void convertDouble(SingleValue value) {
+        value.value = value.doubleValue;
+    }
+    static void transfer(Value from, Value to) {
+        to.set(from.get());
+    }
+    static void transferInt(Value from, Value to) {
+        to.setInt(from.getInt());
+    }
+    static void transferLong(Value from, Value to) {
+        to.setInt(from.getInt());
+    }
+    static void transferDouble(Value from, Value to) {
+        to.setDouble(from.getDouble());
+    }    
 }

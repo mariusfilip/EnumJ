@@ -223,7 +223,7 @@ final class PipeEnumerable<T,E> extends AbstractEnumerable<E> {
         return of(enumerable,
                   in -> ((PipeEnumerator)in).reversedFlatMap(
                           e -> mapper.apply((E)e).iterator(),
-                          Value.Type.GENERIC),
+                          Value.GENERIC),
                   () -> false);
     }
 

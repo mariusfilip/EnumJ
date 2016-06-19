@@ -112,16 +112,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last =
-                (AbstractPipeProcessor)pipeline.peekLast();
+                (AbstractPipeProcessor)this.pipeline.peekLast();
         safePipelineAddLast(processor);
         if (processor.hasNextNeedsValue) {
-            ++needValueForHasNext;
+            ++this.needValueForHasNext;
         }
         if (last != null) {
             last.setNext((AbstractPipeProcessor<E,?>)processor);
         }
-        if (!sources.isEmpty()) {
-            final PipeSource source = sources.getLast();
+        if (!this.sources.isEmpty()) {
+            final PipeSource source = this.sources.getLast();
             source.setFirstProcessorIfNone(processor);
             processor.setSource(source);
         }
@@ -142,10 +142,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeProcessor<? super X, ?> processor) {
-        final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
+        final AbstractPipeProcessor<?,?> first = this.pipeline.peekFirst();
         safePipelineAddFirst(processor);
         if (processor.hasNextNeedsValue) {
-            ++needValueForHasNext;
+            ++this.needValueForHasNext;
         }
         if (first != null) {
             processor.setNext((AbstractPipeProcessor)first);
@@ -170,16 +170,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected <X> Enumerator<X> enqueueProcessor(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
         final AbstractPipeProcessor<?,? extends E> last =
-                (AbstractPipeProcessor)pipeline.peekLast();
+                (AbstractPipeProcessor)this.pipeline.peekLast();
         safeMultiPipelineAddLast(processor);
         if (processor.hasNextNeedsValue) {
-            ++needValueForHasNext;
+            ++this.needValueForHasNext;
         }
         if (last != null) {
             last.setNext((AbstractPipeProcessor<E,?>)processor);
         }
-        if (!sources.isEmpty()) {
-            final PipeSource source = sources.getLast();
+        if (!this.sources.isEmpty()) {
+            final PipeSource source = this.sources.getLast();
             source.setFirstProcessorIfNone(processor);
             processor.setSource(source);
         }
@@ -200,10 +200,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
-        final AbstractPipeProcessor<?,?> first = pipeline.peekFirst();
+        final AbstractPipeProcessor<?,?> first = this.pipeline.peekFirst();
         safeMultiPipelineAddFirst(processor);
         if (processor.hasNextNeedsValue) {
-            ++needValueForHasNext;
+            ++this.needValueForHasNext;
         }
         if (first != null) {
             processor.setNext((AbstractPipeProcessor)first);
@@ -221,8 +221,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> Enumerator<X> enqueueMapProcessor(
             ValueFunction<? super E, X> mapper) {
-        if (pipeline.isEmpty() ||
-            !pipeline.getLast().enqueueMap((ValueFunction)mapper)) {
+        if (this.pipeline.isEmpty() ||
+            !this.pipeline
+                 .getLast()
+                 .enqueueMap((ValueFunction)mapper)) {
             return enqueueProcessor(new MapPipeProcessor(mapper));
         }
         return (Enumerator<X>)this;
@@ -238,8 +240,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> PipeEnumerator<E> pushFrontMapProcessor(
             ValueFunction<? super X, ?> mapper) {
-        if (pipeline.isEmpty()
-            || !pipeline.getFirst().pushFrontMap((ValueFunction)mapper)) {
+        if (this.pipeline.isEmpty()
+            || !this.pipeline
+                    .getFirst()
+                    .pushFrontMap((ValueFunction)mapper)) {
             return pushFrontProcessor(new MapPipeProcessor(mapper));
         }
         return this;
@@ -254,8 +258,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected Enumerator<E> enqueueFilterProcessor(
             ValuePredicate<? super E> filter) {
-        if (pipeline.isEmpty()
-            || !pipeline.getLast().enqueueFilter((ValuePredicate)filter)) {
+        if (this.pipeline.isEmpty()
+            || !this.pipeline
+                    .getLast()
+                    .enqueueFilter((ValuePredicate)filter)) {
             return enqueueProcessor(new FilterPipeProcessor(filter));
         }
         return this;
@@ -270,8 +276,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected PipeEnumerator<E> pushFrontFilterProcessor(
             ValuePredicate<?> filter) {
-        if (pipeline.isEmpty()
-            || !pipeline.getFirst().pushFrontFilter((ValuePredicate)filter)) {
+        if (this.pipeline.isEmpty()
+            || !this.pipeline
+                    .getFirst()
+                    .pushFrontFilter((ValuePredicate)filter)) {
             return pushFrontProcessor(new FilterPipeProcessor(filter));
         }
         return this;
@@ -290,7 +298,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> void safePipelineAddLast(
             AbstractPipeProcessor<? super E, ? extends X> processor) {
-        pipeline.addLast(processor);
+        this.pipeline.addLast(processor);
     }
 
     /**
@@ -310,7 +318,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         try {
             multiPipelineAddLast(processor);
         } catch(Throwable err) {
-            pipeline.removeLast();
+            this.pipeline.removeLast();
             throw err;
         }
     }
@@ -326,7 +334,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> void multiPipelineAddLast(
             AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
-        multiPipeline.addLast(processor);
+        this.multiPipeline.addLast(processor);
     }
 
     /**
@@ -337,7 +345,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> void safePipelineAddFirst(
             AbstractPipeProcessor<? super X, ?> processor) {
-        pipeline.addFirst(processor);
+        this.pipeline.addFirst(processor);
     }
 
     /**
@@ -357,7 +365,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         try {
             multiPipelineAddFirst(processor);
         } catch(Throwable err) {
-            pipeline.removeFirst();
+            this.pipeline.removeFirst();
             throw err;
         }
     }
@@ -374,7 +382,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected <X> void multiPipelineAddFirst(
             AbstractPipeMultiProcessor<? super X, ?> processor) {
-        multiPipeline.addFirst(processor);
+        this.multiPipeline.addFirst(processor);
     }
 
     // ---------------------------------------------------------------------- //
@@ -391,8 +399,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * </p>
      */
     protected void dequeueSourceWithProcessors() {
-        dequeueSourceProcessors(sources.remove());
-        value.clear();
+        dequeueSourceProcessors(this.sources.remove());
+        this.value.clear();
     }
 
     /**
@@ -409,7 +417,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     protected void dequeueSourcesUpToProcessor(
             AbstractPipeProcessor processor) {
         final PipeSource processorSource = processor.getSource();
-        while(processorSource != sources.getFirst()) {
+        while(processorSource != this.sources.getFirst()) {
             dequeueSourceWithProcessors();
         }
     }
@@ -422,14 +430,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * its processors to be removed as well.
      */
     protected void dequeueSourceProcessors(PipeSource<?> removed) {
-        if (sources.isEmpty()) {
-            pipeline.clear();
-            multiPipeline.clear();
+        if (this.sources.isEmpty()) {
+            this.pipeline.clear();
+            this.multiPipeline.clear();
             return;
         }
 
-        AbstractPipeProcessor firstInPipeline = pipeline.peekFirst();
-        final PipeSource firstSource = sources.getFirst();
+        AbstractPipeProcessor firstInPipeline = this.pipeline.peekFirst();
+        final PipeSource firstSource = this.sources.getFirst();
 
         if (firstSource.getFirstProcessor() == null) {
             if (removed.getFirstProcessor() != null) {
@@ -462,14 +470,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     protected AbstractPipeProcessor dequeueProcessor() {
         final AbstractPipeProcessor head = pipeline.remove();
-        if (!multiPipeline.isEmpty()
-            && head == multiPipeline.getFirst()) {
-            multiPipeline.remove();
+        if (!this.multiPipeline.isEmpty()
+            && head == this.multiPipeline.getFirst()) {
+            this.multiPipeline.remove();
         }
         if (head.hasNextNeedsValue) {
-            --needValueForHasNext;
+            --this.needValueForHasNext;
         }
-        return pipeline.peekFirst();
+        return this.pipeline.peekFirst();
     }
 
     /**
@@ -487,9 +495,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         out.clear();
         processor.clear();
 
-        if (!multiPipeline.isEmpty()) {
+        if (!this.multiPipeline.isEmpty()) {
             final Iterator<AbstractPipeMultiProcessor<?,?>>
-                    multiProcessorIterator = multiPipeline.descendingIterator();
+                    multiProcessorIterator = this.multiPipeline
+                                                 .descendingIterator();
             AbstractPipeMultiProcessor multiProcessor;
             while(multiProcessorIterator.hasNext()) {
                 multiProcessor = multiProcessorIterator.next();
@@ -508,8 +517,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             return false;
         }
 
-        sources.peekFirst().yieldNext((Out)out);
-        processor.set(pipeline.peekFirst());
+        this.sources.peekFirst().yieldNext((Out)out);
+        processor.set(this.pipeline.peekFirst());
         return true;
     }
 
@@ -526,46 +535,45 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * end, false otherwise.
      */
     protected boolean tryPipelineOut(
-            In<?>                 in,
-            AbstractPipeProcessor processor,
-            Out<?>                out,
-            Out<Boolean>          nextOnSameSourceOnNoValue) {
-        out.clear();
+            In<?>                     in,
+            In<AbstractPipeProcessor> processor,
+            Out<?>                    out,
+            Out<Boolean>              nextOnSameSourceOnNoValue) {
         nextOnSameSourceOnNoValue.clear();
+        out.setValue(in.castOut());
 
-        final InOut<?> val = new InOut<>(in);
-        while(processor != null) {
-            if (processor.isInactive()) {
-                this.dequeueSourcesUpToProcessor(processor);
+        AbstractPipeProcessor proc = processor.get();
+        processor = null;
+        while(proc != null) {
+            if (proc.isInactive()) {
+                this.dequeueSourcesUpToProcessor(proc);
                 nextOnSameSourceOnNoValue.set(false);
                 return false;
             }
-            processor.processInputValue(val);
-            if (processor.hasOutputValue()) {
-                processor.getOutputValue(val);
+            proc.processInputValue(out.castIn());
+            if (proc.hasOutputValue()) {
+                proc.getOutputValue(out);
             } else {
-                nextOnSameSourceOnNoValue.set(
-                        processor.nextOnSameSourceOnNoValue);
+                nextOnSameSourceOnNoValue.set(proc.nextOnSameSourceOnNoValue);
                 return false;
             }
-            processor = processor.getNext();
+            proc = proc.getNext();
         }
-        out.setValue((Value)val);
         return true;
     }
 
     // ---------------------------------------------------------------------- //
 
     @Override protected boolean internalHasNext() {
-        if (value.isPresent()) {
+        if (this.value.isPresent()) {
             return true;
         }
-        return needValueForHasNext > 0
+        return this.needValueForHasNext > 0
                 ? tryGetNext()
                 : straightHasNext();
     }
     @Override protected void internalNext(Out<E> value) {
-        if (!value.isPresent()) {
+        if (!this.value.isPresent()) {
             final boolean gotten = tryGetNext();
             assert gotten; // should always be true;
         }
@@ -573,10 +581,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         this.value.clear();
     }    
     @Override protected void cleanup() {
-        pipeline.clear();
-        multiPipeline.clear();
-        sources.clear();
-        value.clear();
+        this.pipeline.clear();
+        this.multiPipeline.clear();
+        this.sources.clear();
+        this.value.clear();
     }
 
     /**
@@ -587,10 +595,10 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return true if there are more elements, false otherwise.
      */
     protected final boolean straightHasNext() {
-        while(!sources.isEmpty() && !sources.peekFirst().hasNext()) {
+        while(!this.sources.isEmpty() && !this.sources.peekFirst().hasNext()) {
             dequeueSourceWithProcessors();
         }
-        return !sources.isEmpty();
+        return !this.sources.isEmpty();
     }
 
     /**
@@ -599,17 +607,17 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the next value.
      */
     protected final boolean tryGetNext() {
-        final InOut<?> val = new InOut();
+        final In<?> inputValue = new InOut();
         final Out<AbstractPipeProcessor> processor = new InOut<>();
         final Out<Boolean> nextOnSameSourceOnNoValue = new InOut<>();
         while(true) {
-            val.clear();
-            if (!tryPipelineIn(val, processor)) {
+            inputValue.clear();
+            if (!tryPipelineIn(inputValue.castOut(), processor)) {
                 return false;
             }
-            if (tryPipelineOut(val,
-                               processor.get(),
-                               value,
+            if (tryPipelineOut(inputValue,
+                               processor.castIn(),
+                               this.value,
                                nextOnSameSourceOnNoValue)) {
                 return true;
             }
@@ -631,7 +639,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         return this;
     }
     protected final void addSourceLast(PipeSource<E> source) {
-        sources.addLast(source);
+        this.sources.addLast(source);
     }
     @Override
     public Enumerator<E> filter(Predicate<? super E> predicate) {
@@ -641,7 +649,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     public <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
         return enqueueProcessor(new FlatMapPipeProcessor(mapper,
-                                                         Value.Type.GENERIC));
+                                                         Value.GENERIC));
     }
     @Override
     public <X> Enumerator<X> map(
@@ -665,11 +673,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
-        return enqueueProcessor(new WhilePipeProcessor(predicate));
+        return enqueueProcessor(
+                new WhilePipeProcessor(new ValuePredicate(predicate)));
     }
     @Override
     public Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        return enqueueProcessor(new SkipWhilePipeProcessor(predicate));
+        return enqueueProcessor(
+                new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
     }
     @Override
     public Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
@@ -711,9 +721,9 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public PipeEnumerator<E> setSource(Iterator<?> elements) {
         final GenericPipeSource<?> source = GenericPipeSource.of(elements);
-        sources.addFirst(source);
+        this.sources.addFirst(source);
         final Iterator<AbstractPipeProcessor<?,?>> pipelineIterator =
-                pipeline.iterator();
+                this.pipeline.iterator();
         while(pipelineIterator.hasNext()) {
             final AbstractPipeProcessor processor = pipelineIterator.next();
             if (processor.getSource() != null) {
@@ -753,8 +763,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public PipeEnumerator<E> reversedFlatMap(
         Function<?, ? extends Iterator<?>> mapper,
-        Value.Type                         type) {
-        return pushFrontProcessor(new FlatMapPipeProcessor(mapper, type));
+        int                                valueType) {
+        return pushFrontProcessor(new FlatMapPipeProcessor(mapper, valueType));
     }
 
     /**
@@ -799,7 +809,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedTakeWhile(Predicate<?> predicate) {
-        return pushFrontProcessor(new WhilePipeProcessor(predicate));
+        return pushFrontProcessor(
+                new WhilePipeProcessor(new ValuePredicate(predicate)));
     }
 
     /**
@@ -809,7 +820,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedSkipWhile(Predicate<?> predicate) {
-        return pushFrontProcessor(new SkipWhilePipeProcessor(predicate));
+        return pushFrontProcessor(
+                new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
     }
 
     /**

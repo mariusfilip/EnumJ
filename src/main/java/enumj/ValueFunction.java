@@ -23,6 +23,7 @@
  */
 package enumj;
 
+import java.util.function.Consumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
@@ -32,44 +33,56 @@ final class ValueFunction<T,R> implements Function<In<T>,Out<R>> {
 
     private final Out<R> out = new InOut<>();
 
-    private Value.Type          type;
+    private int                 type;
     private Function<T,R>       function;
     private IntUnaryOperator    intFunction;
     private LongUnaryOperator   longFunction;
     private DoubleUnaryOperator doubleFunction;
+    
+    private final Consumer<In<T>> consumer = this::consume;
+    private final Consumer<In<T>> intConsumer = this::consumeInt;
+    private final Consumer<In<T>> longConsumer = this::consumeLong;
+    private final Consumer<In<T>> doubleConsumer = this::consumeDouble;
+    private final Consumer[]      consumers = {
+        consumer,
+        intConsumer,
+        longConsumer,
+        doubleConsumer
+    };
 
     public ValueFunction(Function<T,R> function) {
-        this.type = Value.Type.GENERIC;
+        this.type = Value.GENERIC;
         this.function = function;
     }
     public ValueFunction(IntUnaryOperator intFunction) {
-        this.type = Value.Type.INT;
+        this.type = Value.INT;
         this.intFunction = intFunction;
     }
     public ValueFunction(LongUnaryOperator longFunction) {
-        this.type = Value.Type.LONG;
+        this.type = Value.LONG;
         this.longFunction = longFunction;
     }
     public ValueFunction(DoubleUnaryOperator doubleFunction) {
-        this.type = Value.Type.DOUBLE;
+        this.type = Value.DOUBLE;
         this.doubleFunction = doubleFunction;
     }
 
     @Override
     public Out<R> apply(In<T> value) {
-        switch(type) {
-            case GENERIC:
-                out.set(function.apply(value.get())); break;
-            case INT:
-                out.setInt(intFunction.applyAsInt(value.getInt())); break;
-            case LONG:
-                out.setLong(longFunction.applyAsLong(value.getLong())); break;
-            case DOUBLE:
-                out.setDouble(doubleFunction.applyAsDouble(value.getDouble()));
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
+        consumers[type].accept(value);
         return out;
+    }
+    
+    private void consume(In<T> value) {
+        out.set(function.apply(value.get()));
+    }
+    private void consumeInt(In<T> value) {
+        out.setInt(intFunction.applyAsInt(value.getInt()));
+    }
+    private void consumeLong(In<T> value) {
+        out.setLong(longFunction.applyAsLong(value.getLong()));
+    }
+    private void consumeDouble(In<T> value) {
+        out.setDouble(doubleFunction.applyAsDouble(value.getDouble()));
     }
 }

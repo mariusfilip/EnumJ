@@ -40,13 +40,21 @@ import java.util.function.Function;
 final class FlatMapPipeProcessor<TIn,TOut>
             extends AbstractPipeMultiProcessor<TIn,TOut> {
 
-    private final Value.Type                   type;
+    private final int                          type;
     private final Function<TIn,Iterator<TOut>> mapper;
     private final Nullable<TOut>               value;
-    private       Iterator<TOut>               iterator;
-    private       PrimitiveIterator.OfInt      intIterator;
-    private       PrimitiveIterator.OfLong     longIterator;
-    private       PrimitiveIterator.OfDouble   doubleIterator;
+    private final Iterator[]                   iterators;
+
+    private final Consumer<Iterator> get       = this::getNextValue;
+    private final Consumer<Iterator> getInt    = this::getNextIntValue;
+    private final Consumer<Iterator> getLong   = this::getNextLongValue;
+    private final Consumer<Iterator> getDouble = this::getNextDoubleValue;
+    private final Consumer[] getters = {
+        get,
+        getInt,
+        getLong,
+        getDouble
+    };
 
     /**
      * Constructs a {@code FlatMapPipeProcessor} instances.
@@ -58,11 +66,11 @@ final class FlatMapPipeProcessor<TIn,TOut>
      * sub-iterators.
      */
     public FlatMapPipeProcessor(Function<TIn,Iterator<TOut>> mapper,
-                                Value.Type                   type) {
+                                int                          valueType) {
         super(true, true);
-        this.type = type;
+        this.type = valueType;
         this.mapper = mapper;
-        this.iterator = null;
+        this.iterators = new Iterator[Value.DOUBLE-Value.GENERIC+1];
         this.value = Nullable.empty();
     }
 
@@ -70,13 +78,12 @@ final class FlatMapPipeProcessor<TIn,TOut>
         return !value.isPresent();
     }
     @Override public void processInputValue(In<TIn> value) {
-        getIt(value.get());
-        if (this.iterator != null) {
-            if (this.iterator.hasNext()) {
-                getNextValue();
-            } else {
-                this.value.clear();
-            }
+        this.clearIt();
+        final Iterator<TOut> it = this.iterators[this.type]
+                                = this.mapper.apply(value.get());
+        if (it != null && it.hasNext()) {
+            final Consumer<Iterator<TOut>> getter = this.getters[this.type];
+            getter.accept(it);
         } else {
             this.value.clear();
         }
@@ -86,58 +93,38 @@ final class FlatMapPipeProcessor<TIn,TOut>
     }
     @Override public void getOutputValue(Out<TOut> value) {
         value.setValue(this.value);
-        if (iterator.hasNext()) {
-            getNextValue();
+        final Iterator<TOut> it = this.iterators[this.type];
+        if (it.hasNext()) {
+            final Consumer<Iterator<TOut>> getter = getters[this.type];
+            getter.accept(it);
         } else {
-            value.clear();
-            clearIt();
+            this.value.clear();
+            this.clearIt();
         }
     }
     @Override public boolean isInactive() {
         return false;
     }
-    
-    private void getIt(TIn value) {
-        iterator = mapper.apply(value);
-        switch(type) {
-            case INT:
-                intIterator = (PrimitiveIterator.OfInt)iterator;
-                break;
-            case LONG:
-                longIterator = (PrimitiveIterator.OfLong)iterator;
-                break;
-            case DOUBLE:
-                doubleIterator = (PrimitiveIterator.OfDouble)iterator;
-                break;
-            default:
-                intIterator = null;
-                longIterator = null;
-                doubleIterator = null;
-                break;
-        }
-    }
+
     private void clearIt() {
-        iterator = null;
-        intIterator = null;
-        longIterator = null;
-        doubleIterator = null;
-    }
-    private void getNextValue() {
-        switch(type) {
-            case GENERIC:
-                value.set(iterator.next());
-                break;
-            case INT:
-                value.setInt(intIterator.nextInt());
-                break;
-            case LONG:
-                value.setLong(longIterator.nextLong());
-                break;
-            case DOUBLE:
-                value.setDouble(doubleIterator.nextDouble());
-                break;
-            default:
-                assert false;
+        for(int i=0; i<this.iterators.length; ++i) {
+            this.iterators[i] = null;
         }
+    }
+    private void getNextValue(Iterator it) {
+        final Iterator<TOut> iter = (Iterator<TOut>)it;
+        this.value.set(iter.next());
+    }
+    private void getNextIntValue(Iterator it) {
+        final PrimitiveIterator.OfInt iter = (PrimitiveIterator.OfInt)it;
+        this.value.setInt(iter.nextInt());
+    }
+    private void getNextLongValue(Iterator it) {
+        final PrimitiveIterator.OfLong iter = (PrimitiveIterator.OfLong)it;
+        this.value.setLong(iter.nextLong());
+    }
+    private void getNextDoubleValue(Iterator it) {
+        final PrimitiveIterator.OfDouble iter = (PrimitiveIterator.OfDouble)it;
+        this.value.setDouble(iter.nextDouble());
     }
 }

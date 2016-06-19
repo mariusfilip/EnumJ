@@ -87,7 +87,7 @@ public class PipeEnumeratorTest {
         final ThrowingFirstPipeEnumerator<Integer> throwEn =
                 new ThrowingFirstPipeEnumerator<>(pipe);
         assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x),
-                                              Value.Type.GENERIC));
+                                              Value.GENERIC));
     }
 
     @Test(expected=IllegalStateException.class)
@@ -97,7 +97,7 @@ public class PipeEnumeratorTest {
         final ThrowingMultiFirstPipeEnumerator<Integer> throwEn =
                 new ThrowingMultiFirstPipeEnumerator<>(pipe);
         assertNotNull(throwEn.reversedFlatMap(x -> Enumerator.on(x),
-                                              Value.Type.GENERIC));
+                                              Value.GENERIC));
     }
 
     class ThrowingMultiLastPipeEnumerator<E> extends PipeEnumerator<E> {
@@ -159,11 +159,12 @@ public class PipeEnumeratorTest {
 
         FailingMultiPipeProcessor() {
             super(true,true);
+            this.value = new InOut<>();
         }
 
         @Override
         public boolean needsValue() {
-            return value == null;
+            return !this.value.isPresent();
         }
         @Override
         public void processInputValue(In<TIn> value) {
@@ -328,8 +329,8 @@ public class PipeEnumeratorTest {
                 .reversedFlatMap(x -> {
                     final Integer y = (Integer)x;
                     return Enumerator.on(y, y+1);
-                }, Value.Type.GENERIC)
-                .reversedFlatMap(x -> Enumerator.on(x), Value.Type.GENERIC);
+                }, Value.GENERIC)
+                .reversedFlatMap(x -> Enumerator.on(x), Value.GENERIC);
         assertTrue(pipe.elementsEqual(
                 Enumerator.on(1, 2, 3, 4, 5, 6)));
     }
@@ -343,9 +344,9 @@ public class PipeEnumeratorTest {
                 .reversedFlatMap(x -> {
                     final Integer y = (Integer)x;
                     return Enumerator.on(y, y+1);
-                }, Value.Type.GENERIC)
+                }, Value.GENERIC)
                 .reversedMap(new ValueFunction(IntUnaryOperator.identity()))
-                .reversedFlatMap(x -> Enumerator.on(x), Value.Type.GENERIC)
+                .reversedFlatMap(x -> Enumerator.on(x), Value.GENERIC)
                 .reversedMap(new ValueFunction(IntUnaryOperator.identity()));
         assertTrue(pipe.elementsEqual(
                 Enumerator.on(1, 2, 3, 4, 5, 6)));

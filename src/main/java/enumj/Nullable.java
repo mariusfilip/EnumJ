@@ -105,7 +105,7 @@ public final class Nullable<T> implements Value<T> {
         this.value.setValue(value);
     }
 
-    @Override public Type getType() { return value.getType(); }
+    @Override public int getType() { return value.getType(); }
     @Override public void clear() { value.clear(); }
 
     /**

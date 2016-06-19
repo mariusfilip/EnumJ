@@ -37,9 +37,9 @@ import java.util.function.Function;
  */
 final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
 
-    private ValueFunction<T,R>             mapper;
-    private LinkedList<ValueFunction<?,?>> mappers;
-    private InOut<R>                       value;
+    private       ValueFunction<T,R>             mapper;
+    private       LinkedList<ValueFunction<?,?>> mappers;
+    private final InOut<R>                       value;
 
     /**
      * Constructs a {@code MapPipeProcessor} instance.
@@ -54,6 +54,8 @@ final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
     public MapPipeProcessor(ValueFunction<T,R> functor) {
         super(false, false);
         mapper = functor;
+        mappers = null;
+        value = new InOut<>();
     }
 
     // ---------------------------------------------------------------------- //
@@ -96,6 +98,7 @@ final class MapPipeProcessor<T,R> extends AbstractPipeProcessor<T,R> {
     }
     @Override public void getOutputValue(Out<R> value) {
         value.setValue(this.value);
+        this.value.clear();
     }
     @Override public boolean isInactive() {
         return false;

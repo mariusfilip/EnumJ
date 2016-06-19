@@ -142,7 +142,7 @@ public class AbstractEnumeratorTest {
     public void testDistinct() {
         System.out.println("distinct");
         assertTrue(Reversible.distinct(Enumerator.on(1, 1), false)
-                                     .elementsEqual(Enumerator.on(1)));
+                             .elementsEqual(Enumerator.on(1)));
         assertTrue(Enumerable.on(1, 1)
                              .distinct()
                              .elementsEqual(Enumerable.on(1)));
