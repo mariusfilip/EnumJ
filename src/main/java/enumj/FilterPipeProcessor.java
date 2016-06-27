@@ -77,25 +77,21 @@ final class FilterPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
     // ---------------------------------------------------------------------- //
 
-    @Override
-    public void processInputValue(In<E> value) {
+    @Override public void processInputValue(In<E> value) {
         this.value.setValue(value);
     }
-    @Override
-    public boolean hasOutputValue() {
+    @Override public boolean hasOutputValue() {
         if (testOutputValue()) {
             return true;
         }
         this.value.clear();
         return false;
     }
-    @Override
-    public void getOutputValue(Out<E> value) {
+    @Override public void getOutputValue(Out<E> value) {
         value.setValue(this.value);
         this.value.clear();
     }
-    @Override
-    public boolean isInactive() {
+    @Override public boolean isInactive() {
         return false;
     }
 

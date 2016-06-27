@@ -23,10 +23,7 @@
  */
 package enumj;
 
-import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
-import java.util.function.LongUnaryOperator;
 import java.util.function.Predicate;
 
 /**
@@ -37,7 +34,7 @@ import java.util.function.Predicate;
  * @see PipeEnumerator
  * @see AbstractPipeMultiProcessor
  */
-abstract class AbstractPipeProcessor<T,R> {
+abstract class AbstractPipeProcessor<T,R> implements Recoverable {
 
     /**
      * Represents whether the pipeline should proceed to the next element
@@ -105,13 +102,15 @@ abstract class AbstractPipeProcessor<T,R> {
      * @throws UnsupportedOperationException {@code next} is being set twice.
      * @see #getNext()
      */
-    public final void setNext(AbstractPipeProcessor<? super R,?> next) {
+    public final void setNext(AbstractPipeProcessor<? super R,?> next)
+                      throws InternalError {
         if (this.next == null) {
             this.next = next;
         } else {
-            throw new UnsupportedOperationException();
+            throw new InternalError();
         }
     }
+    final void clearNext() { this.next = null; }
 
     /**
      * Gets the value of {@code AbstractPipeProcessor.source}.
@@ -131,14 +130,14 @@ abstract class AbstractPipeProcessor<T,R> {
      * @param reference Value for {@link #source}.
      * @see #getSource()
      */
-    public final void setSource(PipeSource reference) {
+    public final void setSource(PipeSource reference) throws InternalError {
         if (source == null) {
             source = reference;
         } else {
-            throw new UnsupportedOperationException();
+            throw new InternalError();
         }
     }
-
+    
     // ---------------------------------------------------------------------- //
 
     /**
@@ -244,7 +243,7 @@ abstract class AbstractPipeProcessor<T,R> {
      * @see #retrieveOutputValue()
      * @see #clearOutputValue()
      */
-    public abstract void    getOutputValue(Out<R> value);    
+    public abstract void    getOutputValue(Out<R> value);
     /**
      * Gets whether the processor does not process any more and the pipeline
      * up to it should be discarded.

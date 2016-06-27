@@ -104,14 +104,15 @@ abstract class AbstractEnumerator<E> implements Enumerator<E>, Recoverable {
     @Override public final Optional<Throwable> getLastError() {
         return Optional.ofNullable(error);
     }
-    @Override public final void recover() {
+    @Override public final boolean recover() {
         if (error != null) {
             try {
-                internalRecovery(error);
+                return internalRecovery(error);
             } finally {
                 error = null;
             }
         }
+        return true;
     }
 
     private boolean safeHasNext() {
@@ -154,7 +155,7 @@ abstract class AbstractEnumerator<E> implements Enumerator<E>, Recoverable {
      * @param value instance of {@link Out} storing the next value.
      */
     protected abstract void internalNext(Out<E> value);
-    protected abstract void internalRecovery(Throwable error);
+    protected abstract boolean internalRecovery(Throwable error);
     /**
      * Cleans up the internals of the current enumerator when enumeration
      * ends.

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Marius Filip.
+ * Copyright 2016 Marius Filip.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,41 +24,28 @@
 package enumj;
 
 /**
- * {@code Enumerator} implementation for arrays.
- *
- * @param <E> Type of enumerated elements.
- * @see Enumerator
+ * Signals an internal error.
  */
-final class ArrayEnumerator<E> extends AbstractEnumerator<E> {
-
-    private E[] source;
-    private int index;
-
+final class InternalError extends Exception {
+    private final Error error;
     /**
-     * Constructs an {@code ArrayEnumerator} that enumerates over the given
-     * array.
-     * <p>
-     * The new {@link ArrayEnumerator} stores the {@code source} array
-     * internally.
-     * </p>
-     * 
-     * @param source Array to enumerate.
+     * Creates an internal error exception with no cause except bad code.
      */
-    public ArrayEnumerator(E[] source) {
-        Checks.ensureNotNull(source, Messages.NULL_ENUMERATOR_SOURCE);
-        this.source = source;
+    public InternalError() { super("Internal error"); error = null; }
+    /**
+     * Creates an internal error for a given cause.
+     * @param cause instance of {@link Throwable} representing the cause of
+     * error.
+     */
+    public InternalError(Error error) {
+        super("Internal error", error);
+        this.error = error;
     }
-
-    @Override protected boolean internalHasNext() {
-        return index < source.length;
-    }
-    @Override protected void internalNext(Out<E> value) {
-        value.set(source[index++]);
-    }
-    @Override protected boolean internalRecovery(Throwable error) {
-        return true;
-    }
-    @Override protected void cleanup() {
-        source = null;
+    /**
+     * Gets the error that caused this internal error.
+     * @return error cause.
+     */
+    public Error getError() {
+        return error;
     }
 }

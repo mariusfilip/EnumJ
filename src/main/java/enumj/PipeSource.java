@@ -34,9 +34,15 @@ abstract class PipeSource<E> extends IteratorEnumerator<E> {
     public final AbstractPipeProcessor<?,?> getFirstProcessor() {
         return firstProcessor;
     }
-    public final void setFirstProcessorIfNone(
+    public final AbstractPipeProcessor<?,?> setFirstProcessorIfNone(
             AbstractPipeProcessor<?,?> processor) {
+        final AbstractPipeProcessor<?,?> result = firstProcessor;
         if (firstProcessor == null) { firstProcessor = processor; }
+        return result;
+    }
+    public final void restoreFirstProcessor(
+            AbstractPipeProcessor<?,?> processor) {
+        this.firstProcessor = processor;
     }
     
     public final void yieldNext(Out<? super E> value) {

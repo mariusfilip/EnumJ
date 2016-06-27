@@ -58,8 +58,9 @@ final class CacheEnumerator<E> extends AbstractEnumerator<E> {
         value.set(cached.get().getElement());
         cached = cached.get().getNextWrapper();
     }
-    @Override protected void internalRecovery(Throwable error) {
+    @Override protected boolean internalRecovery(Throwable error) {
         cached = Optional.empty();
+        return true;
     }
     @Override protected void cleanup() {
         cached = null;

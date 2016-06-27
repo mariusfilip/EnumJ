@@ -110,7 +110,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the current {@link PipeEnumerator}.
      */
     protected <X> Enumerator<X> enqueueProcessor(
-            AbstractPipeProcessor<? super E, ? extends X> processor) {
+            AbstractPipeProcessor<? super E, ? extends X> processor)
+                throws InternalError {
         final AbstractPipeProcessor<?,? extends E> last =
                 (AbstractPipeProcessor)this.pipeline.peekLast();
         safePipelineAddLast(processor);
@@ -118,12 +119,27 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             ++this.needValueForHasNext;
         }
         if (last != null) {
-            last.setNext((AbstractPipeProcessor<E,?>)processor);
+            try {
+                last.setNext((AbstractPipeProcessor<E,?>)processor);
+            } catch(InternalError ex) {
+                --this.needValueForHasNext;
+                this.pipeline.removeLast();
+                throw ex;
+            }
         }
         if (!this.sources.isEmpty()) {
             final PipeSource source = this.sources.getLast();
-            source.setFirstProcessorIfNone(processor);
-            processor.setSource(source);
+            final AbstractPipeProcessor previous =
+                    source.setFirstProcessorIfNone(processor);
+            try {
+                processor.setSource(source);
+            } catch(InternalError ex) {
+                source.restoreFirstProcessor(previous);
+                if (last != null) { last.clearNext(); }
+                --this.needValueForHasNext;
+                this.pipeline.removeLast();
+                throw ex;
+            }
         }
         return (Enumerator<X>)this;
     }
@@ -141,14 +157,21 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the current {@link PipeEnumerator}.
      */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
-            AbstractPipeProcessor<? super X, ?> processor) {
+            AbstractPipeProcessor<? super X, ?> processor)
+                throws InternalError {
         final AbstractPipeProcessor<?,?> first = this.pipeline.peekFirst();
         safePipelineAddFirst(processor);
         if (processor.hasNextNeedsValue) {
             ++this.needValueForHasNext;
         }
         if (first != null) {
-            processor.setNext((AbstractPipeProcessor)first);
+            try {
+                processor.setNext((AbstractPipeProcessor)first);
+            } catch(InternalError ex) {
+                --this.needValueForHasNext;
+                this.pipeline.removeFirst();
+                throw ex;
+            }
         }
         return this;
     }
@@ -168,7 +191,8 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the current {@link PipeEnumerator}.
      */
     protected <X> Enumerator<X> enqueueProcessor(
-            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor)
+                throws InternalError {
         final AbstractPipeProcessor<?,? extends E> last =
                 (AbstractPipeProcessor)this.pipeline.peekLast();
         safeMultiPipelineAddLast(processor);
@@ -176,12 +200,29 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             ++this.needValueForHasNext;
         }
         if (last != null) {
-            last.setNext((AbstractPipeProcessor<E,?>)processor);
+            try {
+                last.setNext((AbstractPipeProcessor<E,?>)processor);
+            } catch(InternalError ex) {
+                --this.needValueForHasNext;
+                this.multiPipeline.removeLast();
+                this.pipeline.removeLast();
+                throw ex;
+            }
         }
         if (!this.sources.isEmpty()) {
             final PipeSource source = this.sources.getLast();
-            source.setFirstProcessorIfNone(processor);
-            processor.setSource(source);
+            final AbstractPipeProcessor previous =
+                    source.setFirstProcessorIfNone(processor);
+            try {
+                processor.setSource(source);
+            } catch(InternalError ex) {
+                source.restoreFirstProcessor(previous);
+                if (last != null) { last.clearNext(); }
+                --this.needValueForHasNext;
+                this.multiPipeline.removeLast();
+                this.pipeline.removeLast();
+                throw ex;
+            }
         }
         return (Enumerator<X>)this;
     }
@@ -199,14 +240,22 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return the current {@link PipeEnumerator}.
      */
     protected <X> PipeEnumerator<E> pushFrontProcessor(
-            AbstractPipeMultiProcessor<? super X, ?> processor) {
+            AbstractPipeMultiProcessor<? super X, ?> processor)
+                throws InternalError {
         final AbstractPipeProcessor<?,?> first = this.pipeline.peekFirst();
         safeMultiPipelineAddFirst(processor);
         if (processor.hasNextNeedsValue) {
             ++this.needValueForHasNext;
         }
         if (first != null) {
-            processor.setNext((AbstractPipeProcessor)first);
+            try {
+                processor.setNext((AbstractPipeProcessor)first);
+            } catch(InternalError ex) {
+                --this.needValueForHasNext;
+                this.multiPipeline.removeFirst();
+                this.pipeline.removeFirst();
+                throw ex;
+            }
         }
         return this;
     }
@@ -220,7 +269,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return mapped {@link Enumerator}.
      */
     protected <X> Enumerator<X> enqueueMapProcessor(
-            ValueFunction<? super E, X> mapper) {
+            ValueFunction<? super E, X> mapper) throws InternalError {
         if (this.pipeline.isEmpty() ||
             !this.pipeline
                  .getLast()
@@ -239,7 +288,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return mapped {@link Enumerator}.
      */
     protected <X> PipeEnumerator<E> pushFrontMapProcessor(
-            ValueFunction<? super X, ?> mapper) {
+            ValueFunction<? super X, ?> mapper) throws InternalError {
         if (this.pipeline.isEmpty()
             || !this.pipeline
                     .getFirst()
@@ -257,7 +306,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return filtered {@link Enumerator}.
      */
     protected Enumerator<E> enqueueFilterProcessor(
-            ValuePredicate<? super E> filter) {
+            ValuePredicate<? super E> filter) throws InternalError {
         if (this.pipeline.isEmpty()
             || !this.pipeline
                     .getLast()
@@ -275,7 +324,7 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return filtered {@link Enumerator}.
      */
     protected PipeEnumerator<E> pushFrontFilterProcessor(
-            ValuePredicate<?> filter) {
+            ValuePredicate<?> filter) throws InternalError {
         if (this.pipeline.isEmpty()
             || !this.pipeline
                     .getFirst()
@@ -297,8 +346,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @param processor {@link AbstractPipeProcessor} to add.
      */
     protected <X> void safePipelineAddLast(
-            AbstractPipeProcessor<? super E, ? extends X> processor) {
-        this.pipeline.addLast(processor);
+            AbstractPipeProcessor<? super E, ? extends X> processor)
+                throws InternalError {
+        try {
+            this.pipeline.addLast(processor);
+        } catch(OutOfMemoryError ex) {
+            throw new InternalError(ex);
+        }
     }
 
     /**
@@ -313,13 +367,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @param processor {@link AbstractPipeMultiProcessor} to add.
      */
     private <X> void safeMultiPipelineAddLast(
-            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor)
+                throws InternalError {
         safePipelineAddLast(processor);
         try {
             multiPipelineAddLast(processor);
-        } catch(Throwable err) {
+        } catch(InternalError ex) {
             this.pipeline.removeLast();
-            throw err;
+            throw ex;
         }
     }
 
@@ -333,8 +388,13 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @param processor {@link AbstractPipeProcessor} to add.
      */
     protected <X> void multiPipelineAddLast(
-            AbstractPipeMultiProcessor<? super E, ? extends X> processor) {
-        this.multiPipeline.addLast(processor);
+            AbstractPipeMultiProcessor<? super E, ? extends X> processor)
+                throws InternalError {
+        try {
+            this.multiPipeline.addLast(processor);
+        } catch(OutOfMemoryError ex) {
+            throw new InternalError(ex);
+        }
     }
 
     /**
@@ -632,7 +692,15 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
 
     // ---------------------------------------------------------------------- //
-
+    
+    private <T> T badResult(InternalError ex) {
+        if (ex.getError() != null) {
+            throw ex.getError();
+        }
+        assert false: "Bad code error";
+        return null;
+    }
+    
     @Override
     public Enumerator<E> concat(Iterator<? extends E> elements) {
         addSourceLast(GenericPipeSource.of((Iterator<E>)elements));
@@ -643,22 +711,38 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     }
     @Override
     public Enumerator<E> filter(Predicate<? super E> predicate) {
-        return enqueueFilterProcessor(new ValuePredicate(predicate));
+        try {
+            return enqueueFilterProcessor(new ValuePredicate(predicate));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
     @Override
     public <R> Enumerator<R> flatMap(
             Function<? super E, ? extends Iterator<? extends R>> mapper) {
-        return enqueueProcessor(new FlatMapPipeProcessor(mapper,
-                                                         Value.GENERIC));
+        try {
+            return enqueueProcessor(
+                    new FlatMapPipeProcessor(mapper, Value.GENERIC));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
     @Override
     public <X> Enumerator<X> map(
             Function<? super E, ? extends X> mapper) {
-        return enqueueMapProcessor(new ValueFunction(mapper));
+        try {
+            return enqueueMapProcessor(new ValueFunction(mapper));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
     @Override
     public Enumerator<E> limit(long maxSize) {
-        return enqueueProcessor(new LimitPipeProcessor(maxSize));
+        try {
+            return enqueueProcessor(new LimitPipeProcessor(maxSize));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
     @Override
     public Enumerator<E> prepend(Iterator<? extends E> elements) {
@@ -669,17 +753,37 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (n == 0) {
             return this;
         }
-        return enqueueProcessor(new SkipPipeProcessor(n));
+        try {
+            return enqueueProcessor(new SkipPipeProcessor(n));
+        } catch(InternalError ex) {
+            if (ex.getError() != null) {
+                throw ex.getError();
+            }
+            assert false: "Internal error";
+            return null;
+        }
     }
     @Override
     public Enumerator<E> takeWhile(Predicate<? super E> predicate) {
-        return enqueueProcessor(
-                new WhilePipeProcessor(new ValuePredicate(predicate)));
+        try {
+            return enqueueProcessor(
+                    new WhilePipeProcessor(new ValuePredicate(predicate)));
+        } catch(InternalError ex) {
+            if (ex.getError() != null) {
+                throw ex.getError();
+            }
+            assert false: "Internal error";
+            return null;
+        }
     }
     @Override
     public Enumerator<E> skipWhile(Predicate<? super E> predicate) {
-        return enqueueProcessor(
-                new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
+        try {
+            return enqueueProcessor(
+                    new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
     @Override
     public Enumerator<Optional<E>[]> zipAll(Iterator<? extends E> first,
@@ -701,9 +805,16 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
     public Enumerator<Optional<E>[]> zipAll(Iterator<E> first,
                                             List<Iterator<E>> rest) {
         PipeEnumerator<Optional<E>> optionalPipe =
-                (PipeEnumerator<Optional<E>>)map(e -> Optional.of(e))
-                .concat(Enumerator.of(() -> Optional.of(Optional.empty())));
-        return optionalPipe.enqueueProcessor(new ZipPipeProcessor(first, rest));
+                (PipeEnumerator<Optional<E>>)
+                this.map(e -> Optional.of(e))
+                    .concat(Enumerator.of(
+                            () -> Optional.of(Optional.empty())));
+        try {
+            return optionalPipe.enqueueProcessor(
+                    new ZipPipeProcessor(first, rest));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     // ---------------------------------------------------------------------- //
@@ -729,8 +840,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
             if (processor.getSource() != null) {
                 break;
             }
-            source.setFirstProcessorIfNone(processor);
-            processor.setSource(source);
+            final AbstractPipeProcessor previous =
+                    source.setFirstProcessorIfNone(processor);
+            try {
+                processor.setSource(source);
+            } catch(InternalError ex) {
+                source.restoreFirstProcessor(previous);
+                return badResult(ex);
+            }
         }
         return this;
     }
@@ -752,7 +869,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedFilter(ValuePredicate<?> predicate) {
-        return pushFrontFilterProcessor(predicate);
+        try {
+            return pushFrontFilterProcessor(predicate);
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -762,9 +883,14 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedFlatMap(
-        Function<?, ? extends Iterator<?>> mapper,
-        int                                valueType) {
-        return pushFrontProcessor(new FlatMapPipeProcessor(mapper, valueType));
+            Function<?, ? extends Iterator<?>> mapper,
+            int                                valueType) {
+        try {
+            return pushFrontProcessor(
+                    new FlatMapPipeProcessor(mapper, valueType));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -776,7 +902,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public <X> PipeEnumerator<E> reversedMap(
             ValueFunction<? super X, ?> mapper) {
-        return pushFrontMapProcessor(mapper);
+        try {
+            return pushFrontMapProcessor(mapper);
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -786,7 +916,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public Enumerator<E> reversedLimit(long maxSize) {
-        return pushFrontProcessor(new LimitPipeProcessor(maxSize));
+        try {
+            return pushFrontProcessor(new LimitPipeProcessor(maxSize));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -799,7 +933,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
         if (n == 0) {
             return this;
         }
-        return pushFrontProcessor(new SkipPipeProcessor(n));
+        try {
+            return pushFrontProcessor(new SkipPipeProcessor(n));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -809,8 +947,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedTakeWhile(Predicate<?> predicate) {
-        return pushFrontProcessor(
-                new WhilePipeProcessor(new ValuePredicate(predicate)));
+        try {
+            return pushFrontProcessor(
+                    new WhilePipeProcessor(new ValuePredicate(predicate)));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -820,8 +962,12 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      * @return this {@link PipeEnumerator}.
      */
     public PipeEnumerator<E> reversedSkipWhile(Predicate<?> predicate) {
-        return pushFrontProcessor(
-                new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
+        try {
+            return pushFrontProcessor(
+                    new SkipWhilePipeProcessor(new ValuePredicate(predicate)));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
     }
 
     /**
@@ -833,7 +979,11 @@ class PipeEnumerator<E> extends AbstractEnumerator<E> {
      */
     public PipeEnumerator<E> reversedZipAll(Iterator<?> first,
                                             List<Iterator<?>> rest) {
-        pushFrontProcessor(new ZipPipeProcessor(first, rest));
+        try {
+            pushFrontProcessor(new ZipPipeProcessor(first, rest));
+        } catch(InternalError ex) {
+            return badResult(ex);
+        }
         reversedConcat(Enumerator.of(() -> Optional.of(Optional.empty())));
         final Function<E,Optional<E>> fun = Optional::of;
         return reversedMap(new ValueFunction<>(fun));

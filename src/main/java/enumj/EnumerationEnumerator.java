@@ -57,8 +57,9 @@ final class EnumerationEnumerator<E> extends AbstractEnumerator<E> {
     @Override protected void internalNext(Out<E> value) {
         value.set(source.nextElement());
     }
-    @Override protected void internalRecovery(Throwable error) {
+    @Override protected boolean internalRecovery(Throwable error) {
         source = null;
+        return true;
     }
     @Override protected void cleanup() {
         source = null;

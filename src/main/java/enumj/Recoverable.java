@@ -33,6 +33,15 @@ import java.util.Optional;
  * </p>
  */
 public interface Recoverable {
+    /**
+     * Gets the last error, if any.
+     * @return optional instance of {@link Throwable} representing the last
+     * raised error.
+     */
     public Optional<Throwable> getLastError();
-    public void                recover();
+    /**
+     * Recovers the current object from error, if possible.
+     * @return true if recovery was successful, false otherwise.
+     */
+    public boolean             recover();
 }

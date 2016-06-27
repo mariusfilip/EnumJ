@@ -107,9 +107,10 @@ final class ChoiceEnumerator<E> extends AbstractEnumerator<E> {
         value.setValue(this.value);
         this.value.clear();
     }
-    @Override protected void internalRecovery(Throwable error) {
+    @Override protected boolean internalRecovery(Throwable error) {
         this.value.clear();
         this.sources.clear();
+        return true;
     }
     @Override protected void cleanup() {
         this.indexSupplier = null;
