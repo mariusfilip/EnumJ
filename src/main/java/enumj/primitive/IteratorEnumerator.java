@@ -26,12 +26,12 @@ package enumj.primitive;
 import java.util.PrimitiveIterator;
 
 final class IteratorEnumerator {    
-    public static final class OfInt extends AbstractIntEnumerator {
+    public static class OfInt extends AbstractIntEnumerator {
         
         private PrimitiveIterator.OfInt source;
         private int                     value;
         
-        private OfInt(PrimitiveIterator.OfInt source) {
+        protected OfInt(PrimitiveIterator.OfInt source) {
             this.source = source;
         }
         @Override
@@ -49,12 +49,12 @@ final class IteratorEnumerator {
         @Override
         protected final void cleanup() { source = null; }
     }
-    public static final class OfLong extends AbstractLongEnumerator {
+    public static class OfLong extends AbstractLongEnumerator {
         
         private PrimitiveIterator.OfLong source;
         private long                     value;
         
-        private OfLong(PrimitiveIterator.OfLong source) {
+        protected OfLong(PrimitiveIterator.OfLong source) {
             this.source = source;
         }
         @Override
@@ -72,12 +72,12 @@ final class IteratorEnumerator {
         @Override
         protected final void cleanup() { source = null; }
     }
-    public static final class OfDouble extends AbstractDoubleEnumerator {
+    public static class OfDouble extends AbstractDoubleEnumerator {
         
         private PrimitiveIterator.OfDouble source;
         private double                     value;
         
-        private OfDouble(PrimitiveIterator.OfDouble source) {
+        protected OfDouble(PrimitiveIterator.OfDouble source) {
             this.source = source;
         }
         @Override
