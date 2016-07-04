@@ -52,17 +52,12 @@ final class SkipPipeProcessor<E> extends AbstractPipeProcessor<E,E> {
 
     @Override
     public void processInputValue(E value) {
-        if (n == 0) {
-            this.value = value;
-        }
+        if (n == 0) { this.value = value; }
     }
     @Override
     public boolean hasOutputValue() {
-        if (n == 0) {
-            return true;
-        }
-        --n;
-        return false;
+        if (n == 0) { return true; }
+        --n; return false;
     }
     @Override
     protected E retrieveOutputValue() {

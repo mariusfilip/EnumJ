@@ -27,20 +27,21 @@ import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableLong;
 
-final class LimitPipeProcessor {
+final class SkipPipeProcessor {
 
-    private long size;
+    private long n;
 
-    private LimitPipeProcessor(long maxSize) {
-        this.size = maxSize;
+    private SkipPipeProcessor(long n) {
+        this.n = n;
     }
 
     private void processInputValue(Runnable setter) {
-        if (this.size > 0) { setter.run(); }
+        if (this.n == 0) { setter.run(); }
     }
-    private boolean hasOutputValue() { return this.size > 0; }
-    private void retrieveOutputValue() { --this.size; }
-    private boolean isInactive() { return this.size == 0; }
+    private boolean hasOutputValue() {
+        if (n == 0) { return true; }
+        --n; return false;
+    }
 
     // ---------------------------------------------------------------------- //
 
@@ -51,21 +52,18 @@ final class LimitPipeProcessor {
         private OfInt() { super(false, true); }
 
         @Override public final void processInputValue(int value) {
-            LimitPipeProcessor.this.processInputValue(() -> {
+            SkipPipeProcessor.this.processInputValue(() -> {
                 this.value.setValue(value);
             });
         }
         @Override public final boolean hasOutputValue() {
-            return LimitPipeProcessor.this.hasOutputValue();
+            return SkipPipeProcessor.this.hasOutputValue();
         }
         @Override protected final int retrieveIntOutputValue() {
-            LimitPipeProcessor.this.retrieveOutputValue();
             return value.intValue();
         }
         @Override protected final void clearOutputValue() {}
-        @Override public final boolean isInactive() {
-            return LimitPipeProcessor.this.isInactive();
-        }
+        @Override public final boolean isInactive() { return false; }
     }
     public final class OfLong extends AbstractPipeProcessor.OfLong {
 
@@ -74,21 +72,18 @@ final class LimitPipeProcessor {
         private OfLong() { super(false, true); }
         
         @Override public final void processInputValue(long value) {
-            LimitPipeProcessor.this.processInputValue(() -> {
+            SkipPipeProcessor.this.processInputValue(() -> {
                 this.value.setValue(value);
             });
         }
         @Override public final boolean hasOutputValue() {
-            return LimitPipeProcessor.this.hasOutputValue();
+            return SkipPipeProcessor.this.hasOutputValue();
         }
         @Override protected final long retrieveLongOutputValue() {
-            LimitPipeProcessor.this.retrieveOutputValue();
             return value.longValue();
         }
         @Override protected final void clearOutputValue() {}
-        @Override public final boolean isInactive() {
-            return LimitPipeProcessor.this.isInactive();
-        }
+        @Override public final boolean isInactive() { return false; }
     }
     public final class OfDouble extends AbstractPipeProcessor.OfDouble {
 
@@ -97,32 +92,29 @@ final class LimitPipeProcessor {
         private OfDouble() { super(false, true); }
 
         @Override public final void processInputValue(double value) {
-            LimitPipeProcessor.this.processInputValue(() -> {
+            SkipPipeProcessor.this.processInputValue(() -> {
                 this.value.setValue(value);
             });
         }
         @Override public final boolean hasOutputValue() {
-            return LimitPipeProcessor.this.hasOutputValue();
+            return SkipPipeProcessor.this.hasOutputValue();
         }
         @Override protected final double retrieveDoubleOutputValue() {
-            LimitPipeProcessor.this.retrieveOutputValue();
             return value.doubleValue();
         }
         @Override protected final void clearOutputValue() {}
-        @Override public final boolean isInactive() {
-            return LimitPipeProcessor.this.isInactive();
-        }
+        @Override public final boolean isInactive() { return false; }
     }
 
     // ---------------------------------------------------------------------- //
 
-    public static OfInt ofInt(long maxSize) {
-        return (new LimitPipeProcessor(maxSize)).new OfInt();
+    public static OfInt ofInt(long n) {
+        return (new SkipPipeProcessor(n)).new OfInt();
     }
-    public static OfLong ofLong(long maxSize) {
-        return (new LimitPipeProcessor(maxSize)).new OfLong();
+    public static OfLong ofLong(long n) {
+        return (new SkipPipeProcessor(n)).new OfLong();
     }
-    public static OfDouble ofDouble(long maxSize) {
-        return (new LimitPipeProcessor(maxSize)).new OfDouble();
+    public static OfDouble ofDouble(long n) {
+        return (new SkipPipeProcessor(n)).new OfDouble();
     }
 }
